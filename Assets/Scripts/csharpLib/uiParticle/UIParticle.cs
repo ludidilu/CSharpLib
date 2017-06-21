@@ -6,7 +6,7 @@ using publicTools;
 public class UIParticle : Graphic
 {
 
-    private static readonly Vector4 uv = new Vector4(0, 0, 1, 1);
+    private static Mesh quadMesh;
 
     private ParticleSystem ps;
 
@@ -16,29 +16,33 @@ public class UIParticle : Graphic
 
     private float fix;
 
-    private UIVertex[] vertex;
+    private UIVertex[] vertexPool;
 
     private Camera m_camera;
 
     private Vector2 canvasRectSizeDelta;
 
-    void Start()
+    private Mesh mesh;
+
+    protected override void Start()
     {
 
-        canvasRectSizeDelta = (canvas.transform as RectTransform).sizeDelta;
+        base.Start();
+
+        m_camera = canvas.worldCamera;
+
+        canvasRectSizeDelta = (rectTransform.root as RectTransform).sizeDelta;
 
         Vector2 pos0 = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, new Vector3(0, 0, 0));
 
         Vector2 pos1 = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, new Vector3(1, 0, 0));
 
-        fix = Mathf.Abs(pos0.x - pos1.x) * 0.5f;
+        fix = Mathf.Abs(pos0.x - pos1.x);
     }
 
     protected override void Awake()
     {
         base.Awake();
-
-        m_camera = canvas.worldCamera;
 
         ps = GetComponent<ParticleSystem>();
 
@@ -46,11 +50,45 @@ public class UIParticle : Graphic
 
         p = new ParticleSystem.Particle[ps.maxParticles];
 
-        vertex = new UIVertex[4];
-
         base.raycastTarget = false;
 
         psr.enabled = false;
+
+        if (psr.renderMode == ParticleSystemRenderMode.Mesh)
+        {
+            mesh = psr.mesh;
+
+            vertexPool = new UIVertex[mesh.vertexCount];
+        }
+        else
+        {
+            if (quadMesh == null)
+            {
+                quadMesh = new Mesh();
+
+                Vector3[] vertex = new Vector3[4];
+
+                Vector2[] uv = new Vector2[4];
+
+                vertex[0] = new Vector3(-0.5f, -0.5f, 0);
+                vertex[1] = new Vector3(-0.5f, 0.5f, 0);
+                vertex[2] = new Vector3(0.5f, 0.5f, 0);
+                vertex[3] = new Vector3(0.5f, -0.5f, 0);
+
+                uv[0] = new Vector2(0, 0);
+                uv[1] = new Vector2(0, 1);
+                uv[2] = new Vector2(1, 1);
+                uv[3] = new Vector2(1, 0);
+
+                quadMesh.vertices = vertex;
+
+                quadMesh.uv = uv;
+            }
+
+            mesh = quadMesh;
+
+            vertexPool = new UIVertex[4];
+        }
     }
 
     public override Material material
@@ -112,107 +150,39 @@ public class UIParticle : Graphic
 
         for (int i = 0; i < num; i++)
         {
-
             ParticleSystem.Particle pp = p[i];
 
-            Vector2 size = pp.GetCurrentSize3D(ps);
+            Vector3 size = pp.GetCurrentSize3D(ps);
 
             Color color = pp.GetCurrentColor(ps);
 
-            if(ps.scalingMode == ParticleSystemScalingMode.Local)
+            Vector2 pos;
+
+            if (ps.scalingMode == ParticleSystemScalingMode.Hierarchy)
+            {
+                pos = pp.position;
+            }
+            else
             {
                 size = size * fix;
 
-                Vector2 pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
-
-                UIVertex v = UIVertex.simpleVert;
-
-                v.color = color;
-
-                v.position = new Vector2(pos.x - size.x, pos.y - size.y);
-
-                v.uv0 = new Vector2(uv.x, uv.y);
-
-                vertex[0] = v;
-
-                v = UIVertex.simpleVert;
-
-                v.color = color;
-
-                v.position = new Vector2(pos.x - size.x, pos.y + size.y);
-
-                v.uv0 = new Vector2(uv.x, uv.w);
-
-                vertex[1] = v;
-
-                v = UIVertex.simpleVert;
-
-                v.color = color;
-
-                v.position = new Vector2(pos.x + size.x, pos.y + size.y);
-
-                v.uv0 = new Vector2(uv.z, uv.w);
-
-                vertex[2] = v;
-
-                v = UIVertex.simpleVert;
-
-                v.color = color;
-
-                v.position = new Vector2(pos.x + size.x, pos.y - size.y);
-
-                v.uv0 = new Vector2(uv.z, uv.y);
-
-                vertex[3] = v;
+                pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
             }
-            else if(ps.scalingMode == ParticleSystemScalingMode.Hierarchy)
+
+            for (int m = 0; m < mesh.vertexCount; m++)
             {
-                size = size * 0.5f;
-
-                Vector2 pos = pp.position;
-
                 UIVertex v = UIVertex.simpleVert;
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x - size.x, pos.y - size.y);
+                v.position = new Vector2(pos.x + mesh.vertices[m].x * size.x, pos.y + mesh.vertices[m].y * size.y);
 
-                v.uv0 = new Vector2(uv.x, uv.y);
+                v.uv0 = mesh.uv[m];
 
-                vertex[0] = v;
-
-                v = UIVertex.simpleVert;
-
-                v.color = color;
-
-                v.position = new Vector2(pos.x - size.x, pos.y + size.y);
-
-                v.uv0 = new Vector2(uv.x, uv.w);
-
-                vertex[1] = v;
-
-                v = UIVertex.simpleVert;
-
-                v.color = color;
-
-                v.position = new Vector2(pos.x + size.x, pos.y + size.y);
-
-                v.uv0 = new Vector2(uv.z, uv.w);
-
-                vertex[2] = v;
-
-                v = UIVertex.simpleVert;
-
-                v.color = color;
-
-                v.position = new Vector2(pos.x + size.x, pos.y - size.y);
-
-                v.uv0 = new Vector2(uv.z, uv.y);
-
-                vertex[3] = v;
+                vertexPool[m] = v;
             }
 
-            vh.AddUIVertexQuad(vertex);
+            vh.AddUIVertexQuad(vertexPool);
         }
     }
 }
