@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
-using System.Collections.Generic;
 using publicTools;
 
 [RequireComponent(typeof(ParticleSystem))]
@@ -121,47 +119,98 @@ public class UIParticle : Graphic
 
             Color color = pp.GetCurrentColor(ps);
 
-            Vector2 pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
+            if(ps.scalingMode == ParticleSystemScalingMode.Local)
+            {
+                size = size * fix;
 
-            UIVertex v = UIVertex.simpleVert;
+                Vector2 pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
 
-            v.color = color;
+                UIVertex v = UIVertex.simpleVert;
 
-            v.position = new Vector2(pos.x - size * fix, pos.y - size * fix);
+                v.color = color;
 
-            v.uv0 = new Vector2(uv.x, uv.y);
+                v.position = new Vector2(pos.x - size, pos.y - size);
 
-            vertex[0] = v;
+                v.uv0 = new Vector2(uv.x, uv.y);
 
-            v = UIVertex.simpleVert;
+                vertex[0] = v;
 
-            v.color = color;
+                v = UIVertex.simpleVert;
 
-            v.position = new Vector2(pos.x - size * fix, pos.y + size * fix);
+                v.color = color;
 
-            v.uv0 = new Vector2(uv.x, uv.w);
+                v.position = new Vector2(pos.x - size, pos.y + size);
 
-            vertex[1] = v;
+                v.uv0 = new Vector2(uv.x, uv.w);
 
-            v = UIVertex.simpleVert;
+                vertex[1] = v;
 
-            v.color = color;
+                v = UIVertex.simpleVert;
 
-            v.position = new Vector2(pos.x + size * fix, pos.y + size * fix);
+                v.color = color;
 
-            v.uv0 = new Vector2(uv.z, uv.w);
+                v.position = new Vector2(pos.x + size, pos.y + size);
 
-            vertex[2] = v;
+                v.uv0 = new Vector2(uv.z, uv.w);
 
-            v = UIVertex.simpleVert;
+                vertex[2] = v;
 
-            v.color = color;
+                v = UIVertex.simpleVert;
 
-            v.position = new Vector2(pos.x + size * fix, pos.y - size * fix);
+                v.color = color;
 
-            v.uv0 = new Vector2(uv.z, uv.y);
+                v.position = new Vector2(pos.x + size, pos.y - size);
 
-            vertex[3] = v;
+                v.uv0 = new Vector2(uv.z, uv.y);
+
+                vertex[3] = v;
+            }
+            else if(ps.scalingMode == ParticleSystemScalingMode.Hierarchy)
+            {
+                size = size * 0.5f;
+
+                Vector2 pos = pp.position;
+
+                UIVertex v = UIVertex.simpleVert;
+
+                v.color = color;
+
+                v.position = new Vector2(pos.x - size, pos.y - size);
+
+                v.uv0 = new Vector2(uv.x, uv.y);
+
+                vertex[0] = v;
+
+                v = UIVertex.simpleVert;
+
+                v.color = color;
+
+                v.position = new Vector2(pos.x - size, pos.y + size);
+
+                v.uv0 = new Vector2(uv.x, uv.w);
+
+                vertex[1] = v;
+
+                v = UIVertex.simpleVert;
+
+                v.color = color;
+
+                v.position = new Vector2(pos.x + size, pos.y + size);
+
+                v.uv0 = new Vector2(uv.z, uv.w);
+
+                vertex[2] = v;
+
+                v = UIVertex.simpleVert;
+
+                v.color = color;
+
+                v.position = new Vector2(pos.x + size, pos.y - size);
+
+                v.uv0 = new Vector2(uv.z, uv.y);
+
+                vertex[3] = v;
+            }
 
             vh.AddUIVertexQuad(vertex);
         }
