@@ -52,13 +52,20 @@ public class UIParticle : Graphic
 
         base.raycastTarget = false;
 
-        psr.enabled = false;
-
         if (psr.renderMode == ParticleSystemRenderMode.Mesh)
         {
             mesh = psr.mesh;
 
-            vertexPool = new UIVertex[mesh.vertexCount];
+            if (mesh == null)
+            {
+                Destroy(this);
+
+                return;
+            }
+            else
+            {
+                vertexPool = new UIVertex[mesh.vertexCount];
+            }
         }
         else
         {
@@ -82,12 +89,37 @@ public class UIParticle : Graphic
 
                 quadMesh.vertices = vertex;
 
+                int[] index = new int[6];
+
+                index[0] = 0;
+
+                index[1] = 1;
+
+                index[2] = 2;
+
+                index[3] = 0;
+
+                index[4] = 2;
+
+                index[5] = 3;
+
+                quadMesh.triangles = index;
+
                 quadMesh.uv = uv;
             }
 
             mesh = quadMesh;
 
             vertexPool = new UIVertex[4];
+        }
+
+        if (!psr.enabled)
+        {
+            enabled = false;
+        }
+        else
+        {
+            psr.enabled = false;
         }
     }
 
@@ -135,7 +167,7 @@ public class UIParticle : Graphic
         if (Application.isPlaying)
         {
 
-//			ps.Simulate (Time.unscaledDeltaTime, false, false);
+            //			ps.Simulate (Time.unscaledDeltaTime, false, false);
 
             SetVerticesDirty();
         }
@@ -180,9 +212,14 @@ public class UIParticle : Graphic
                 v.uv0 = mesh.uv[m];
 
                 vertexPool[m] = v;
+
+                vh.AddVert(v);
             }
 
-            vh.AddUIVertexQuad(vertexPool);
+            for (int m = 0; m < mesh.triangles.Length / 3; m++)
+            {
+                vh.AddTriangle(i * mesh.vertexCount + mesh.triangles[m * 3], i * mesh.vertexCount + mesh.triangles[m * 3 + 1], i * mesh.vertexCount + mesh.triangles[m * 3 + 2]);
+            }
         }
     }
 }
