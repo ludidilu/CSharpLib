@@ -115,7 +115,7 @@ public class UIParticle : Graphic
 
             ParticleSystem.Particle pp = p[i];
 
-            float size = pp.GetCurrentSize(ps);
+            Vector2 size = pp.GetCurrentSize3D(ps);
 
             Color color = pp.GetCurrentColor(ps);
 
@@ -129,7 +129,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x - size, pos.y - size);
+                v.position = new Vector2(pos.x - size.x, pos.y - size.y);
 
                 v.uv0 = new Vector2(uv.x, uv.y);
 
@@ -139,7 +139,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x - size, pos.y + size);
+                v.position = new Vector2(pos.x - size.x, pos.y + size.y);
 
                 v.uv0 = new Vector2(uv.x, uv.w);
 
@@ -149,7 +149,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x + size, pos.y + size);
+                v.position = new Vector2(pos.x + size.x, pos.y + size.y);
 
                 v.uv0 = new Vector2(uv.z, uv.w);
 
@@ -159,7 +159,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x + size, pos.y - size);
+                v.position = new Vector2(pos.x + size.x, pos.y - size.y);
 
                 v.uv0 = new Vector2(uv.z, uv.y);
 
@@ -175,7 +175,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x - size, pos.y - size);
+                v.position = new Vector2(pos.x - size.x, pos.y - size.y);
 
                 v.uv0 = new Vector2(uv.x, uv.y);
 
@@ -185,7 +185,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x - size, pos.y + size);
+                v.position = new Vector2(pos.x - size.x, pos.y + size.y);
 
                 v.uv0 = new Vector2(uv.x, uv.w);
 
@@ -195,7 +195,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x + size, pos.y + size);
+                v.position = new Vector2(pos.x + size.x, pos.y + size.y);
 
                 v.uv0 = new Vector2(uv.z, uv.w);
 
@@ -205,7 +205,7 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x + size, pos.y - size);
+                v.position = new Vector2(pos.x + size.x, pos.y - size.y);
 
                 v.uv0 = new Vector2(uv.z, uv.y);
 
