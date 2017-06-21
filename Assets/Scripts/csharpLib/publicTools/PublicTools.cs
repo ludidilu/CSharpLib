@@ -190,16 +190,16 @@ namespace publicTools
 			}
 		}
 
-		public static Vector3 WorldPositionToCanvasPosition(Camera _worldCamera,RectTransform _canvasRect,Vector3 _worldPosition){
+		public static Vector3 WorldPositionToCanvasPosition(Camera _worldCamera,Vector2 _canvasRectSizeDelta,Vector3 _worldPosition){
 
 			Vector3 screenPos = _worldCamera.WorldToViewportPoint(_worldPosition);
 
-			return new Vector3((screenPos.x * _canvasRect.sizeDelta.x) - (_canvasRect.sizeDelta.x * 0.5f),(screenPos.y * _canvasRect.sizeDelta.y) - (_canvasRect.sizeDelta.y * 0.5f),screenPos.z);
+			return new Vector3((screenPos.x * _canvasRectSizeDelta.x) - (_canvasRectSizeDelta.x * 0.5f),(screenPos.y * _canvasRectSizeDelta.y) - (_canvasRectSizeDelta.y * 0.5f),screenPos.z);
 		}
 
-		public static Vector3 CanvasPositionToWorldPosition(Camera _worldCamea,RectTransform _canvasRect,Vector2 _canvasPosition){
+		public static Vector3 CanvasPositionToWorldPosition(Camera _worldCamea,Vector2 _canvasRectSizeDelta, Vector2 _canvasPosition){
 
-			Vector3 screenPos = new Vector3((_canvasPosition.x + _canvasRect.sizeDelta.x * 0.5f) / _canvasRect.sizeDelta.x,(_canvasPosition.y + _canvasRect.sizeDelta.y * 0.5f) / _canvasRect.sizeDelta.y,0);
+			Vector3 screenPos = new Vector3((_canvasPosition.x + _canvasRectSizeDelta.x * 0.5f) / _canvasRectSizeDelta.x,(_canvasPosition.y + _canvasRectSizeDelta.y * 0.5f) / _canvasRectSizeDelta.y,0);
 
 			return _worldCamea.ViewportToWorldPoint(screenPos);
 		}

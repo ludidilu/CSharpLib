@@ -2,160 +2,168 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using publicTools;
 
 [RequireComponent(typeof(ParticleSystem))]
-public class UIParticle : Graphic {
+public class UIParticle : Graphic
+{
 
-	private static readonly Vector4 uv = new Vector4(0, 0, 1, 1);
+    private static readonly Vector4 uv = new Vector4(0, 0, 1, 1);
 
-	private ParticleSystem ps;
+    private ParticleSystem ps;
 
-	private ParticleSystemRenderer psr;
+    private ParticleSystemRenderer psr;
 
-	private ParticleSystem.Particle[] p;
+    private ParticleSystem.Particle[] p;
 
-	private float fix;
+    private float fix;
 
-	private UIVertex[] vertex;
+    private UIVertex[] vertex;
 
-	private Camera m_camera;
+    private Camera m_camera;
 
-	private Vector2 canvasRect;
+    private Vector2 canvasRectSizeDelta;
 
-	void Start(){
+    void Start()
+    {
 
-		canvasRect = (canvas.transform as RectTransform).sizeDelta;
+        canvasRectSizeDelta = (canvas.transform as RectTransform).sizeDelta;
 
-		Vector2 pos0 = WorldPositionToCanvasPosition (new Vector3(0,0,0));
+        Vector2 pos0 = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, new Vector3(0, 0, 0));
 
-		Vector2 pos1 = WorldPositionToCanvasPosition (new Vector3(1,0,0));
+        Vector2 pos1 = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, new Vector3(1, 0, 0));
 
-		fix = Mathf.Abs (pos0.x - pos1.x) * 0.5f;
-	}
+        fix = Mathf.Abs(pos0.x - pos1.x) * 0.5f;
+    }
 
-	protected override void Awake ()
-	{
-		base.Awake ();
+    protected override void Awake()
+    {
+        base.Awake();
 
-		m_camera = canvas.worldCamera;
+        m_camera = canvas.worldCamera;
 
-		ps = GetComponent<ParticleSystem> ();
+        ps = GetComponent<ParticleSystem>();
 
-		psr = GetComponent<ParticleSystemRenderer> ();
+        psr = GetComponent<ParticleSystemRenderer>();
 
-		p = new ParticleSystem.Particle[ps.maxParticles];
+        p = new ParticleSystem.Particle[ps.maxParticles];
 
-		vertex = new UIVertex[4];
+        vertex = new UIVertex[4];
 
-		base.raycastTarget = false;
+        base.raycastTarget = false;
 
-		psr.enabled = false;
-	}
+        psr.enabled = false;
+    }
 
-	public override Material material {
+    public override Material material
+    {
 
-		get {
+        get
+        {
 
-			if (Application.isPlaying) {
+            if (Application.isPlaying)
+            {
 
-				return psr.sharedMaterial;
+                return psr.sharedMaterial;
 
-			} else {
+            }
+            else {
 
-				return base.material;
-			}
-		}
-	}
+                return base.material;
+            }
+        }
+    }
 
-	public override Texture mainTexture {
+    public override Texture mainTexture
+    {
 
-		get {
+        get
+        {
 
-			if (Application.isPlaying) {
+            if (Application.isPlaying)
+            {
 
-				return psr.sharedMaterial.mainTexture;
+                return psr.sharedMaterial.mainTexture;
 
-			} else {
+            }
+            else {
 
-				return material.mainTexture;
-			}
-		}
-	}
+                return material.mainTexture;
+            }
+        }
+    }
 
-	void Update(){
+    void Update()
+    {
 
-		if (Application.isPlaying) {
+        if (Application.isPlaying)
+        {
 
 //			ps.Simulate (Time.unscaledDeltaTime, false, false);
 
-			SetVerticesDirty ();
-		}
-	}
+            SetVerticesDirty();
+        }
+    }
 
-	protected override void OnPopulateMesh (VertexHelper vh){
-		
-		vh.Clear ();
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
 
-		int num = ps.GetParticles (p);
+        vh.Clear();
 
-		for (int i = 0; i < num; i++) {
+        int num = ps.GetParticles(p);
 
-			ParticleSystem.Particle pp = p [i];
+        for (int i = 0; i < num; i++)
+        {
 
-			float size = pp.GetCurrentSize (ps);
+            ParticleSystem.Particle pp = p[i];
 
-			Color color = pp.GetCurrentColor (ps);
+            float size = pp.GetCurrentSize(ps);
 
-			Vector2 pos = WorldPositionToCanvasPosition (pp.position);
+            Color color = pp.GetCurrentColor(ps);
 
-			UIVertex v = UIVertex.simpleVert;
+            Vector2 pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
 
-			v.color = color;
+            UIVertex v = UIVertex.simpleVert;
 
-			v.position = new Vector2 (pos.x - size * fix, pos.y - size * fix);
+            v.color = color;
 
-			v.uv0 = new Vector2 (uv.x, uv.y);
+            v.position = new Vector2(pos.x - size * fix, pos.y - size * fix);
 
-			vertex [0] = v;
+            v.uv0 = new Vector2(uv.x, uv.y);
 
-			v = UIVertex.simpleVert;
+            vertex[0] = v;
 
-			v.color = color;
+            v = UIVertex.simpleVert;
 
-			v.position = new Vector2 (pos.x - size * fix, pos.y + size * fix);
+            v.color = color;
 
-			v.uv0 = new Vector2 (uv.x, uv.w);
+            v.position = new Vector2(pos.x - size * fix, pos.y + size * fix);
 
-			vertex [1] = v;
+            v.uv0 = new Vector2(uv.x, uv.w);
 
-			v = UIVertex.simpleVert;
+            vertex[1] = v;
 
-			v.color = color;
+            v = UIVertex.simpleVert;
 
-			v.position = new Vector2 (pos.x + size * fix, pos.y + size * fix);
+            v.color = color;
 
-			v.uv0 = new Vector2 (uv.z, uv.w);
+            v.position = new Vector2(pos.x + size * fix, pos.y + size * fix);
 
-			vertex [2] = v;
+            v.uv0 = new Vector2(uv.z, uv.w);
 
-			v = UIVertex.simpleVert;
+            vertex[2] = v;
 
-			v.color = color;
+            v = UIVertex.simpleVert;
 
-			v.position = new Vector2 (pos.x + size * fix, pos.y - size * fix);
+            v.color = color;
 
-			v.uv0 = new Vector2 (uv.z, uv.y);
+            v.position = new Vector2(pos.x + size * fix, pos.y - size * fix);
 
-			vertex [3] = v;
+            v.uv0 = new Vector2(uv.z, uv.y);
 
-			vh.AddUIVertexQuad (vertex);
-		}
-	}
+            vertex[3] = v;
 
-	private Vector3 WorldPositionToCanvasPosition(Vector3 _worldPosition){
-
-		Vector3 screenPos = m_camera.WorldToViewportPoint(_worldPosition);
-
-		return new Vector3((screenPos.x * canvasRect.x) - (canvasRect.x * 0.5f),(screenPos.y * canvasRect.y) - (canvasRect.y * 0.5f),screenPos.z);
-	}
+            vh.AddUIVertexQuad(vertex);
+        }
+    }
 }
