@@ -64,7 +64,11 @@ namespace superList
 		private List<SuperListCell> showPool = new List<SuperListCell> ();
 		private List<SuperListCell> hidePool = new List<SuperListCell> ();
 
-		private int showIndex;
+        private List<int> tmpList = new List<int>();
+        private SuperListCell[] newShowPool;
+        private List<SuperListCell> replacePool = new List<SuperListCell>();
+
+        private int showIndex;
 		private int selectedIndex = -1;
 		private float curPercent = 0;
 
@@ -89,10 +93,16 @@ namespace superList
 
 					for(int i = 0 ; i < showPool.Count ; i++){
 
-						showPool[i].transform.SetParent(pool.transform, false);
+                        SuperListCell unit = showPool[i];
 
-						hidePool.Add(showPool[i]);
-					}
+                        HideCell(unit);
+
+                        //unit.gameObject.SetActive(false);
+
+                        //unit.transform.SetParent(pool.transform, false);
+
+                        hidePool.Add(unit);
+                    }
 
 					showPool.Clear();
 				}
@@ -324,10 +334,10 @@ namespace superList
 			for (int i = 0; i < rowNum * colNum; i++) {
 				
 				GameObject unit = GameObject.Instantiate (go);
-				
-				unit.transform.SetParent (pool.transform, false);
 
-				(unit.transform as RectTransform).localScale = new Vector3 (cellScale, cellScale, cellScale);
+                unit.transform.SetParent(container.transform, false);
+
+                (unit.transform as RectTransform).localScale = new Vector3 (cellScale, cellScale, cellScale);
 				
 				(unit.transform as RectTransform).pivot = new Vector2 (0, 1);
 				
@@ -339,7 +349,13 @@ namespace superList
 
 				cell.Init(this,_objs);
 
-				if(isAlphaIn){
+                HideCell(cell);
+
+                //unit.SetActive(false);
+
+                //unit.transform.SetParent(pool.transform, false);
+
+                if (isAlphaIn){
 
 					cell.canvasGroup = unit.GetComponent<CanvasGroup>();
 
@@ -414,6 +430,8 @@ namespace superList
 			height = (transform as RectTransform).rect.height;
 
 			SetSize ();
+
+            newShowPool = new SuperListCell[rowNum * colNum];
 			
 			CreateCells (_objs);
 		}
@@ -566,8 +584,12 @@ namespace superList
 
 							hidePool.Add (unit);
 
-							unit.transform.SetParent (pool.transform, false);
-						}
+                            HideCell(unit);
+
+                            //unit.gameObject.SetActive(false);
+
+                            //unit.transform.SetParent(pool.transform, false);
+                        }
 					}
 
 				} else if (_nowIndex - showIndex == -colNum) {
@@ -590,8 +612,12 @@ namespace superList
 
 							hidePool.RemoveAt (0);
 
-							unit.transform.SetParent (container.transform, false);
-						}
+                            ShowCell(unit);
+
+                            //unit.gameObject.SetActive(true);
+
+                            //unit.transform.SetParent(container.transform, false);
+                        }
 
 						showPool.Insert (0, unit);
 
@@ -602,7 +628,7 @@ namespace superList
 
                 } else {
 
-					List<int> tmpList = new List<int> ();
+					//List<int> tmpList = new List<int> ();
 
 					for (int i = 0; i < rowNum * colNum; i++) {
 
@@ -616,9 +642,9 @@ namespace superList
 						}
 					}
 
-					SuperListCell[] newShowPool = new SuperListCell[tmpList.Count];
+					//SuperListCell[] newShowPool = new SuperListCell[tmpList.Count];
 
-					List<SuperListCell> replacePool = new List<SuperListCell> ();
+					//List<SuperListCell> replacePool = new List<SuperListCell> ();
 
 					for (int i = 0; i < showPool.Count; i++) {
 
@@ -648,7 +674,7 @@ namespace superList
 
 					showPool.Clear ();
 
-					for (int i = 0; i < newShowPool.Length; i++) {
+					for (int i = 0; i < tmpList.Count; i++) {
 
 						if (newShowPool [i] == null) {
 
@@ -666,8 +692,12 @@ namespace superList
 
 								hidePool.RemoveAt (0);
 
-								unit.transform.SetParent (container.transform, false);
-							}
+                                ShowCell(unit);
+
+                                //unit.gameObject.SetActive(true);
+
+                                //unit.transform.SetParent(container.transform, false);
+                            }
 
 							newShowPool [i] = unit;
 
@@ -683,10 +713,23 @@ namespace superList
 
 						SuperListCell unit = replacePool[i];
 
-						unit.transform.SetParent (pool.transform, false);
+                        HideCell(unit);
 
-						hidePool.Add (unit);
+                        //unit.gameObject.SetActive(false);
+
+                        //unit.transform.SetParent(pool.transform, false);
+
+                        hidePool.Add (unit);
 					}
+
+                    for (int i = 0; i < tmpList.Count; i++)
+                    {
+                        newShowPool[i] = null;
+                    }
+
+                    tmpList.Clear();
+
+                    replacePool.Clear();
 				}
 
 			} else {
@@ -712,9 +755,13 @@ namespace superList
                         else {
 							
 							hidePool.Add (unit);
-							
-							unit.transform.SetParent (pool.transform, false);
-						}
+
+                            HideCell(unit);
+
+                            //unit.gameObject.SetActive(false);
+
+                            //unit.transform.SetParent(pool.transform, false);
+                        }
 					}
 					
 				} else if (_nowIndex - showIndex == -rowNum) {
@@ -736,9 +783,13 @@ namespace superList
 							unit = hidePool [0];
 							
 							hidePool.RemoveAt (0);
-							
-							unit.transform.SetParent (container.transform, false);
-						}
+
+                            ShowCell(unit);
+
+                            //unit.gameObject.SetActive(true);
+
+                            //unit.transform.SetParent(container.transform, false);
+                        }
 						
 						showPool.Insert (0, unit);
 
@@ -749,7 +800,7 @@ namespace superList
 
                 } else {
 					
-					List<int> tmpList = new List<int> ();
+					//List<int> tmpList = new List<int> ();
 					
 					for (int i = 0; i < rowNum * colNum; i++) {
 						
@@ -763,9 +814,9 @@ namespace superList
 						}
 					}
 					
-					SuperListCell[] newShowPool = new SuperListCell[tmpList.Count];
+					//SuperListCell[] newShowPool = new SuperListCell[tmpList.Count];
 					
-					List<SuperListCell> replacePool = new List<SuperListCell> ();
+					//List<SuperListCell> replacePool = new List<SuperListCell> ();
 					
 					for (int i = 0; i < showPool.Count; i++) {
 						
@@ -795,7 +846,7 @@ namespace superList
 					
 					showPool.Clear ();
 					
-					for (int i = 0; i < newShowPool.Length; i++) {
+					for (int i = 0; i < tmpList.Count; i++) {
 						
 						if (newShowPool [i] == null) {
 							
@@ -812,9 +863,13 @@ namespace superList
 								unit = hidePool [0];
 								
 								hidePool.RemoveAt (0);
-								
-								unit.transform.SetParent (container.transform, false);
-							}
+
+                                ShowCell(unit);
+
+                                //unit.gameObject.SetActive(true);
+
+                                //unit.transform.SetParent(container.transform, false);
+                            }
 							
 							newShowPool [i] = unit;
 
@@ -829,11 +884,24 @@ namespace superList
 					for(int i = 0 ; i < replacePool.Count ; i++){
 
 						SuperListCell unit = replacePool[i];
-					
-						unit.transform.SetParent (pool.transform, false);
-						
-						hidePool.Add (unit);
+
+                        HideCell(unit);
+
+                        //unit.gameObject.SetActive(false);
+
+                        //unit.transform.SetParent(pool.transform, false);
+
+                        hidePool.Add (unit);
 					}
+
+                    for (int i = 0; i < tmpList.Count; i++)
+                    {
+                        newShowPool[i] = null;
+                    }
+
+                    tmpList.Clear();
+
+                    replacePool.Clear();
 				}
 			}
 
@@ -846,10 +914,14 @@ namespace superList
 					SuperListCell unit = hidePool [0];
 					
 					hidePool.RemoveAt (0);
-					
-					unit.transform.SetParent (container.transform, false);
 
-					showPool.Add(unit);
+                    ShowCell(unit);
+
+                    //unit.gameObject.SetActive(true);
+
+                    //unit.transform.SetParent(container.transform, false);
+
+                    showPool.Add(unit);
 					
 					SetCellData (unit, -1);
 
@@ -857,6 +929,16 @@ namespace superList
                 }
             }
 		}
+
+        private void ShowCell(SuperListCell _cell)
+        {
+            _cell.gameObject.SetActive(true);
+        }
+
+        private void HideCell(SuperListCell _cell)
+        {
+            _cell.gameObject.SetActive(false);
+        }
 
 		private void SetCellIndex (SuperListCell _cell, int _index)
 		{
