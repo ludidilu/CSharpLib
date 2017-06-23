@@ -372,8 +372,6 @@ namespace superList
 		// Use this for initialization
 		void Awake ()
 		{
-
-
 			scrollRect = gameObject.AddComponent<SuperScrollRect> ();
 
 			scrollRect.vertical = isVertical;
@@ -382,19 +380,17 @@ namespace superList
 
 			scrollRect.isRestrain = isRestrain;
 
-			gameObject.AddComponent<RectMask2D>();
+//			gameObject.AddComponent<RectMask2D>();
 
 			Image img = gameObject.AddComponent<Image>();
 
-			img.material = new Material(Shader.Find("Custom/UI/Default"));
+//			img.material = new Material(Shader.Find("Custom/UI/Default"));
 
-			img.color = Color.clear;
+//			img.color = Color.clear;
 
-//			Mask mask = gameObject.AddComponent<Mask>();
-//
-//			mask.showMaskGraphic = false;
-//
-//			gameObject.AddComponent<Image>();
+			Mask mask = gameObject.AddComponent<Mask>();
+
+			mask.showMaskGraphic = false;
 
 			if (autoStart) {
 

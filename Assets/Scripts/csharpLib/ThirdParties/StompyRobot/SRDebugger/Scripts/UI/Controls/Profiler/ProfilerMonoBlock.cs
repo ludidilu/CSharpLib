@@ -21,8 +21,8 @@ namespace SRDebugger.UI.Controls.Profiler
         {
             base.OnEnable();
 
-            NotSupportedMessage.SetActive(!UnityEngine.Profiler.supported);
-            CurrentUsedText.gameObject.SetActive(UnityEngine.Profiler.supported);
+            NotSupportedMessage.SetActive(!UnityEngine.Profiling.Profiler.supported);
+            CurrentUsedText.gameObject.SetActive(UnityEngine.Profiling.Profiler.supported);
 
             TriggerRefresh();
         }
@@ -40,8 +40,8 @@ namespace SRDebugger.UI.Controls.Profiler
 
         public void TriggerRefresh()
         {
-            var max = UnityEngine.Profiler.supported ? UnityEngine.Profiler.GetMonoHeapSize() : GC.GetTotalMemory(false);
-            var current = UnityEngine.Profiler.GetMonoUsedSize();
+            var max = UnityEngine.Profiling.Profiler.supported ? UnityEngine.Profiling.Profiler.GetMonoHeapSize() : GC.GetTotalMemory(false);
+            var current = UnityEngine.Profiling.Profiler.GetMonoUsedSize();
 
             Slider.maxValue = max;
             Slider.value = current;

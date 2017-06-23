@@ -16,7 +16,7 @@ namespace SRDebugger.UI.Controls
         {
             base.Start();
 
-            if (!UnityEngine.Profiler.supported)
+            if (!UnityEngine.Profiling.Profiler.supported)
             {
                 Text.text = SRDebugStrings.Current.Profiler_NotSupported;
                 EnableButton.gameObject.SetActive(false);
@@ -37,7 +37,7 @@ namespace SRDebugger.UI.Controls
 
         protected void UpdateLabels()
         {
-            if (!UnityEngine.Profiler.enabled)
+            if (!UnityEngine.Profiling.Profiler.enabled)
             {
                 Text.text = SRDebugStrings.Current.Profiler_EnableProfilerInfo;
                 ButtonText.text = "Enable";
@@ -48,14 +48,14 @@ namespace SRDebugger.UI.Controls
                 ButtonText.text = "Disable";
             }
 
-            _previousState = UnityEngine.Profiler.enabled;
+            _previousState = UnityEngine.Profiling.Profiler.enabled;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (UnityEngine.Profiler.enabled != _previousState)
+            if (UnityEngine.Profiling.Profiler.enabled != _previousState)
             {
                 UpdateLabels();
             }
@@ -64,7 +64,7 @@ namespace SRDebugger.UI.Controls
         public void ToggleProfiler()
         {
             Debug.Log("Toggle Profiler");
-            UnityEngine.Profiler.enabled = !UnityEngine.Profiler.enabled;
+            UnityEngine.Profiling.Profiler.enabled = !UnityEngine.Profiling.Profiler.enabled;
         }
     }
 }

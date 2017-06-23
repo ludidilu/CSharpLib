@@ -29,8 +29,8 @@ namespace scene{
 
 				lightmaps[i] = new LightmapData();
 
-				lightmaps[i].lightmapFar = farTextures[i];
-				lightmaps[i].lightmapNear = nearTextures[i];
+				lightmaps[i].lightmapLight = farTextures[i];
+				lightmaps[i].lightmapDir = nearTextures[i];
 			}
 
 			LightmapSettings.lightmaps = lightmaps;

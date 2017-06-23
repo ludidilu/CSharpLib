@@ -38,8 +38,8 @@ public class SceneTools  {
 		
 		for(int i = 0 ; i < datas.Length ; i++){
 			
-			scene.farTextures[i] = datas[i].lightmapFar;
-			scene.nearTextures[i] = datas[i].lightmapNear;
+			scene.farTextures[i] = datas[i].lightmapLight;
+			scene.nearTextures[i] = datas[i].lightmapDir;
 		}
 		
 		scene.fieldOfView = Camera.main.fieldOfView;

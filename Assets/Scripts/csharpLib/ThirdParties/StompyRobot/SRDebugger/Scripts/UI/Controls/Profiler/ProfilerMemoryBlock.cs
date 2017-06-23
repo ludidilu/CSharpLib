@@ -35,8 +35,8 @@ namespace SRDebugger.UI.Controls.Profiler
 
         public void TriggerRefresh()
         {
-            var max = UnityEngine.Profiler.GetTotalReservedMemory();
-            var current = UnityEngine.Profiler.GetTotalAllocatedMemory();
+            var max = UnityEngine.Profiling.Profiler.GetTotalReservedMemory();
+            var current = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory();
 
             Slider.maxValue = max;
             Slider.value = current;
