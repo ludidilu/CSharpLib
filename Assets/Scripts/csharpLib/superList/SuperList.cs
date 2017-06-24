@@ -64,7 +64,7 @@ namespace superList
 		private List<SuperListCell> showPool = new List<SuperListCell> ();
 		private List<SuperListCell> hidePool = new List<SuperListCell> ();
 
-        private List<int> tmpList = new List<int>();
+        private Dictionary<int, int> tmpDic = new Dictionary<int, int>();
         private SuperListCell[] newShowPool;
         private List<SuperListCell> replacePool = new List<SuperListCell>();
 
@@ -624,13 +624,11 @@ namespace superList
 
                 } else {
 
-					//List<int> tmpList = new List<int> ();
-
 					for (int i = 0; i < rowNum * colNum; i++) {
 
 						if (_nowIndex + i < data.Count) {
 
-							tmpList.Add (_nowIndex + i);
+                            tmpDic.Add(_nowIndex + i, i);
 
 						} else {
 
@@ -638,19 +636,19 @@ namespace superList
 						}
 					}
 
-					//SuperListCell[] newShowPool = new SuperListCell[tmpList.Count];
-
-					//List<SuperListCell> replacePool = new List<SuperListCell> ();
-
 					for (int i = 0; i < showPool.Count; i++) {
 
 						SuperListCell unit = showPool [i];
 
 						int tmpIndex = unit.index;
 
-						if (tmpList.Contains (tmpIndex)) {
+                        int ii;
 
-							newShowPool [tmpList.IndexOf (tmpIndex)] = unit;
+                        bool b = tmpDic.TryGetValue(tmpIndex, out ii);
+
+                        if (b)
+                        {
+							newShowPool [ii] = unit;
 
 							if(_dataHasChange){
 
@@ -670,23 +668,27 @@ namespace superList
 
 					showPool.Clear ();
 
-					for (int i = 0; i < tmpList.Count; i++) {
+                    Dictionary<int, int>.Enumerator enumerator = tmpDic.GetEnumerator();
 
-						if (newShowPool [i] == null) {
+                    while (enumerator.MoveNext())
+                    {
+                        KeyValuePair<int, int> pair = enumerator.Current;
 
-							SuperListCell unit;
+                        if (newShowPool[pair.Value] == null)
+                        {
+                            SuperListCell unit;
 
-							if (replacePool.Count > 0) {
+                            if (replacePool.Count > 0)
+                            {
+                                unit = replacePool[0];
 
-								unit = replacePool [0];
+                                replacePool.RemoveAt(0);
+                            }
+                            else {
 
-								replacePool.RemoveAt (0);
+                                unit = hidePool[0];
 
-							} else {
-
-								unit = hidePool [0];
-
-								hidePool.RemoveAt (0);
+                                hidePool.RemoveAt(0);
 
                                 ShowCell(unit);
 
@@ -695,15 +697,15 @@ namespace superList
                                 //unit.transform.SetParent(container.transform, false);
                             }
 
-							newShowPool [i] = unit;
+                            newShowPool[pair.Value] = unit;
 
-							SetCellData (unit, tmpList [i]);
+                            SetCellData(unit, pair.Key);
 
-                            SetCellIndex(unit, tmpList[i]);
+                            SetCellIndex(unit, pair.Key);
                         }
 
-                        showPool.Add (newShowPool [i]);
-					}
+                        showPool.Add(newShowPool[pair.Value]);
+                    }
 
 					for(int i = 0 ; i < replacePool.Count ; i++){
 
@@ -718,12 +720,12 @@ namespace superList
                         hidePool.Add (unit);
 					}
 
-                    for (int i = 0; i < tmpList.Count; i++)
+                    for (int i = 0; i < tmpDic.Count; i++)
                     {
                         newShowPool[i] = null;
                     }
 
-                    tmpList.Clear();
+                    tmpDic.Clear();
 
                     replacePool.Clear();
 				}
@@ -796,13 +798,11 @@ namespace superList
 
                 } else {
 					
-					//List<int> tmpList = new List<int> ();
-					
 					for (int i = 0; i < rowNum * colNum; i++) {
 						
 						if (_nowIndex + i < data.Count) {
 							
-							tmpList.Add (_nowIndex + i);
+                            tmpDic.Add(_nowIndex + i, i);
 							
 						} else {
 							
@@ -810,19 +810,19 @@ namespace superList
 						}
 					}
 					
-					//SuperListCell[] newShowPool = new SuperListCell[tmpList.Count];
-					
-					//List<SuperListCell> replacePool = new List<SuperListCell> ();
-					
 					for (int i = 0; i < showPool.Count; i++) {
 						
 						SuperListCell unit = showPool [i];
 						
 						int tmpIndex = unit.index;
-						
-						if (tmpList.Contains (tmpIndex)) {
-							
-							newShowPool [tmpList.IndexOf (tmpIndex)] = unit;
+
+                        int ii;
+
+                        bool b = tmpDic.TryGetValue(tmpIndex, out ii);
+
+                        if (b) { 
+
+							newShowPool [ii] = unit;
 
 							if(_dataHasChange){
 
@@ -841,24 +841,28 @@ namespace superList
 					}
 					
 					showPool.Clear ();
-					
-					for (int i = 0; i < tmpList.Count; i++) {
-						
-						if (newShowPool [i] == null) {
-							
-							SuperListCell unit;
-							
-							if (replacePool.Count > 0) {
-								
-								unit = replacePool [0];
-								
-								replacePool.RemoveAt (0);
-								
-							} else {
-								
-								unit = hidePool [0];
-								
-								hidePool.RemoveAt (0);
+
+                    Dictionary<int, int>.Enumerator enumerator = tmpDic.GetEnumerator();
+
+                    while (enumerator.MoveNext())
+                    {
+                        KeyValuePair<int, int> pair = enumerator.Current;
+
+                        if (newShowPool[pair.Value] == null)
+                        {
+                            SuperListCell unit;
+
+                            if (replacePool.Count > 0)
+                            {
+                                unit = replacePool[0];
+
+                                replacePool.RemoveAt(0);
+                            }
+                            else {
+
+                                unit = hidePool[0];
+
+                                hidePool.RemoveAt(0);
 
                                 ShowCell(unit);
 
@@ -866,17 +870,17 @@ namespace superList
 
                                 //unit.transform.SetParent(container.transform, false);
                             }
-							
-							newShowPool [i] = unit;
 
-							SetCellData (unit, tmpList [i]);
+                            newShowPool[pair.Value] = unit;
 
-                            SetCellIndex(unit, tmpList[i]);
+                            SetCellData(unit, pair.Key);
+
+                            SetCellIndex(unit, pair.Key);
                         }
 
-                        showPool.Add (newShowPool [i]);
-					}
-
+                        showPool.Add(newShowPool[pair.Value]);
+                    }
+					
 					for(int i = 0 ; i < replacePool.Count ; i++){
 
 						SuperListCell unit = replacePool[i];
@@ -890,12 +894,12 @@ namespace superList
                         hidePool.Add (unit);
 					}
 
-                    for (int i = 0; i < tmpList.Count; i++)
+                    for (int i = 0; i < tmpDic.Count; i++)
                     {
                         newShowPool[i] = null;
                     }
 
-                    tmpList.Clear();
+                    tmpDic.Clear();
 
                     replacePool.Clear();
 				}
@@ -939,7 +943,7 @@ namespace superList
         {
             //_cell.gameObject.SetActive(false);
 
-            _cell.canvasGroup.alpha = 0;
+            _cell.canvasGroup.alpha = 0;//for no gc set alpha to zero
 
             _cell.canvasGroup.blocksRaycasts = false;
         }
