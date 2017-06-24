@@ -349,13 +349,11 @@ namespace superList
 
 				cell.Init(this,_objs);
 
-                HideCell(cell);
-
                 //unit.SetActive(false);
 
                 //unit.transform.SetParent(pool.transform, false);
 
-                if (isAlphaIn){
+                //if (isAlphaIn){
 
 					cell.canvasGroup = unit.GetComponent<CanvasGroup>();
 
@@ -363,9 +361,11 @@ namespace superList
 
 						cell.canvasGroup = unit.AddComponent<CanvasGroup>();
 					}
-				}
+                //}
 
-				hidePool.Add (cell);
+                HideCell(cell);
+
+                hidePool.Add (cell);
 			}
 		}
 
@@ -928,12 +928,20 @@ namespace superList
 
         private void ShowCell(SuperListCell _cell)
         {
-            _cell.gameObject.SetActive(true);
+            //_cell.gameObject.SetActive(true);
+
+            _cell.canvasGroup.alpha = 1;
+
+            _cell.canvasGroup.blocksRaycasts = true;
         }
 
         private void HideCell(SuperListCell _cell)
         {
-            _cell.gameObject.SetActive(false);
+            //_cell.gameObject.SetActive(false);
+
+            _cell.canvasGroup.alpha = 0;
+
+            _cell.canvasGroup.blocksRaycasts = false;
         }
 
 		private void SetCellIndex (SuperListCell _cell, int _index)
@@ -999,7 +1007,7 @@ namespace superList
 			
 			_cell.index = _index;
 
-			_cell.gameObject.name = unitName + _index;
+			//_cell.gameObject.name = unitName + _index;
 
 			_cell.SetSelected (_index == selectedIndex);//如果补全空的单元格  这里可能会有问题
 		}
