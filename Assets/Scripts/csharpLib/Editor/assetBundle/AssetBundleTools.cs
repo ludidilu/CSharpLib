@@ -150,8 +150,6 @@ public class AssetBundleTools{
 		
 		try{
 			
-			List<UnityEngine.Object> assets = new List<UnityEngine.Object> ();
-			
 			List<string> assetNames = new List<string> ();
 			
 			List<string> assetBundleNames = new List<string> ();
@@ -160,15 +158,17 @@ public class AssetBundleTools{
 			
 			for(int i = 0 ; i < abs.Length ; i++){
 
-				AssetBundle ab = LoadAssetBundle("file:///" + Application.streamingAssetsPath + "/" + AssetBundleManager.path + abs[i]);
+                //AssetBundle ab = LoadAssetBundle("file:///" + Application.streamingAssetsPath + "/" + AssetBundleManager.path + abs[i]);
 
-//				AssetBundle ab = AssetBundle.CreateFromFile(Application.streamingAssetsPath + "/" + AssetBundleManager.path + abs[i]);
+                AssetBundle ab = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/" + AssetBundleManager.path + abs[i]);
+
+                aaaa[i] = ab;
 				
-				aaaa[i] = ab;
-				
-				string[] nn = ab.GetAllAssetNames();
-				
-				foreach(string str in nn){
+				string[] strs = ab.GetAllAssetNames();
+
+                for (int m = 0; m < strs.Length; m++)
+                {
+                    string str = strs[m];
 					
 					if(assetNames.Contains(str)){
 						
@@ -177,10 +177,6 @@ public class AssetBundleTools{
 					}else{
 						
 						assetNames.Add(str);
-						
-						UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(str);
-						
-						assets.Add(obj);
 						
 						assetBundleNames.Add(abs[i]);
 
@@ -193,28 +189,32 @@ public class AssetBundleTools{
 			
 			for (int i = 0; i < assetNames.Count; i++) {
 				
-				string name = assetNames[i];
+				string assetName = assetNames[i];
 				string abName = assetBundleNames[i];
-				UnityEngine.Object obj = assets[i];
-				List<string> list = result[name];
-				
-				UnityEngine.Object[] sss = EditorUtility.CollectDependencies(new UnityEngine.Object[]{obj});
-				
-				foreach(UnityEngine.Object dd in sss){
-					
-					if(dd != obj){
-						
-						if(assets.Contains(dd)){
-							
-							string assetBundleName = assetBundleNames[assets.IndexOf(dd)];
-							
-							if(assetBundleName != abName && !list.Contains(assetBundleName)){
-								
-								list.Add(assetBundleName);
-							}
-						}
-					}
-				}
+				List<string> list = result[assetName];
+
+                string[] strs = AssetDatabase.GetDependencies(assetName);
+
+                for (int m = 0; m < strs.Length; m++)
+                {
+                    string tmpAssetName = strs[m].ToLower();
+
+                    if(tmpAssetName != assetName)
+                    {
+                        int index = assetNames.IndexOf(tmpAssetName);
+
+                        if(index != -1)
+                        {
+                            string assetBundleName = assetBundleNames[index];
+
+                            if (assetBundleName != abName && !list.Contains(assetBundleName))
+                            {
+
+                                list.Add(assetBundleName);
+                            }
+                        }
+                    }
+                }
 			}
 
 			FileInfo fi = new FileInfo(Application.streamingAssetsPath + "/" + AssetManager.dataName);
