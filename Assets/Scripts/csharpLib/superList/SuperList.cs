@@ -30,7 +30,9 @@ namespace superList
 		private GameObject pool;
 
 		private RectTransform rectTransform;
-		private SuperScrollRect scrollRect;
+
+		[HideInInspector]
+		public SuperScrollRect scrollRect { private set; get; }
 
 		private float width;
 		private float height;
