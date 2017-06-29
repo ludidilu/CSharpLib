@@ -91,9 +91,19 @@ public class AssetBundleTools{
 		Debug.Log("AssetBundle生成成功！Android");
 	}
 
-	private static void PrepareToBuildAssetBundle(){
+    [MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:Mac")]
+    public static void CreateAssetBundleMac()
+    {
+        AssetBundleManifest manifest = CreateAssetBundle(BUILD_OPTION, BuildTarget.StandaloneOSXUniversal);
 
-		DirectoryInfo directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/assetbundle");
+        CreateAssetBundleDat(manifest, BUILD_OPTION, BuildTarget.StandaloneOSXUniversal);
+
+        Debug.Log("AssetBundle生成成功！Mac");
+    }
+
+    private static void PrepareToBuildAssetBundle(){
+
+		DirectoryInfo directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/" + AssetBundleManager.path);
 
 		if(!directoryInfo.Exists){
 
