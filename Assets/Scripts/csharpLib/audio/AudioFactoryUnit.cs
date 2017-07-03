@@ -33,6 +33,8 @@ namespace audio{
 				
 				callBackList.Add (_callBack);
 
+                AssetManager.Instance.GetAsset<AudioClip>(name, GetAsset);
+
                 return null;
 				
 			} else if (type == 0) {

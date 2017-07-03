@@ -30,6 +30,8 @@ namespace animatorFactoty{
 
 				callBackList.Add(_callBack);
 
+                AssetManager.Instance.GetAsset<RuntimeAnimatorController>(name, GetAsset);
+
                 return null;
 
 			}else if(type == 0){
