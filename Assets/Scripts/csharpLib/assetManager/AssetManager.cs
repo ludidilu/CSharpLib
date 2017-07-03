@@ -46,7 +46,9 @@ namespace assetManager
 
 		private Dictionary<string,AssetManagerData> dataDic;
 
-		public AssetManager ()
+        public Func<string, Type, string> getAssetPathDelegate;
+
+        public AssetManager ()
 		{
 			dic = new Dictionary<string, IAssetManagerUnit> ();
 
@@ -127,10 +129,29 @@ namespace assetManager
 
 		public void GetAsset<T> (string _name, Action<T> _callBack) where T:UnityEngine.Object
 		{
+            string assetName;
+
+            if (getAssetPathDelegate != null)
+            {
+                string tmpName = getAssetPathDelegate(_name, typeof(T));
+
+                if (!string.IsNullOrEmpty(tmpName))
+                {
+                    assetName = tmpName;
+                }
+                else
+                {
+                    assetName = _name;
+                }
+            }
+            else
+            {
+                assetName = _name;
+            }
 
 #if USE_ASSETBUNDLE
 
-			AssetManagerUnit<T> unit;
+            AssetManagerUnit<T> unit;
 			
 			if (!dic.ContainsKey (_name)) {
 				
@@ -154,9 +175,29 @@ namespace assetManager
 
 		public void GetAsset<T> (string _name, Action<T[]> _callBack) where T:UnityEngine.Object
 		{
+            string assetName;
+
+            if (getAssetPathDelegate != null)
+            {
+                string tmpName = getAssetPathDelegate(_name, typeof(T));
+
+                if (!string.IsNullOrEmpty(tmpName))
+                {
+                    assetName = tmpName;
+                }
+                else
+                {
+                    assetName = _name;
+                }
+            }
+            else
+            {
+                assetName = _name;
+            }
+
 #if USE_ASSETBUNDLE
-			
-			AssetManagerUnit2<T> unit;
+
+            AssetManagerUnit2<T> unit;
 			
 			if (!dic.ContainsKey (_name)) {
 				
