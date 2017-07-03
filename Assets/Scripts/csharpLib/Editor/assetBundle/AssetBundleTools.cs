@@ -13,7 +13,9 @@ using System.Threading;
 
 public class AssetBundleTools{
 
-	private static readonly BuildAssetBundleOptions BUILD_OPTION = BuildAssetBundleOptions.ForceRebuildAssetBundle;
+    private const bool DELETE_OLD_FILES = false;
+
+	private static readonly BuildAssetBundleOptions BUILD_OPTION = BuildAssetBundleOptions.ChunkBasedCompression;
 
 //	private static readonly BuildAssetBundleOptions BUILD_OPTION = BuildAssetBundleOptions.UncompressedAssetBundle;
 
@@ -109,7 +111,7 @@ public class AssetBundleTools{
 
 			directoryInfo.Create();
 
-		}else{
+		}else if(DELETE_OLD_FILES){
 
 			FileInfo[] fileInfos = directoryInfo.GetFiles();
 

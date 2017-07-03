@@ -153,27 +153,27 @@ namespace assetManager
 
             AssetManagerUnit<T> unit;
 			
-			if (!dic.ContainsKey (_name)) {
+			if (!dic.ContainsKey (assetName)) {
 				
-				unit = new AssetManagerUnit<T> (_name);
+				unit = new AssetManagerUnit<T> (assetName);
 				
-				dic.Add(_name,unit);
+				dic.Add(assetName, unit);
 				
 			} else {
 				
-				unit = dic [_name] as AssetManagerUnit<T>;
+				unit = dic [assetName] as AssetManagerUnit<T>;
 			}
 			
 			unit.Load (_callBack);
 #else
 
-			T data = AssetDatabase.LoadAssetAtPath<T> (_name);
+			T data = AssetDatabase.LoadAssetAtPath<T> (assetName);
 
 			_callBack (data);
 #endif
-		}
+        }
 
-		public void GetAsset<T> (string _name, Action<T[]> _callBack) where T:UnityEngine.Object
+        public void GetAsset<T> (string _name, Action<T[]> _callBack) where T:UnityEngine.Object
 		{
             string assetName;
 
@@ -199,21 +199,21 @@ namespace assetManager
 
             AssetManagerUnit2<T> unit;
 			
-			if (!dic.ContainsKey (_name)) {
+			if (!dic.ContainsKey (assetName)) {
 				
-				unit = new AssetManagerUnit2<T> (_name);
+				unit = new AssetManagerUnit2<T> (assetName);
 				
-				dic.Add(_name,unit);
+				dic.Add(assetName, unit);
 				
 			} else {
 				
-				unit = dic [_name] as AssetManagerUnit2<T>;
+				unit = dic [assetName] as AssetManagerUnit2<T>;
 			}
 			
 			unit.Load (_callBack);
-			
+
 #else
-			UnityEngine.Object[] datas = AssetDatabase.LoadAllAssetsAtPath (_name);
+			UnityEngine.Object[] datas = AssetDatabase.LoadAllAssetsAtPath (assetName);
 			
 			List<T> tmpList = new List<T>();
 
@@ -231,6 +231,6 @@ namespace assetManager
 
 			_callBack (result);
 #endif
-		}
-	}
+        }
+    }
 }
