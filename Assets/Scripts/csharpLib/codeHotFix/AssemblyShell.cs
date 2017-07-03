@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class AssemblyShell : MonoBehaviour {
+
+    public string sceneName;
 
 	public static readonly string ASSEMBLY_FILE_NAME = "Script.bytes";
 
@@ -33,6 +35,6 @@ public class AssemblyShell : MonoBehaviour {
 			SuperDebug.Log("没有找到新的代码文件！！！");
 		}
 
-		Application.LoadLevel("main");
+		SceneManager.LoadScene(sceneName);
 	}
 }

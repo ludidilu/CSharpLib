@@ -152,7 +152,7 @@ namespace assetManager
 #endif
 		}
 
-		public T[] GetAsset<T> (string _name, Action<T[]> _callBack) where T:UnityEngine.Object
+		public void GetAsset<T> (string _name, Action<T[]> _callBack) where T:UnityEngine.Object
 		{
 #if USE_ASSETBUNDLE
 			
@@ -170,8 +170,6 @@ namespace assetManager
 			}
 			
 			unit.Load (_callBack);
-			
-			return null;
 			
 #else
 			UnityEngine.Object[] datas = AssetDatabase.LoadAllAssetsAtPath (_name);
@@ -191,9 +189,6 @@ namespace assetManager
 			T[] result = tmpList.ToArray();
 
 			_callBack (result);
-			
-			return result;
-
 #endif
 		}
 	}

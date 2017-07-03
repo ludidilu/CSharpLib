@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEditor;
 using System;
+using UnityEditor.SceneManagement;
 
 public class CreateIOSDummyScene {
 
@@ -12,7 +13,7 @@ public class CreateIOSDummyScene {
 	[MenuItem("打包前准备工作/构造ios空场景")]
 	public static void Start(){
 
-		EditorApplication.OpenScene("Assets/scenes/iosDummy.unity");
+        EditorSceneManager.OpenScene("Assets/scenes/iosDummy.unity");
 
 		GameObject[] gos = GameObject.FindGameObjectsWithTag(TAG);
 
@@ -55,7 +56,7 @@ public class CreateIOSDummyScene {
 			}
 		}
 
-		EditorApplication.SaveScene();
+        EditorSceneManager.SaveOpenScenes();
 
 		Debug.Log("IOSDummy场景构造完毕!!!");
 	}

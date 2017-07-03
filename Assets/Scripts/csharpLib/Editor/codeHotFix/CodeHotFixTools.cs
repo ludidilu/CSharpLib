@@ -5,9 +5,10 @@ using System;
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEditor.Events;
 using superList;
+using UnityEditor.SceneManagement;
 
 public class CodeHotFixTools{
 
@@ -21,8 +22,8 @@ public class CodeHotFixTools{
 		FixAllPrefabs();
 		
 		FixAllScene();
-		
-		EditorApplication.OpenScene("Assets/_Scenes/" + shellScene + ".unity");
+
+        EditorSceneManager.OpenScene("Assets/_Scenes/" + shellScene + ".unity");
 	}
 
 	[MenuItem("安卓代码热更新前的准备/修改所有prefab")]
@@ -74,7 +75,7 @@ public class CodeHotFixTools{
 
 		foreach(string scenePath in scenes){
 
-			EditorApplication.OpenScene("Assets/_Scenes/" + scenePath + ".unity");
+			EditorSceneManager.OpenScene("Assets/_Scenes/" + scenePath + ".unity");
 
 			FixScene();
 		}
@@ -98,8 +99,8 @@ public class CodeHotFixTools{
 		}
 
 		if(_hasChange){
-			
-			EditorApplication.SaveScene();
+
+            EditorSceneManager.SaveOpenScenes();
 		}
 	}
 

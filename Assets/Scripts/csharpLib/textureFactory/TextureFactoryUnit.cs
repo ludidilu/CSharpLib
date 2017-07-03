@@ -28,8 +28,10 @@ namespace textureFactory{
 				type = 0;
 				
 				callBackList.Add (_callBack);
-				
-				return default(T);
+
+                AssetManager.Instance.GetAsset<T>(name, GetAsset);
+
+                return default(T);
 
             } else if (type == 0) {
 				

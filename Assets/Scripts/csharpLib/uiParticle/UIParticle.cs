@@ -48,7 +48,7 @@ public class UIParticle : Graphic
 
         psr = GetComponent<ParticleSystemRenderer>();
 
-        p = new ParticleSystem.Particle[ps.maxParticles];
+        p = new ParticleSystem.Particle[ps.main.maxParticles];
 
         base.raycastTarget = false;
 
@@ -167,7 +167,7 @@ public class UIParticle : Graphic
         if (Application.isPlaying)
         {
 
-            //			ps.Simulate (Time.unscaledDeltaTime, false, false);
+//			ps.Simulate (Time.unscaledDeltaTime, false, false);
 
             SetVerticesDirty();
         }
@@ -190,7 +190,7 @@ public class UIParticle : Graphic
 
             Vector2 pos;
 
-            if (ps.scalingMode == ParticleSystemScalingMode.Hierarchy)
+            if (ps.main.scalingMode == ParticleSystemScalingMode.Hierarchy)
             {
                 pos = pp.position;
             }

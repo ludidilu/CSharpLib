@@ -69,10 +69,6 @@ namespace heroFactory{
 			//加载武器
 			if (_hasWeapon) {
 
-				List<string> weaponList = new List<string>();
-				List<string> jointList = new List<string>();
-				List<float> weaponScaleList = new List<float>();
-				
 				if(!string.IsNullOrEmpty(_mainHandWeaponPath)){
 
 					loadNum++;

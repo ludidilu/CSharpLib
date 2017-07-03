@@ -362,7 +362,7 @@ namespace gameObjectFactory{
 			
 			renderer.receiveShadows = false;
 			
-			renderer.useLightProbes = false;
+			renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
 			
 			renderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
@@ -557,8 +557,8 @@ namespace gameObjectFactory{
 			_resultObj.GetComponent<MeshRenderer> ().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 			
 			_resultObj.GetComponent<MeshRenderer> ().receiveShadows = false;
-			
-			_resultObj.GetComponent<MeshRenderer> ().useLightProbes = false;
+
+            _resultObj.GetComponent<MeshRenderer>().lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
 			
 			_resultObj.GetComponent<MeshRenderer> ().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 			

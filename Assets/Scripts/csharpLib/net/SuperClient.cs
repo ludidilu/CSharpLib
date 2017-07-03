@@ -55,7 +55,7 @@ public class SuperClient : MonoBehaviour {
 
 			Clear ();
 
-			dele(false,"error");
+			dele(false,"error:" + e.ToString());
 
 			return;
 		}

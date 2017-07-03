@@ -107,8 +107,6 @@ public class RecordLog{
         HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
         Stream streamResponse = response.GetResponseStream();
         StreamReader streamRead = new StreamReader(streamResponse);
-        string responseString = streamRead.ReadToEnd();
-        // Close the stream object
         streamResponse.Close();
         streamRead.Close();
 
@@ -174,8 +172,8 @@ public class RecordLog{
             }
             catch (Exception e)
             {
+                Debug.Log(e.ToString());
             }
-            finally { }
 
 			Stop();
 

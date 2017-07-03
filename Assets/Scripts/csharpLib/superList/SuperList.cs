@@ -83,8 +83,6 @@ namespace superList
 
 		private bool hasSetContainerSize = false;//由于在setData之前就调用OnScroll方法会导致报错  所以确保在OnScroll之前就已经setDta了
 
-		private string unitName;
-
 		public void SetData<T> (List<T> _data)
 		{
 			scrollRect.StopMovement();
@@ -331,8 +329,6 @@ namespace superList
 
 		void CreateCells (object[] _objs)
 		{
-			unitName = go.name;
-
 			for (int i = 0; i < rowNum * colNum; i++) {
 				
 				GameObject unit = GameObject.Instantiate (go);
@@ -384,11 +380,7 @@ namespace superList
 
 //			gameObject.AddComponent<RectMask2D>();
 
-			Image img = gameObject.AddComponent<Image>();
-
-//			img.material = new Material(Shader.Find("Custom/UI/Default"));
-
-//			img.color = Color.clear;
+			gameObject.AddComponent<Image>();
 
 			Mask mask = gameObject.AddComponent<Mask>();
 

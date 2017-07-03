@@ -29,18 +29,11 @@ namespace textureFactory{
 
 				callBackList.Add (new KeyValuePair<Action<T>, int>(_callBack,_index));
 
-				T[] result = AssetManager.Instance.GetAsset<T> (name,GetAsset);
+				AssetManager.Instance.GetAsset<T> (name,GetAsset);
 
-				if(result == null){
+                return default(T);
 
-					return default(T);
-
-				}else{
-
-					return AssetManager.Instance.GetAsset<T> (name,GetAsset)[_index];
-				}
-				
-			} else if (type == 0) {
+            } else if (type == 0) {
 
 				callBackList.Add (new KeyValuePair<Action<T>, int>(_callBack,_index));
 				

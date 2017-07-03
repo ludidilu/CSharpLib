@@ -7,13 +7,6 @@ namespace heroFactory{
 
 	public class HeroControllerDispatcher : MonoBehaviour {
 
-		private Animator animator;
-
-		void Awake(){
-
-			animator = GetComponent<Animator>();
-		}
-
 		public void DispatchAnimationEvent(string _eventName)
 		{
 			string[] strs = _eventName.Split('$');
