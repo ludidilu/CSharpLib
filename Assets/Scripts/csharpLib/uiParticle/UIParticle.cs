@@ -173,6 +173,14 @@ public class UIParticle : Graphic
         }
     }
 
+    void LateUpdate()
+    {
+        if (Application.isPlaying)
+        {
+            transform.rotation = Quaternion.identity;
+        }
+    }
+
     protected override void OnPopulateMesh(VertexHelper vh)
     {
 
@@ -190,15 +198,66 @@ public class UIParticle : Graphic
 
             Vector2 pos;
 
-            if (ps.main.scalingMode == ParticleSystemScalingMode.Hierarchy)
+            if (ps.main.simulationSpace == ParticleSystemSimulationSpace.World)
             {
-                pos = pp.position;
+                Vector2 tp = pp.position - transform.position;
+
+                if (ps.main.scalingMode == ParticleSystemScalingMode.Hierarchy)
+                {
+                    pos = new Vector2(tp.x / transform.lossyScale.x, tp.y / transform.lossyScale.y);
+                }
+                else
+                {
+                    size = size * fix;
+
+                    size = new Vector3(size.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, size.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y, size.z * canvas.transform.localScale.z / transform.lossyScale.z * transform.localScale.z);
+
+                    pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, tp);
+
+                    pos = new Vector3(pos.x * canvas.transform.localScale.x / transform.lossyScale.x, pos.y * canvas.transform.localScale.y / transform.lossyScale.y);
+                }
             }
             else
             {
-                size = size * fix;
+                if (ps.main.scalingMode == ParticleSystemScalingMode.Hierarchy)
+                {
+                    pos = pp.position;
+                }
+                else
+                {
+                    size = size * fix;
 
-                pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
+                    size = new Vector3(size.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, size.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y, size.z * canvas.transform.localScale.z / transform.lossyScale.z * transform.localScale.z);
+
+                    pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
+
+                    pos = new Vector3(pos.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, pos.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y);
+                }
+            }
+
+            float uFix;
+            float vFix;
+            float uFixPlus;
+            float vFixPlus;
+
+            if (ps.textureSheetAnimation.enabled)
+            {
+                uFix = 1f / ps.textureSheetAnimation.numTilesX;
+                vFix = 1f / ps.textureSheetAnimation.numTilesY;
+
+                float t = (pp.startLifetime - pp.remainingLifetime) / pp.startLifetime;
+
+                int frame = (int)(ps.textureSheetAnimation.frameOverTime.curve.Evaluate(t) * ps.textureSheetAnimation.numTilesX * ps.textureSheetAnimation.numTilesY);
+
+                uFixPlus = uFix * (frame % ps.textureSheetAnimation.numTilesX);
+                vFixPlus = vFix * (ps.textureSheetAnimation.numTilesY - 1 - frame / ps.textureSheetAnimation.numTilesX);
+            }
+            else
+            {
+                uFix = 1;
+                vFix = 1;
+                uFixPlus = 0;
+                vFixPlus = 0;
             }
 
             for (int m = 0; m < mesh.vertexCount; m++)
@@ -209,7 +268,9 @@ public class UIParticle : Graphic
 
                 v.position = new Vector2(pos.x + mesh.vertices[m].x * size.x, pos.y + mesh.vertices[m].y * size.y);
 
-                v.uv0 = mesh.uv[m];
+                Vector2 uv = mesh.uv[m];
+
+                v.uv0 = new Vector2(uv.x * uFix + uFixPlus, uv.y * vFix + vFixPlus);
 
                 vertexPool[m] = v;
 
