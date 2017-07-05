@@ -5,9 +5,6 @@ using publicTools;
 [RequireComponent(typeof(ParticleSystem))]
 public class UIParticle : Graphic
 {
-
-    private static Mesh quadMesh;
-
     private ParticleSystem ps;
 
     private ParticleSystemRenderer psr;
@@ -22,7 +19,10 @@ public class UIParticle : Graphic
 
     private Vector2 canvasRectSizeDelta;
 
-    private Mesh mesh;
+    private int vertexCount;
+    private Vector3[] vertices;
+    private Vector2[] uv;
+    private int[] triangles;
 
     protected override void Start()
     {
@@ -54,7 +54,7 @@ public class UIParticle : Graphic
 
         if (psr.renderMode == ParticleSystemRenderMode.Mesh)
         {
-            mesh = psr.mesh;
+            Mesh mesh = psr.mesh;
 
             if (mesh == null)
             {
@@ -64,54 +64,41 @@ public class UIParticle : Graphic
             }
             else
             {
-                vertexPool = new UIVertex[mesh.vertexCount];
+                vertexCount = mesh.vertexCount;
+                vertices = mesh.vertices;
+                uv = mesh.uv;
+                triangles = mesh.triangles;
             }
         }
         else
         {
-            if (quadMesh == null)
-            {
-                quadMesh = new Mesh();
+            vertexCount = 4;
 
-                Vector3[] vertex = new Vector3[4];
+            vertices = new Vector3[vertexCount];
 
-                Vector2[] uv = new Vector2[4];
+            uv = new Vector2[vertexCount];
 
-                vertex[0] = new Vector3(-0.5f, -0.5f, 0);
-                vertex[1] = new Vector3(-0.5f, 0.5f, 0);
-                vertex[2] = new Vector3(0.5f, 0.5f, 0);
-                vertex[3] = new Vector3(0.5f, -0.5f, 0);
+            vertices[0] = new Vector3(-0.5f, -0.5f, 0);
+            vertices[1] = new Vector3(-0.5f, 0.5f, 0);
+            vertices[2] = new Vector3(0.5f, 0.5f, 0);
+            vertices[3] = new Vector3(0.5f, -0.5f, 0);
 
-                uv[0] = new Vector2(0, 0);
-                uv[1] = new Vector2(0, 1);
-                uv[2] = new Vector2(1, 1);
-                uv[3] = new Vector2(1, 0);
+            uv[0] = new Vector2(0, 0);
+            uv[1] = new Vector2(0, 1);
+            uv[2] = new Vector2(1, 1);
+            uv[3] = new Vector2(1, 0);
 
-                quadMesh.vertices = vertex;
+            triangles = new int[6];
 
-                int[] index = new int[6];
-
-                index[0] = 0;
-
-                index[1] = 1;
-
-                index[2] = 2;
-
-                index[3] = 0;
-
-                index[4] = 2;
-
-                index[5] = 3;
-
-                quadMesh.triangles = index;
-
-                quadMesh.uv = uv;
-            }
-
-            mesh = quadMesh;
-
-            vertexPool = new UIVertex[4];
+            triangles[0] = 0;
+            triangles[1] = 1;
+            triangles[2] = 2;
+            triangles[3] = 0;
+            triangles[4] = 2;
+            triangles[5] = 3;
         }
+
+        vertexPool = new UIVertex[vertexCount];
 
         if (!psr.enabled)
         {
@@ -295,26 +282,26 @@ public class UIParticle : Graphic
                 vFixPlus = 0;
             }
 
-            for (int m = 0; m < mesh.vertexCount; m++)
+            for (int m = 0; m < vertexCount; m++)
             {
                 UIVertex v = UIVertex.simpleVert;
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x + mesh.vertices[m].x * size.x, pos.y + mesh.vertices[m].y * size.y);
+                v.position = new Vector2(pos.x + vertices[m].x * size.x, pos.y + vertices[m].y * size.y);
 
-                Vector2 uv = mesh.uv[m];
+                Vector2 tmpUv = uv[m];
 
-                v.uv0 = new Vector2(uv.x * uFix + uFixPlus, uv.y * vFix + vFixPlus);
+                v.uv0 = new Vector2(tmpUv.x * uFix + uFixPlus, tmpUv.y * vFix + vFixPlus);
 
                 vertexPool[m] = v;
 
                 vh.AddVert(v);
             }
 
-            for (int m = 0; m < mesh.triangles.Length / 3; m++)
+            for (int m = 0; m < triangles.Length / 3; m++)
             {
-                vh.AddTriangle(i * mesh.vertexCount + mesh.triangles[m * 3], i * mesh.vertexCount + mesh.triangles[m * 3 + 1], i * mesh.vertexCount + mesh.triangles[m * 3 + 2]);
+                vh.AddTriangle(i * vertexCount + triangles[m * 3], i * vertexCount + triangles[m * 3 + 1], i * vertexCount + triangles[m * 3 + 2]);
             }
         }
     }
