@@ -166,8 +166,7 @@ public class UIParticle : Graphic
 
         if (Application.isPlaying)
         {
-
-//			ps.Simulate (Time.unscaledDeltaTime, false, false);
+            //			ps.Simulate (Time.unscaledDeltaTime, false, false);
 
             SetVerticesDirty();
         }
@@ -245,12 +244,48 @@ public class UIParticle : Graphic
                 uFix = 1f / ps.textureSheetAnimation.numTilesX;
                 vFix = 1f / ps.textureSheetAnimation.numTilesY;
 
-                float t = (pp.startLifetime - pp.remainingLifetime) / pp.startLifetime;
+                int frameNum;
 
-                int frame = (int)(ps.textureSheetAnimation.frameOverTime.curve.Evaluate(t) * ps.textureSheetAnimation.numTilesX * ps.textureSheetAnimation.numTilesY);
+                if (ps.textureSheetAnimation.animation == ParticleSystemAnimationType.WholeSheet)
+                {
+                    frameNum = ps.textureSheetAnimation.numTilesX * ps.textureSheetAnimation.numTilesY;
+                }
+                else
+                {
+                    frameNum = ps.textureSheetAnimation.numTilesX;
+                }
 
-                uFixPlus = uFix * (frame % ps.textureSheetAnimation.numTilesX);
-                vFixPlus = vFix * (ps.textureSheetAnimation.numTilesY - 1 - frame / ps.textureSheetAnimation.numTilesX);
+                int frame;
+
+                if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.Curve)
+                {
+                    float t = (pp.startLifetime - pp.remainingLifetime) / pp.startLifetime;
+
+                    frame = (int)(ps.textureSheetAnimation.frameOverTime.curve.Evaluate(t) * frameNum);
+                }
+                else if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.TwoConstants)
+                {
+                    frame = (int)(Mathf.Clamp((float)pp.randomSeed / uint.MaxValue, ps.textureSheetAnimation.frameOverTime.constantMin, ps.textureSheetAnimation.frameOverTime.constantMax) * frameNum);
+                }
+                else if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.Constant)
+                {
+                    frame = (int)(ps.textureSheetAnimation.frameOverTime.constant * frameNum);
+                }
+                else
+                {
+                    throw new System.Exception("unknown ps.textureSheetAnimation.frameOverTime.mode");
+                }
+
+                if (ps.textureSheetAnimation.animation == ParticleSystemAnimationType.WholeSheet)
+                {
+                    uFixPlus = uFix * (frame % ps.textureSheetAnimation.numTilesX);
+                    vFixPlus = vFix * (ps.textureSheetAnimation.numTilesY - 1 - frame / ps.textureSheetAnimation.numTilesX);
+                }
+                else
+                {
+                    uFixPlus = uFix * frame;
+                    vFixPlus = vFix * (ps.textureSheetAnimation.numTilesY - 1 - ps.textureSheetAnimation.rowIndex);
+                }
             }
             else
             {
