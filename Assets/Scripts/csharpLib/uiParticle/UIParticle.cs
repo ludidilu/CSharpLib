@@ -100,14 +100,7 @@ public class UIParticle : Graphic
 
         vertexPool = new UIVertex[vertexCount];
 
-        if (!psr.enabled)
-        {
-            enabled = false;
-        }
-        else
-        {
-            psr.enabled = false;
-        }
+        psr.enabled = false;
     }
 
     public override Material material
@@ -159,16 +152,9 @@ public class UIParticle : Graphic
         }
     }
 
-    void LateUpdate()
-    {
-        if (Application.isPlaying)
-        {
-            transform.rotation = Quaternion.identity;
-        }
-    }
-
     protected override void OnPopulateMesh(VertexHelper vh)
     {
+        Matrix4x4 matrix = Matrix4x4.TRS(Vector3.zero, transform.rotation, Vector3.one);
 
         vh.Clear();
 
@@ -182,15 +168,15 @@ public class UIParticle : Graphic
 
             Color color = pp.GetCurrentColor(ps);
 
-            Vector2 pos;
+            Vector3 pos;
 
             if (ps.main.simulationSpace == ParticleSystemSimulationSpace.World)
             {
-                Vector2 tp = pp.position - transform.position;
+                Vector3 tp = pp.position - transform.position;
 
                 if (ps.main.scalingMode == ParticleSystemScalingMode.Hierarchy)
                 {
-                    pos = new Vector2(tp.x / transform.lossyScale.x, tp.y / transform.lossyScale.y);
+                    pos = new Vector3(tp.x / transform.lossyScale.x, tp.y / transform.lossyScale.y, tp.z / transform.lossyScale.z);
                 }
                 else
                 {
@@ -208,6 +194,8 @@ public class UIParticle : Graphic
                 if (ps.main.scalingMode == ParticleSystemScalingMode.Hierarchy)
                 {
                     pos = pp.position;
+
+                    pos = matrix.MultiplyPoint3x4(pos);
                 }
                 else
                 {
@@ -215,7 +203,9 @@ public class UIParticle : Graphic
 
                     size = new Vector3(size.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, size.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y, size.z * canvas.transform.localScale.z / transform.lossyScale.z * transform.localScale.z);
 
-                    pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pp.position);
+                    pos = matrix.MultiplyPoint3x4(pp.position);
+
+                    pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pos);
 
                     pos = new Vector3(pos.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, pos.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y);
                 }
@@ -282,13 +272,36 @@ public class UIParticle : Graphic
                 vFixPlus = 0;
             }
 
+
             for (int m = 0; m < vertexCount; m++)
             {
                 UIVertex v = UIVertex.simpleVert;
 
                 v.color = color;
 
-                v.position = new Vector2(pos.x + vertices[m].x * size.x, pos.y + vertices[m].y * size.y);
+                if (ps.main.simulationSpace == ParticleSystemSimulationSpace.World)
+                {
+                    v.position = new Vector3(pos.x + vertices[m].x * size.x, pos.y + vertices[m].y * size.y, 0);
+
+                    v.position = matrix.inverse.MultiplyPoint3x4(v.position);
+                }
+                else
+                {
+                    if (psr.renderMode == ParticleSystemRenderMode.Billboard)
+                    {
+                        v.position = new Vector3(pos.x + vertices[m].x * size.x, pos.y + vertices[m].y * size.y, 0);
+
+                        v.position = matrix.inverse.MultiplyPoint3x4(v.position);
+                    }
+                    else
+                    {
+                        Vector3 vv = matrix.MultiplyPoint3x4(vertices[m]);
+
+                        v.position = new Vector3(pos.x + vv.x * size.x, pos.y + vv.y * size.y, 0);
+
+                        v.position = matrix.inverse.MultiplyPoint3x4(v.position);
+                    }
+                }
 
                 Vector2 tmpUv = uv[m];
 
