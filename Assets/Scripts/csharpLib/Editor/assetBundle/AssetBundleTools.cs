@@ -123,8 +123,13 @@ public class AssetBundleTools{
 	}
 
 	private static AssetBundleManifest CreateAssetBundle(BuildAssetBundleOptions _option,BuildTarget _buildTarget){
-		
-		PrepareToBuildAssetBundle();
+
+#if !USE_ASSETBUNDLE
+
+        throw new Exception("Add \"USE_ASSETBUNDLE\" symbol to scripting define symbol first!");
+#endif
+
+        PrepareToBuildAssetBundle();
 
 		RenderSettings.fog = true;
 		
