@@ -272,6 +272,23 @@ public class UIParticle : Graphic
                 vFixPlus = 0;
             }
 
+            Quaternion qq;
+
+            if (psr.renderMode == ParticleSystemRenderMode.Billboard)
+            {
+                qq = Quaternion.AngleAxis(pp.rotation, Vector3.back);
+            }
+            else
+            {
+                qq = Quaternion.AngleAxis(pp.rotation, pp.axisOfRotation);
+            }
+
+            Matrix4x4 mm = Matrix4x4.TRS(Vector3.zero, qq, Vector3.one);
+
+            if (ps.main.simulationSpace == ParticleSystemSimulationSpace.Local && psr.renderMode != ParticleSystemRenderMode.Billboard)
+            {
+                mm = matrix * mm;
+            }
 
             for (int m = 0; m < vertexCount; m++)
             {
@@ -279,29 +296,11 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
-                if (ps.main.simulationSpace == ParticleSystemSimulationSpace.World)
-                {
-                    v.position = new Vector3(pos.x + vertices[m].x * size.x, pos.y + vertices[m].y * size.y, 0);
+                Vector3 vv = mm.MultiplyPoint3x4(vertices[m]);
 
-                    v.position = matrix.inverse.MultiplyPoint3x4(v.position);
-                }
-                else
-                {
-                    if (psr.renderMode == ParticleSystemRenderMode.Billboard)
-                    {
-                        v.position = new Vector3(pos.x + vertices[m].x * size.x, pos.y + vertices[m].y * size.y, 0);
+                vv = new Vector3(pos.x + vv.x * size.x, pos.y + vv.y * size.y, 0);
 
-                        v.position = matrix.inverse.MultiplyPoint3x4(v.position);
-                    }
-                    else
-                    {
-                        Vector3 vv = matrix.MultiplyPoint3x4(vertices[m]);
-
-                        v.position = new Vector3(pos.x + vv.x * size.x, pos.y + vv.y * size.y, 0);
-
-                        v.position = matrix.inverse.MultiplyPoint3x4(v.position);
-                    }
-                }
+                v.position = matrix.inverse.MultiplyPoint3x4(vv);
 
                 Vector2 tmpUv = uv[m];
 
