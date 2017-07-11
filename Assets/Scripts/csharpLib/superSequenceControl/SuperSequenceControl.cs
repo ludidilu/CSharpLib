@@ -159,10 +159,15 @@ namespace superSequenceControl{
 
 		public static void To(float _start, float _end, float _time, Action<float> _del, int _index){
 
-			Action dele = delegate() {
+            Action dele = null;
 
-				MoveNext(_index);
-			};
+            if (_index != 0)
+            {
+                dele = delegate () {
+
+                    MoveNext(_index);
+                };
+            }
 
 			SuperTween.Instance.To (_start, _end, _time, _del, dele);
 		}
