@@ -24,9 +24,10 @@ public class UIParticle : Graphic
     private Vector2[] uv;
     private int[] triangles;
 
+    private Transform tmpTrans;
+
     protected override void Start()
     {
-
         base.Start();
 
         m_camera = canvas.worldCamera;
@@ -99,6 +100,15 @@ public class UIParticle : Graphic
         }
 
         vertexPool = new UIVertex[vertexCount];
+
+        if (psr.renderMode == ParticleSystemRenderMode.Stretch)
+        {
+            GameObject gg = new GameObject();
+
+            tmpTrans = gg.transform;
+
+            tmpTrans.SetParent(transform, false);
+        }
 
         psr.enabled = false;
     }
@@ -272,18 +282,59 @@ public class UIParticle : Graphic
                 vFixPlus = 0;
             }
 
+            Vector3 scale = Vector3.one;
+
             Quaternion qq;
 
             if (psr.renderMode == ParticleSystemRenderMode.Billboard)
             {
                 qq = Quaternion.AngleAxis(pp.rotation, Vector3.back);
             }
-            else
+            else if (psr.renderMode == ParticleSystemRenderMode.Mesh)
             {
                 qq = Quaternion.AngleAxis(pp.rotation, pp.axisOfRotation);
             }
+            else if (psr.renderMode == ParticleSystemRenderMode.Stretch)
+            {
+                Vector3 vv = matrix.inverse.MultiplyPoint3x4(pos);
 
-            Matrix4x4 mm = Matrix4x4.TRS(Vector3.zero, qq, Vector3.one);
+                tmpTrans.localPosition = vv;
+
+                if (ps.main.simulationSpace == ParticleSystemSimulationSpace.Local)
+                {
+                    tmpTrans.LookAt(transform.localToWorldMatrix.MultiplyPoint3x4(vv + pp.velocity), Vector3.back);
+
+                    tmpTrans.localPosition = tmpTrans.localPosition - transform.worldToLocalMatrix.MultiplyVector(tmpTrans.forward) * psr.lengthScale * 0.5f;
+
+                    tmpTrans.Rotate(Vector3.up, 90f);
+
+                    tmpTrans.Rotate(Vector3.left, -90f);
+
+                    qq = tmpTrans.localRotation;
+                }
+                else
+                {
+                    tmpTrans.LookAt(transform.localToWorldMatrix.MultiplyPoint3x4(vv) + pp.velocity, Vector3.back);
+
+                    tmpTrans.localPosition = tmpTrans.localPosition - transform.worldToLocalMatrix.MultiplyVector(tmpTrans.forward) * psr.lengthScale * 0.5f;
+
+                    tmpTrans.Rotate(Vector3.up, 90f);
+
+                    tmpTrans.Rotate(Vector3.left, -90f);
+
+                    qq = tmpTrans.rotation;
+                }
+
+                pos = matrix.MultiplyPoint3x4(tmpTrans.localPosition);
+
+                scale.x = psr.lengthScale;
+            }
+            else
+            {
+                throw new System.Exception("error!");
+            }
+
+            Matrix4x4 mm = Matrix4x4.TRS(Vector3.zero, qq, scale);
 
             if (ps.main.simulationSpace == ParticleSystemSimulationSpace.Local && psr.renderMode != ParticleSystemRenderMode.Billboard)
             {
@@ -296,7 +347,11 @@ public class UIParticle : Graphic
 
                 v.color = color;
 
+                //v.color = Color.clear;
+
                 Vector3 vv = mm.MultiplyPoint3x4(vertices[m]);
+
+                //vv = new Vector3(pos.x + vv.x * size.x, pos.y + vv.y * size.y, pos.z + vv.z * size.z);
 
                 vv = new Vector3(pos.x + vv.x * size.x, pos.y + vv.y * size.y, 0);
 
