@@ -5,83 +5,111 @@ using System.Collections.Generic;
 using wwwManager;
 using System;
 
-namespace assetBundleManager{
+namespace assetBundleManager
+{
 
-	public class AssetBundleManagerUnit{
+    public class AssetBundleManagerUnit
+    {
 
-		private AssetBundle assetBundle;
-		private string name;
-		private int type = -1;
-		private List<Action<AssetBundle>> callBackList;
-		private int useTimes;
+        private AssetBundle assetBundle;
+        private string name;
+        private int type = -1;
+        private List<Action<AssetBundle>> callBackList;
+        private int useTimes;
 
-		public AssetBundleManagerUnit(string _name){
+        public AssetBundleManagerUnit(string _name)
+        {
 
-			name = _name;
+            name = _name;
 
-			callBackList = new List<Action<AssetBundle>> ();
-		}
+            callBackList = new List<Action<AssetBundle>>();
+        }
 
-		public void Load(Action<AssetBundle> _callBack){
+        public AssetBundle Load(Action<AssetBundle> _callBack)
+        {
 
-			useTimes++;
+            useTimes++;
 
-//			SuperDebug.Log ("LoadAssetBundle:" + name);
+            //			SuperDebug.Log ("LoadAssetBundle:" + name);
 
-			if (type == -1) {
+            if (type == -1)
+            {
 
-				type = 0;
+                type = 0;
 
-				callBackList.Add (_callBack);
+                if (_callBack != null)
+                {
+                    callBackList.Add(_callBack);
+                }
 
-				WWWManager.Instance.Load(AssetBundleManager.path + name,GetAssetBundle);
+                WWWManager.Instance.Load(AssetBundleManager.path + name, GetAssetBundle);
 
-			} else if (type == 0) {
+                return null;
 
-				callBackList.Add (_callBack);
+            }
+            else if (type == 0)
+            {
 
-			} else {
+                if (_callBack != null)
+                {
+                    callBackList.Add(_callBack);
+                }
 
-				_callBack (assetBundle);
-			}
-		}
+                return null;
 
-		private void GetAssetBundle(WWW _www){
+            }
+            else {
 
-			type = 1;
+                if (_callBack != null)
+                {
+                    _callBack(assetBundle);
+                }
 
-			if(string.IsNullOrEmpty(_www.error)){
+                return assetBundle;
+            }
+        }
 
-				assetBundle = _www.assetBundle;
+        private void GetAssetBundle(WWW _www)
+        {
+
+            type = 1;
+
+            if (string.IsNullOrEmpty(_www.error))
+            {
+
+                assetBundle = _www.assetBundle;
 
                 for (int i = 0; i < callBackList.Count; i++)
                 {
                     callBackList[i](assetBundle);
                 }
 
-			}else{
+            }
+            else {
 
                 for (int i = 0; i < callBackList.Count; i++)
                 {
                     callBackList[i](null);
                 }
-			}
+            }
 
-			callBackList.Clear ();
-		}
+            callBackList.Clear();
+        }
 
-		public void Unload(){
+        public void Unload()
+        {
 
-			useTimes--;
+            useTimes--;
 
-			if (useTimes == 0) {
+            if (useTimes == 0)
+            {
 
-//				SuperDebug.Log ("dispose assetBundle:" + name);
+                //				SuperDebug.Log ("dispose assetBundle:" + name);
 
-				assetBundle.Unload (false);
+                assetBundle.Unload(false);
 
-				AssetBundleManager.Instance.Remove (name);
-			}
-		}
-	}
+                AssetBundleManager.Instance.Remove(name);
+            }
+        }
+    }
 }

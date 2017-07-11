@@ -4,62 +4,73 @@ using System.Collections.Generic;
 
 using System;
 
-namespace assetBundleManager{
+namespace assetBundleManager
+{
 
-	public class AssetBundleManager{
+    public class AssetBundleManager
+    {
 
 		public const string path = "assetbundle/";
 
-		private static AssetBundleManager _Instance;
+        private static AssetBundleManager _Instance;
 
-		public static AssetBundleManager Instance {
+        public static AssetBundleManager Instance
+        {
 
-			get {
+            get
+            {
 
-				if (_Instance == null) {
+                if (_Instance == null)
+                {
 
-					_Instance = new AssetBundleManager ();
-				}
+                    _Instance = new AssetBundleManager();
+                }
 
-				return _Instance;
-			}
-		}
+                return _Instance;
+            }
+        }
 
-		public Dictionary<string,AssetBundleManagerUnit> dic;
+        public Dictionary<string, AssetBundleManagerUnit> dic;
 
-		public AssetBundleManager(){
+        public AssetBundleManager()
+        {
 
-			dic = new Dictionary<string, AssetBundleManagerUnit>();
-		}
+            dic = new Dictionary<string, AssetBundleManagerUnit>();
+        }
 
-		public void Load(string _name,Action<AssetBundle> _callBack){
+        public AssetBundle Load(string _name, Action<AssetBundle> _callBack)
+        {
 
-			AssetBundleManagerUnit unit;
+            AssetBundleManagerUnit unit;
 
-			if (!dic.ContainsKey (_name)) {
+            if (!dic.ContainsKey(_name))
+            {
 
-				unit = new AssetBundleManagerUnit (_name);
+                unit = new AssetBundleManagerUnit(_name);
 
-				dic.Add (_name, unit);
+                dic.Add(_name, unit);
 
-			} else {
+            }
+            else {
 
-				unit = dic [_name];
-			}
+                unit = dic[_name];
+            }
 
-			unit.Load (_callBack);
-		}
+            return unit.Load(_callBack);
+        }
 
-		public void Remove(string _name){
+        public void Remove(string _name)
+        {
 
-			dic.Remove (_name);
-		}
+            dic.Remove(_name);
+        }
 
-		public void Unload(string _name){
+        public void Unload(string _name)
+        {
 
-//			SuperDebug.Log ("Unload assetBundle:" + _name);
+            //			SuperDebug.Log ("Unload assetBundle:" + _name);
 
-			dic[_name].Unload();
-		}
-	}
+            dic[_name].Unload();
+        }
+    }
 }
