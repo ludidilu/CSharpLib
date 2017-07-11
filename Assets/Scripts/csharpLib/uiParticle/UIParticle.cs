@@ -13,8 +13,6 @@ public class UIParticle : Graphic
 
     private float fix;
 
-    private UIVertex[] vertexPool;
-
     private Camera m_camera;
 
     private Vector2 canvasRectSizeDelta;
@@ -98,8 +96,6 @@ public class UIParticle : Graphic
             triangles[4] = 2;
             triangles[5] = 3;
         }
-
-        vertexPool = new UIVertex[vertexCount];
 
         if (psr.renderMode == ParticleSystemRenderMode.Stretch)
         {
@@ -252,7 +248,11 @@ public class UIParticle : Graphic
                 }
                 else if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.TwoConstants)
                 {
-                    frame = (int)(Mathf.Clamp((float)pp.randomSeed / uint.MaxValue, ps.textureSheetAnimation.frameOverTime.constantMin, ps.textureSheetAnimation.frameOverTime.constantMax) * frameNum);
+                    Random.InitState((int)pp.randomSeed);
+
+                    frame = (int)(Random.Range(ps.textureSheetAnimation.frameOverTime.constantMin, ps.textureSheetAnimation.frameOverTime.constantMax) * frameNum);
+
+                    //frame = (int)(Mathf.Clamp(Random.value, ps.textureSheetAnimation.frameOverTime.constantMin, ps.textureSheetAnimation.frameOverTime.constantMax) * frameNum);
                 }
                 else if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.Constant)
                 {
@@ -302,9 +302,9 @@ public class UIParticle : Graphic
 
                 if (ps.main.simulationSpace == ParticleSystemSimulationSpace.Local)
                 {
-                    tmpTrans.LookAt(transform.localToWorldMatrix.MultiplyPoint3x4(vv + pp.velocity), Vector3.back);
+                    tmpTrans.LookAt(transform.TransformPoint(vv + pp.velocity), Vector3.back);
 
-                    tmpTrans.localPosition = tmpTrans.localPosition - transform.worldToLocalMatrix.MultiplyVector(tmpTrans.forward) * psr.lengthScale * 0.5f;
+                    tmpTrans.localPosition = tmpTrans.localPosition - transform.InverseTransformDirection(tmpTrans.forward) * psr.lengthScale * 0.5f;
 
                     tmpTrans.Rotate(Vector3.up, 90f);
 
@@ -314,9 +314,9 @@ public class UIParticle : Graphic
                 }
                 else
                 {
-                    tmpTrans.LookAt(transform.localToWorldMatrix.MultiplyPoint3x4(vv) + pp.velocity, Vector3.back);
+                    tmpTrans.LookAt(transform.TransformPoint(vv) + pp.velocity, Vector3.back);
 
-                    tmpTrans.localPosition = tmpTrans.localPosition - transform.worldToLocalMatrix.MultiplyVector(tmpTrans.forward) * psr.lengthScale * 0.5f;
+                    tmpTrans.localPosition = tmpTrans.localPosition - transform.InverseTransformDirection(tmpTrans.forward) * psr.lengthScale * 0.5f;
 
                     tmpTrans.Rotate(Vector3.up, 90f);
 
@@ -343,11 +343,9 @@ public class UIParticle : Graphic
 
             for (int m = 0; m < vertexCount; m++)
             {
-                UIVertex v = UIVertex.simpleVert;
+                Color nowColor = color;
 
-                v.color = color;
-
-                //v.color = Color.clear;
+                //Color nowColor = Color.clear;
 
                 Vector3 vv = mm.MultiplyPoint3x4(vertices[m]);
 
@@ -355,15 +353,13 @@ public class UIParticle : Graphic
 
                 vv = new Vector3(pos.x + vv.x * size.x, pos.y + vv.y * size.y, 0);
 
-                v.position = matrix.inverse.MultiplyPoint3x4(vv);
+                Vector3 nowPos = matrix.inverse.MultiplyPoint3x4(vv);
 
                 Vector2 tmpUv = uv[m];
 
-                v.uv0 = new Vector2(tmpUv.x * uFix + uFixPlus, tmpUv.y * vFix + vFixPlus);
+                Vector2 nowUv = new Vector2(tmpUv.x * uFix + uFixPlus, tmpUv.y * vFix + vFixPlus);
 
-                vertexPool[m] = v;
-
-                vh.AddVert(v);
+                vh.AddVert(nowPos, nowColor, nowUv);
             }
 
             for (int m = 0; m < triangles.Length / 3; m++)
