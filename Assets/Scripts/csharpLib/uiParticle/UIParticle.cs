@@ -322,11 +322,13 @@ public class UIParticle : Graphic
 
                 tmpTrans.localPosition = vv;
 
+                float lengthScale = transform.lossyScale.x / transform.lossyScale.z * psr.lengthScale;
+
                 if (ps.main.simulationSpace == ParticleSystemSimulationSpace.Local)
                 {
                     tmpTrans.LookAt(transform.TransformPoint(vv + pp.velocity), Vector3.back);
 
-                    tmpTrans.localPosition = tmpTrans.localPosition - transform.InverseTransformDirection(tmpTrans.forward) * psr.lengthScale * 0.5f;
+                    tmpTrans.localPosition = tmpTrans.localPosition - transform.InverseTransformDirection(tmpTrans.forward) * lengthScale * 0.5f;
 
                     tmpTrans.Rotate(Vector3.up, 90f);
 
@@ -338,7 +340,7 @@ public class UIParticle : Graphic
                 {
                     tmpTrans.LookAt(transform.TransformPoint(vv) + pp.velocity, Vector3.back);
 
-                    tmpTrans.localPosition = tmpTrans.localPosition - transform.InverseTransformDirection(tmpTrans.forward) * psr.lengthScale * 0.5f;
+                    tmpTrans.localPosition = tmpTrans.localPosition - transform.InverseTransformDirection(tmpTrans.forward) * lengthScale * 0.5f;
 
                     tmpTrans.Rotate(Vector3.up, 90f);
 
@@ -349,7 +351,7 @@ public class UIParticle : Graphic
 
                 pos = matrix.MultiplyPoint3x4(tmpTrans.localPosition);
 
-                scale.x = psr.lengthScale;
+                scale.x = lengthScale;
             }
             else
             {
