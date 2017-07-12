@@ -24,6 +24,10 @@ public class UIParticle : Graphic
 
     private Transform tmpTrans;
 
+    private float minSize;
+
+    private float maxSize;
+
     protected override void Start()
     {
         base.Start();
@@ -37,6 +41,19 @@ public class UIParticle : Graphic
         Vector2 pos1 = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, new Vector3(1, 0, 0));
 
         fix = Mathf.Abs(pos0.x - pos1.x);
+
+        if (psr.renderMode == ParticleSystemRenderMode.Billboard)
+        {
+            Vector3 vvv = m_camera.ScreenToWorldPoint(new Vector3(0, 0, 0));
+
+            Vector3 vvv2 = m_camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+
+            float screenSize = vvv2.x - vvv.x;
+
+            minSize = screenSize * psr.minParticleSize;
+
+            maxSize = screenSize * psr.maxParticleSize;
+        }
     }
 
     protected override void Awake()
@@ -171,6 +188,11 @@ public class UIParticle : Graphic
             ParticleSystem.Particle pp = p[i];
 
             Vector3 size = pp.GetCurrentSize3D(ps);
+
+            if (psr.renderMode == ParticleSystemRenderMode.Billboard)
+            {
+                size = new Vector3(Mathf.Clamp(size.x, minSize, maxSize), Mathf.Clamp(size.y, minSize, maxSize), Mathf.Clamp(size.z, minSize, maxSize));
+            }
 
             Color color = pp.GetCurrentColor(ps);
 
