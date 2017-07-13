@@ -34,7 +34,7 @@ public class UIParticle : Graphic
 
         m_camera = canvas.worldCamera;
 
-        canvasRectSizeDelta = (rectTransform.root as RectTransform).sizeDelta;
+        canvasRectSizeDelta = (canvas.rootCanvas.transform as RectTransform).sizeDelta;
 
         Vector2 pos0 = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, new Vector3(0, 0, 0));
 
@@ -210,11 +210,11 @@ public class UIParticle : Graphic
                 {
                     size = size * fix;
 
-                    size = new Vector3(size.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, size.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y, size.z * canvas.transform.localScale.z / transform.lossyScale.z * transform.localScale.z);
+                    size = new Vector3(size.x * canvas.rootCanvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, size.y * canvas.rootCanvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y, size.z * canvas.transform.localScale.z / transform.lossyScale.z * transform.localScale.z);
 
                     pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, tp);
 
-                    pos = new Vector3(pos.x * canvas.transform.localScale.x / transform.lossyScale.x, pos.y * canvas.transform.localScale.y / transform.lossyScale.y);
+                    pos = new Vector3(pos.x * canvas.rootCanvas.transform.localScale.x / transform.lossyScale.x, pos.y * canvas.rootCanvas.transform.localScale.y / transform.lossyScale.y);
                 }
             }
             else
@@ -229,13 +229,13 @@ public class UIParticle : Graphic
                 {
                     size = size * fix;
 
-                    size = new Vector3(size.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, size.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y, size.z * canvas.transform.localScale.z / transform.lossyScale.z * transform.localScale.z);
+                    size = new Vector3(size.x * canvas.rootCanvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, size.y * canvas.rootCanvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y, size.z * canvas.transform.localScale.z / transform.lossyScale.z * transform.localScale.z);
 
                     pos = matrix.MultiplyPoint3x4(pp.position);
 
                     pos = PublicTools.WorldPositionToCanvasPosition(m_camera, canvasRectSizeDelta, pos);
 
-                    pos = new Vector3(pos.x * canvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, pos.y * canvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y);
+                    pos = new Vector3(pos.x * canvas.rootCanvas.transform.localScale.x / transform.lossyScale.x * transform.localScale.x, pos.y * canvas.rootCanvas.transform.localScale.y / transform.lossyScale.y * transform.localScale.y);
                 }
             }
 
