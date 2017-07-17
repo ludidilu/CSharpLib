@@ -5,11 +5,11 @@ using publicTools;
 [RequireComponent(typeof(ParticleSystem))]
 public class UIParticle : Graphic
 {
+    private static ParticleSystem.Particle[] p = new ParticleSystem.Particle[1000];
+
     private ParticleSystem ps;
 
     private ParticleSystemRenderer psr;
-
-    private ParticleSystem.Particle[] p;
 
     private float fix;
 
@@ -63,8 +63,6 @@ public class UIParticle : Graphic
         ps = GetComponent<ParticleSystem>();
 
         psr = GetComponent<ParticleSystemRenderer>();
-
-        p = new ParticleSystem.Particle[ps.main.maxParticles];
 
         base.raycastTarget = false;
 
