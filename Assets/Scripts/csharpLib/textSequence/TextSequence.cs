@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using superTween;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -27,27 +26,27 @@ public class TextSequence
         private TextSequenceEffect effect;
         private string str;
         private Action callBack;
-		private Action stepCallBack;
+        private Action stepCallBack;
 
-		private int tweenIndex;
-		private int currentIndex;
+        private int tweenIndex;
+        private int currentIndex;
 
-		public SequenceHandler(Text _text, TextSequenceEffect _effect, string _str, Action _callBack, float _oneLetterTime, Action _stepCallBack)
+        public SequenceHandler(Text _text, TextSequenceEffect _effect, string _str, Action _callBack, float _oneLetterTime, Action _stepCallBack)
         {
             text = _text;
             effect = _effect;
             str = _str;
             callBack = _callBack;
-			stepCallBack = _stepCallBack;
+            stepCallBack = _stepCallBack;
 
             text.text = str;
 
-			Action<int> dele = delegate(int obj) {
+            Action<int> dele = delegate (int obj)
+            {
+                tweenIndex = SuperTween.Instance.To(0, obj, obj * _oneLetterTime, Step, Over);
+            };
 
-				tweenIndex = SuperTween.Instance.To(0, obj, obj * _oneLetterTime, Step, Over);
-			};
-
-			_effect.Init(dele);
+            _effect.Init(dele);
         }
 
         private void Step(float value)
@@ -63,22 +62,22 @@ public class TextSequence
 
             effect.SetShowNum(currentIndex);
 
-			text.text = string.Empty;
+            text.text = string.Empty;
 
             text.text = str;
 
-			if(stepCallBack != null){
-
-				stepCallBack();
-			}
+            if (stepCallBack != null)
+            {
+                stepCallBack();
+            }
         }
 
-		private void Over(){
+        private void Over()
+        {
+            effect.SetShowNum(-1);
 
-			effect.SetShowNum(-1);
-
-			callBack();
-		}
+            callBack();
+        }
 
         public void Stop()
         {
@@ -86,7 +85,7 @@ public class TextSequence
 
             effect.SetShowNum(-1);
 
-			text.text = string.Empty;
+            text.text = string.Empty;
 
             text.text = str;
 
@@ -98,7 +97,7 @@ public class TextSequence
 
     public void AddSequence(Text text, TextSequenceEffect _effect, string str, Action _callBack, Action _stepCallBack)
     {
-		AddSequence(text, _effect, str, _callBack, m_SingleDefualtTime, _stepCallBack);
+        AddSequence(text, _effect, str, _callBack, m_SingleDefualtTime, _stepCallBack);
     }
 
     public void AddSequence(Text text, TextSequenceEffect _effect, string str, Action _callBack, float _oneLetterTime, Action _stepCallBack)
@@ -113,18 +112,17 @@ public class TextSequence
             }
         };
 
-		SequenceHandler handler = new SequenceHandler(text, _effect, str, dele, _oneLetterTime, _stepCallBack);
+        SequenceHandler handler = new SequenceHandler(text, _effect, str, dele, _oneLetterTime, _stepCallBack);
 
         m_sequenceDic.Add(text, handler);
     }
 
     public void RemoveSequence(Text text)
     {
-        if (m_sequenceDic.ContainsKey(text))
+        SequenceHandler handler;
+
+        if (m_sequenceDic.TryGetValue(text, out handler))
         {
-
-            SequenceHandler handler = m_sequenceDic[text];
-
             handler.Stop();
         }
     }

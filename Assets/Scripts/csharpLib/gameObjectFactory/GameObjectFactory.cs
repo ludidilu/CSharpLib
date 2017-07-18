@@ -4,144 +4,135 @@ using System;
 
 namespace gameObjectFactory
 {
+    public class GameObjectFactory
+    {
+        public Dictionary<string, GameObjectFactoryUnit> dic = new Dictionary<string, GameObjectFactoryUnit>();
 
-    public class GameObjectFactory{
+        private static GameObjectFactory _Instance;
 
-		public Dictionary<string,GameObjectFactoryUnit> dic = new Dictionary<string, GameObjectFactoryUnit>();
+        public static GameObjectFactory Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    _Instance = new GameObjectFactory();
+                }
 
-		private static GameObjectFactory _Instance;
+                return _Instance;
+            }
+        }
 
-		public static GameObjectFactory Instance {
+        public void PreloadGameObjects(string[] _paths, Action _callBack)
+        {
+            int loadNum = _paths.Length;
 
-			get {
+            Action callBack = delegate ()
+            {
+                loadNum--;
 
-				if(_Instance == null){
+                if (loadNum == 0)
+                {
+                    _callBack();
+                }
+            };
 
-					_Instance = new GameObjectFactory();
-				}
+            for (int i = 0; i < _paths.Length; i++)
+            {
+                PreloadGameObject(_paths[i], callBack);
+            }
+        }
 
-				return _Instance;
-			}
-		}
+        public void PreloadGameObject(string _path, Action _callBack)
+        {
+            GameObjectFactoryUnit unit;
 
-		public void PreloadGameObjects(string[] _paths,Action _callBack){
+            if (!dic.TryGetValue(_path, out unit))
+            {
+                unit = new GameObjectFactoryUnit(_path);
 
-			int loadNum = _paths.Length;
+                dic.Add(_path, unit);
+            }
 
-			Action callBack = delegate() {
+            unit.GetGameObject(_callBack);
+        }
 
-				loadNum--;
+        public GameObject GetGameObject(string _path, Action<GameObject> _callBack)
+        {
+            GameObjectFactoryUnit unit;
 
-				if(loadNum == 0){
+            if (!dic.TryGetValue(_path, out unit))
+            {
+                unit = new GameObjectFactoryUnit(_path);
 
-					_callBack();
-				}
-			};
+                dic.Add(_path, unit);
+            }
 
-			for(int i = 0 ; i < _paths.Length ; i++){
+            return unit.GetGameObject(_callBack);
+        }
 
-				PreloadGameObject(_paths[i],callBack);
-			}
-		}
+        public bool Hold(string _path)
+        {
+            GameObjectFactoryUnit unit;
 
-		public void PreloadGameObject(string _path,Action _callBack){
+            if (!dic.TryGetValue(_path, out unit))
+            {
+                return false;
+            }
+            else
+            {
+                unit.AddUseNum();
 
-			GameObjectFactoryUnit unit;
-			
-			if (!dic.ContainsKey (_path)) {
-				
-				unit = new GameObjectFactoryUnit (_path);
-				
-				dic.Add(_path,unit);
-				
-			} else {
-				
-				unit = dic [_path];
-			}
-			
-			unit.GetGameObject (_callBack);
-		}
+                return true;
+            }
+        }
 
-		public GameObject GetGameObject(string _path,Action<GameObject> _callBack){
-			
-			GameObjectFactoryUnit unit;
-			
-			if (!dic.ContainsKey (_path)) {
-				
-				unit = new GameObjectFactoryUnit (_path);
-				
-				dic.Add(_path,unit);
-				
-			} else {
-				
-				unit = dic [_path];
-			}
-			
-			return unit.GetGameObject (_callBack);
-		}
+        public bool Release(string _path)
+        {
+            GameObjectFactoryUnit unit;
 
-		public bool Hold(string _path){
+            if (!dic.TryGetValue(_path, out unit))
+            {
+                return false;
+            }
+            else
+            {
+                unit.DelUseNum();
 
-			if(!dic.ContainsKey(_path)){
+                return true;
+            }
+        }
 
-				return false;
+        public void Dispose(bool _force)
+        {
+            List<string> delKeyList = null;
 
-			}else{
+            Dictionary<string, GameObjectFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
 
-				GameObjectFactoryUnit unit = dic[_path];
+            while (enumerator.MoveNext())
+            {
+                KeyValuePair<String, GameObjectFactoryUnit> pair = enumerator.Current;
 
-				unit.AddUseNum();
+                if (_force || pair.Value.useNum == 0)
+                {
+                    pair.Value.Dispose();
 
-				return true;
-			}
-		}
-
-		public bool Release(string _path){
-
-			if(!dic.ContainsKey(_path)){
-				
-				return false;
-				
-			}else{
-				
-				GameObjectFactoryUnit unit = dic[_path];
-				
-				unit.DelUseNum();
-				
-				return true;
-			}
-		}
-
-		public void Dispose(bool _force){
-
-			List<string> delKeyList = null;
-
-			Dictionary<string,GameObjectFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
-
-			while(enumerator.MoveNext()){
-
-				KeyValuePair<String,GameObjectFactoryUnit> pair = enumerator.Current;
-
-				if (_force || pair.Value.useNum == 0) {
-
-					pair.Value.Dispose ();
-
-                    if(delKeyList == null)
+                    if (delKeyList == null)
                     {
                         delKeyList = new List<string>();
                     }
 
-					delKeyList.Add (pair.Key);
-				}
-			}
+                    delKeyList.Add(pair.Key);
+                }
+            }
 
-            if(delKeyList != null)
+            if (delKeyList != null)
             {
                 for (int i = 0; i < delKeyList.Count; i++)
                 {
                     dic.Remove(delKeyList[i]);
                 }
             }
-		}
-	}
+        }
+    }
 }

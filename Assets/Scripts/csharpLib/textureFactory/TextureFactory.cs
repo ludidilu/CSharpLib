@@ -1,88 +1,82 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
-using UnityEngine.UI;
-using superTween;
 
-namespace textureFactory{
+namespace textureFactory
+{
+    public class TextureFactory
+    {
+        private static TextureFactory _Instance;
 
-	public class TextureFactory{
+        public static TextureFactory Instance
+        {
 
-		private static TextureFactory _Instance;
-		
-		public static TextureFactory Instance {
-			
-			get {
-				
-				if (_Instance == null) {
-					
-					_Instance = new TextureFactory ();
-				}
-				
-				return _Instance;
-			}
-		}
+            get
+            {
+                if (_Instance == null)
+                {
+                    _Instance = new TextureFactory();
+                }
 
-		public Dictionary<string,ITextureFactoryUnit> dic  = new Dictionary<string, ITextureFactoryUnit>();
-		public Dictionary<string,ITextureFactoryUnit> dicWillDispose  = new Dictionary<string, ITextureFactoryUnit>();
+                return _Instance;
+            }
+        }
 
-		public T GetTexture<T> (string _name,Action<T> _callBack,bool _doNotDispose) where T:UnityEngine.Object {
+        public Dictionary<string, ITextureFactoryUnit> dic = new Dictionary<string, ITextureFactoryUnit>();
+        public Dictionary<string, ITextureFactoryUnit> dicWillDispose = new Dictionary<string, ITextureFactoryUnit>();
 
-			return GetTexture(_name,0,_callBack,_doNotDispose);
-		}
+        public T GetTexture<T>(string _name, Action<T> _callBack, bool _doNotDispose) where T : UnityEngine.Object
+        {
+            return GetTexture(_name, 0, _callBack, _doNotDispose);
+        }
 
-		public T GetTexture<T> (string _name,int _index,Action<T> _callBack,bool _doNotDispose) where T:UnityEngine.Object {
-			
-			TextureFactoryUnit2<T> unit;
-			
-			Dictionary<string,ITextureFactoryUnit> tmpDic;
-			
-			if (_doNotDispose) {
-				
-				tmpDic = dic;
-				
-			} else {
-				
-				tmpDic = dicWillDispose;
-			}
-			
-			if (!tmpDic.ContainsKey (_name)) {
-				
-				unit = new TextureFactoryUnit2<T> (_name);
-				
-				tmpDic.Add (_name, unit);
-				
-			} else {
-				
-				unit = tmpDic [_name] as TextureFactoryUnit2<T>;
-			}
-			
-			return unit.GetTexture(_index,_callBack);
-		}
+        public T GetTexture<T>(string _name, int _index, Action<T> _callBack, bool _doNotDispose) where T : UnityEngine.Object
+        {
+            ITextureFactoryUnit unit;
 
-		public void Dispose(bool _force){
+            Dictionary<string, ITextureFactoryUnit> tmpDic;
 
-			Dictionary<string,ITextureFactoryUnit>.ValueCollection.Enumerator enumerator = dicWillDispose.Values.GetEnumerator();
+            if (_doNotDispose)
+            {
+                tmpDic = dic;
+            }
+            else
+            {
+                tmpDic = dicWillDispose;
+            }
 
-			while(enumerator.MoveNext()){
+            if (!tmpDic.TryGetValue(_name, out unit))
+            {
+                unit = new TextureFactoryUnit2<T>(_name);
 
-				enumerator.Current.Dispose();
-			}
+                tmpDic.Add(_name, unit);
+            }
 
-			dicWillDispose.Clear ();
+            return (unit as TextureFactoryUnit2<T>).GetTexture(_index, _callBack);
+        }
 
-			if(_force){
+        public void Dispose(bool _force)
+        {
+            Dictionary<string, ITextureFactoryUnit>.ValueCollection.Enumerator enumerator = dicWillDispose.Values.GetEnumerator();
 
-				enumerator = dic.Values.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                enumerator.Current.Dispose();
+            }
 
-				while(enumerator.MoveNext()){
+            dicWillDispose.Clear();
 
-					enumerator.Current.Dispose();
-				}
+            if (_force)
+            {
+                enumerator = dic.Values.GetEnumerator();
 
-				dic.Clear();
-			}
-		}
-	}
+                while (enumerator.MoveNext())
+                {
+
+                    enumerator.Current.Dispose();
+                }
+
+                dic.Clear();
+            }
+        }
+    }
 }

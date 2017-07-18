@@ -1,56 +1,57 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-namespace shader{
+namespace shader
+{
+    public class UIRenderQueue : MonoBehaviour
+    {
+        private static Dictionary<string, Material> dic = new Dictionary<string, Material>();
 
-	public class UIRenderQueue : MonoBehaviour {
+        [SerializeField]
+        private int renderQueue;
 
-		private static Dictionary<string,Material> dic = new Dictionary<string, Material>();
+        [SerializeField]
+        private bool isIndependent;
 
-		[SerializeField]
-		private int renderQueue;
+        // Use this for initialization
+        void Awake()
+        {
+            MaskableGraphic graphic = GetComponent<MaskableGraphic>();
 
-		[SerializeField]
-		private bool isIndependent;
+            if (isIndependent)
+            {
+                Material material = Instantiate(graphic.material);
 
-		// Use this for initialization
-		void Awake () {
-		
-			MaskableGraphic graphic = GetComponent<MaskableGraphic>();
+                material.renderQueue = renderQueue;
 
-			if(isIndependent){
+                graphic.material = material;
+            }
+            else
+            {
+                string materialName = graphic.material.name + "_" + renderQueue.ToString();
 
-				Material material = Material.Instantiate<Material>(graphic.material);
+                Material material;
 
-				material.renderQueue = renderQueue;
+                if (dic.TryGetValue(materialName, out material))
+                {
+                    graphic.material = material;
+                }
+                else
+                {
+                    material = Instantiate(graphic.material);
 
-				graphic.material = material;
+                    material.name = materialName;
 
-			}else{
+                    material.renderQueue = renderQueue;
 
-				string materialName = graphic.material.name + "_" + renderQueue.ToString();
+                    dic.Add(materialName, material);
 
-				if(dic.ContainsKey(materialName)){
+                    graphic.material = material;
+                }
+            }
 
-					graphic.material = dic[materialName];
-
-				}else{
-
-					Material material = Material.Instantiate<Material>(graphic.material);
-
-					material.name = materialName;
-
-					material.renderQueue = renderQueue;
-
-					dic.Add(materialName,material);
-
-					graphic.material = material;
-				}
-			}
-
-			GameObject.Destroy(this);
-		}
-	}
+            Destroy(this);
+        }
+    }
 }

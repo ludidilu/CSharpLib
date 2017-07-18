@@ -122,7 +122,6 @@ namespace superFunction
 
         private int AddEventListener(GameObject _target, string _eventName, Delegate _callBack, bool _isOnce)
         {
-
             int result = GetIndex();
 
             SuperFunctionUnit unit = new SuperFunctionUnit(_target, _eventName, _callBack, result, _isOnce);
@@ -131,14 +130,8 @@ namespace superFunction
 
             Dictionary<string, List<SuperFunctionUnit>> tmpDic;
 
-            if (dic2.ContainsKey(_target))
+            if (!dic2.TryGetValue(_target, out tmpDic))
             {
-
-                tmpDic = dic2[_target];
-
-            }
-            else {
-
                 _target.AddComponent<SuperFunctionControl>();
 
                 tmpDic = new Dictionary<string, List<SuperFunctionUnit>>();
@@ -148,14 +141,8 @@ namespace superFunction
 
             List<SuperFunctionUnit> tmpList;
 
-            if (tmpDic.ContainsKey(_eventName))
+            if (!tmpDic.TryGetValue(_eventName, out tmpList))
             {
-
-                tmpList = tmpDic[_eventName];
-
-            }
-            else {
-
                 tmpList = new List<SuperFunctionUnit>();
 
                 tmpDic.Add(_eventName, tmpList);
@@ -168,17 +155,14 @@ namespace superFunction
 
         public void RemoveEventListener(int _index)
         {
+            SuperFunctionUnit unit;
 
-            if (dic.ContainsKey(_index))
+            if (dic.TryGetValue(_index, out unit))
             {
-
-                SuperFunctionUnit unit = dic[_index];
-
                 dic.Remove(_index);
 
                 if (removeDelegate != null)
                 {
-
                     removeDelegate(_index);
                 }
 
@@ -190,12 +174,10 @@ namespace superFunction
 
                 if (tmpList.Count == 0)
                 {
-
                     tmpDic.Remove(unit.eventName);
 
                     if (tmpDic.Count == 0)
                     {
-
                         DestroyControl(unit.target);
                     }
                 }
@@ -204,24 +186,20 @@ namespace superFunction
 
         public void RemoveEventListener(GameObject _target)
         {
+            Dictionary<string, List<SuperFunctionUnit>> tmpDic;
 
-            if (dic2.ContainsKey(_target))
+            if (dic2.TryGetValue(_target, out tmpDic))
             {
-
-                Dictionary<string, List<SuperFunctionUnit>> tmpDic = dic2[_target];
-
                 DestroyControl(_target);
 
                 Dictionary<string, List<SuperFunctionUnit>>.ValueCollection.Enumerator enumerator = tmpDic.Values.GetEnumerator();
 
                 while (enumerator.MoveNext())
                 {
-
                     List<SuperFunctionUnit> tmpList = enumerator.Current;
 
                     for (int i = 0; i < tmpList.Count; i++)
                     {
-
                         SuperFunctionUnit unit = tmpList[i];
 
                         dic.Remove(unit.index);
@@ -238,27 +216,22 @@ namespace superFunction
 
         public void RemoveEventListener(GameObject _target, string _eventName)
         {
+            Dictionary<string, List<SuperFunctionUnit>> tmpDic;
 
-            if (dic2.ContainsKey(_target))
+            if (dic2.TryGetValue(_target, out tmpDic))
             {
+                List<SuperFunctionUnit> list;
 
-                Dictionary<string, List<SuperFunctionUnit>> tmpDic = dic2[_target];
-
-                if (tmpDic.ContainsKey(_eventName))
+                if (tmpDic.TryGetValue(_eventName, out list))
                 {
-
-                    List<SuperFunctionUnit> list = tmpDic[_eventName];
-
                     for (int i = 0; i < list.Count; i++)
                     {
-
                         SuperFunctionUnit unit = list[i];
 
                         dic.Remove(unit.index);
 
                         if (removeDelegate != null)
                         {
-
                             removeDelegate(unit.index);
                         }
                     }
@@ -267,7 +240,6 @@ namespace superFunction
 
                     if (tmpDic.Count == 0)
                     {
-
                         DestroyControl(_target);
                     }
                 }
@@ -276,60 +248,49 @@ namespace superFunction
 
         public void RemoveEventListener(GameObject _target, string _eventName, SuperFunctionCallBack0 _callBack)
         {
-
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
         public void RemoveEventListener<T1>(GameObject _target, string _eventName, SuperFunctionCallBack1<T1> _callBack)
         {
-
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
         public void RemoveEventListener<T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBack2<T1, T2> _callBack)
         {
-
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
         public void RemoveEventListener<T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBack3<T1, T2, T3> _callBack)
         {
-
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
         public void RemoveEventListener<T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBack4<T1, T2, T3, T4> _callBack)
         {
-
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
         private void RemoveEventListenerReal(GameObject _target, string _eventName, Delegate _callBack)
         {
+            Dictionary<string, List<SuperFunctionUnit>> tmpDic;
 
-            if (dic2.ContainsKey(_target))
+            if (dic2.TryGetValue(_target, out tmpDic))
             {
+                List<SuperFunctionUnit> list;
 
-                Dictionary<string, List<SuperFunctionUnit>> tmpDic = dic2[_target];
-
-                if (tmpDic.ContainsKey(_eventName))
+                if (tmpDic.TryGetValue(_eventName, out list))
                 {
-
-                    List<SuperFunctionUnit> list = tmpDic[_eventName];
-
                     for (int i = 0; i < list.Count; i++)
                     {
-
                         SuperFunctionUnit unit = list[i];
 
                         if (unit.callBack == _callBack)
                         {
-
                             dic.Remove(unit.index);
 
                             if (removeDelegate != null)
                             {
-
                                 removeDelegate(unit.index);
                             }
 
@@ -341,12 +302,10 @@ namespace superFunction
 
                     if (list.Count == 0)
                     {
-
                         tmpDic.Remove(_eventName);
 
                         if (tmpDic.Count == 0)
                         {
-
                             DestroyControl(_target);
                         }
                     }
@@ -468,14 +427,14 @@ namespace superFunction
         {
             List<SuperFunctionUnit> result = null;
 
-            if (dic2.ContainsKey(_target))
+            Dictionary<string, List<SuperFunctionUnit>> tmpDic;
+
+            if (dic2.TryGetValue(_target, out tmpDic))
             {
-                Dictionary<string, List<SuperFunctionUnit>> tmpDic = dic2[_target];
+                List<SuperFunctionUnit> tmpList;
 
-                if (tmpDic.ContainsKey(_eventName))
+                if (tmpDic.TryGetValue(_eventName, out tmpList))
                 {
-                    List<SuperFunctionUnit> tmpList = tmpDic[_eventName];
-
                     for (int i = 0; i < tmpList.Count; i++)
                     {
                         SuperFunctionUnit unit = tmpList[i];
@@ -498,31 +457,26 @@ namespace superFunction
 
         public void DestroyGameObject(GameObject _target)
         {
+            Dictionary<string, List<SuperFunctionUnit>> tmpDic;
 
-            if (dic2.ContainsKey(_target))
+            if (dic2.TryGetValue(_target, out tmpDic))
             {
-
-                Dictionary<string, List<SuperFunctionUnit>> tmpDic = dic2[_target];
-
                 dic2.Remove(_target);
 
                 Dictionary<string, List<SuperFunctionUnit>>.ValueCollection.Enumerator enumerator = tmpDic.Values.GetEnumerator();
 
                 while (enumerator.MoveNext())
                 {
-
                     List<SuperFunctionUnit> tmpList = enumerator.Current;
 
                     for (int i = 0; i < tmpList.Count; i++)
                     {
-
                         SuperFunctionUnit unit = tmpList[i];
 
                         dic.Remove(unit.index);
 
                         if (removeDelegate != null)
                         {
-
                             removeDelegate(unit.index);
                         }
                     }
@@ -532,17 +486,14 @@ namespace superFunction
 
         private void DestroyControl(GameObject _target)
         {
-
             SuperFunctionControl[] controls = _target.GetComponents<SuperFunctionControl>();
 
             for (int i = 0; i < controls.Length; i++)
             {
-
                 SuperFunctionControl control = controls[i];
 
                 if (!control.isDestroy)
                 {
-
                     control.isDestroy = true;
 
                     GameObject.Destroy(control);
@@ -554,7 +505,6 @@ namespace superFunction
 
         private int GetIndex()
         {
-
             index++;
 
             int result = index;
@@ -564,7 +514,6 @@ namespace superFunction
 
         public int GetNum()
         {
-
             return dic.Count;
         }
     }

@@ -4,95 +4,94 @@ using System;
 
 namespace animatorFactoty
 {
+    public class AnimatorFactory
+    {
+        private static AnimatorFactory _Instance;
 
-    public class AnimatorFactory {
+        public static AnimatorFactory Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    _Instance = new AnimatorFactory();
+                }
 
-		private static AnimatorFactory _Instance;
-		
-		public static AnimatorFactory Instance {
-			
-			get {
-				
-				if (_Instance == null) {
-					
-					_Instance = new AnimatorFactory ();
-				}
-				
-				return _Instance;
-			}
-		}
-		
-		public Dictionary<string,AnimatorFactoryUnit> dic;
-		
-		public AnimatorFactory(){
-			
-			dic = new Dictionary<string, AnimatorFactoryUnit>();
-		}
+                return _Instance;
+            }
+        }
 
-		public RuntimeAnimatorController GetAnimator(string _path,Action<RuntimeAnimatorController> _callBack){
+        public Dictionary<string, AnimatorFactoryUnit> dic;
 
-			AnimatorFactoryUnit unit;
-			
-			if (!dic.ContainsKey (_path)) {
-				
-				unit = new AnimatorFactoryUnit (_path);
-				
-				dic.Add(_path,unit);
-				
-			} else {
-				
-				unit = dic [_path];
-			}
-			
-			return unit.GetAnimator (_callBack);
-		}
+        public AnimatorFactory()
+        {
+            dic = new Dictionary<string, AnimatorFactoryUnit>();
+        }
 
-		public void AddUseNum(string _path){
-			
-			if (dic.ContainsKey (_path)) {
-				
-				dic [_path].AddUseNum ();
-			}
-		}
+        public RuntimeAnimatorController GetAnimator(string _path, Action<RuntimeAnimatorController> _callBack)
+        {
+            AnimatorFactoryUnit unit;
 
-		public void DelUseNum(string _path){
+            if (!dic.TryGetValue(_path, out unit))
+            {
+                unit = new AnimatorFactoryUnit(_path);
 
-			if (dic.ContainsKey (_path)) {
+                dic.Add(_path, unit);
+            }
 
-				dic [_path].DelUseNum ();
-			}
-		}
+            return unit.GetAnimator(_callBack);
+        }
 
-		public void Dispose(bool _force){
-			
-			List<string> delKeyList = null;
+        public void AddUseNum(string _path)
+        {
+            AnimatorFactoryUnit unit;
 
-			Dictionary<string,AnimatorFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
+            if (dic.TryGetValue(_path, out unit))
+            {
+                unit.AddUseNum();
+            }
+        }
 
-			while(enumerator.MoveNext()){
+        public void DelUseNum(string _path)
+        {
+            AnimatorFactoryUnit unit;
 
-				KeyValuePair<String,AnimatorFactoryUnit> pair = enumerator.Current;
-			
-				if (_force || pair.Value.useNum == 0) {
-					
-					pair.Value.Dispose ();
-					
-                    if(delKeyList == null)
+            if (dic.TryGetValue(_path, out unit))
+            {
+                unit.DelUseNum();
+            }
+        }
+
+        public void Dispose(bool _force)
+        {
+            List<string> delKeyList = null;
+
+            Dictionary<string, AnimatorFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                KeyValuePair<String, AnimatorFactoryUnit> pair = enumerator.Current;
+
+                if (_force || pair.Value.useNum == 0)
+                {
+                    pair.Value.Dispose();
+
+                    if (delKeyList == null)
                     {
                         delKeyList = new List<string>();
                     }
 
-					delKeyList.Add (pair.Key);
-				}
-			}
+                    delKeyList.Add(pair.Key);
+                }
+            }
 
-            if(delKeyList != null)
+            if (delKeyList != null)
             {
                 for (int i = 0; i < delKeyList.Count; i++)
                 {
                     dic.Remove(delKeyList[i]);
                 }
             }
-		}
-	}
+        }
+    }
 }

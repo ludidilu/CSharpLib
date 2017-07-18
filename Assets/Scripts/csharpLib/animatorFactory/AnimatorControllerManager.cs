@@ -4,80 +4,82 @@ using System;
 using System.Collections.Generic;
 using assetManager;
 
-namespace animatorFactoty{
+namespace animatorFactoty
+{
+    public class AnimatorControllerManager : ScriptableObject
+    {
+        public static readonly string PATH = "Assets/Arts/animation";
 
-	public class AnimatorControllerManager : ScriptableObject {
+        public static readonly string FILE_NAME = "animators.asset";
 
-		public static readonly string PATH = "Assets/Arts/animation";
+        private static AnimatorControllerManager _Instance;
 
-		public static readonly string FILE_NAME = "animators.asset";
+        public static AnimatorControllerManager Instance
+        {
+            get
+            {
+                return _Instance;
+            }
+        }
 
-		private static AnimatorControllerManager _Instance;
+        [SerializeField]
+        private string[] names;
 
-		public static AnimatorControllerManager Instance{
+        [SerializeField]
+        private RuntimeAnimatorController[] animators;
 
-			get{
+        private Dictionary<string, RuntimeAnimatorController> dic;
 
-				return _Instance;
-			}
-		}
+        public static void Init(Action _callBack)
+        {
+            Action<AnimatorControllerManager> callBack = delegate (AnimatorControllerManager obj)
+            {
+                LoadOK(obj, _callBack);
+            };
 
-		[SerializeField]
-		private string[] names;
+            AssetManager.Instance.GetAsset<AnimatorControllerManager>(PATH + "/" + FILE_NAME, callBack);
+        }
 
-		[SerializeField]
-		private RuntimeAnimatorController[] animators;
+        private void InitDic()
+        {
+            dic = new Dictionary<string, RuntimeAnimatorController>();
 
-		private Dictionary<string,RuntimeAnimatorController> dic;
+            for (int i = 0; i < names.Length; i++)
+            {
+                dic.Add(names[i], animators[i]);
+            }
+        }
 
-		public static void Init(Action _callBack){
+        private static void LoadOK(AnimatorControllerManager _asset, Action _callBack)
+        {
+            _asset.InitDic();
 
-			Action<AnimatorControllerManager> callBack = delegate(AnimatorControllerManager obj) {
+            _Instance = _asset;
 
-				LoadOK (obj,_callBack);
-			};
+            if (_callBack != null)
+            {
+                _callBack();
+            }
+        }
 
-			AssetManager.Instance.GetAsset<AnimatorControllerManager>(PATH + "/" + FILE_NAME,callBack);
-		}
+        public void Save(string[] _names, RuntimeAnimatorController[] _animators)
+        {
+            names = _names;
+            animators = _animators;
+        }
 
-		private void InitDic(){
+        public RuntimeAnimatorController GetAnimator(string _name)
+        {
+            RuntimeAnimatorController controller;
 
-			dic = new Dictionary<string, RuntimeAnimatorController>();
-			
-			for(int i = 0 ; i < names.Length ; i++){
-				
-				dic.Add(names[i],animators[i]);
-			}
-		}
-
-		private static void LoadOK(AnimatorControllerManager _asset,Action _callBack){
-
-			_asset.InitDic();
-
-			_Instance = _asset;
-
-			if(_callBack != null){
-
-				_callBack();
-			}
-		}
-
-		public void Save(string[] _names,RuntimeAnimatorController[] _animators){
-
-			names = _names;
-			animators = _animators;
-		}
-
-		public RuntimeAnimatorController GetAnimator(string _name){
-
-			if(dic.ContainsKey(_name)){
-
-				return dic[_name];
-
-			}else{
-
-				return null;
-			}
-		}
-	}
+            if (dic.TryGetValue(_name, out controller))
+            {
+                return dic[_name];
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
 }

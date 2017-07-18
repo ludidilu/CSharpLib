@@ -4,97 +4,90 @@ using System;
 
 namespace audio
 {
+    public class AudioFactory
+    {
+        private static AudioFactory _Instance;
 
-    public class AudioFactory{
+        public static AudioFactory Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    _Instance = new AudioFactory();
+                }
 
-		private static AudioFactory _Instance;
+                return _Instance;
+            }
+        }
 
-		public static AudioFactory Instance{
+        private Dictionary<string, AudioFactoryUnit> dic = new Dictionary<string, AudioFactoryUnit>();
 
-			get{
+        public AudioClip GetClip(string _name, Action<AudioClip> _callBack)
+        {
+            return GetClip(_name, _callBack, true);
+        }
 
-				if(_Instance == null){
+        public AudioClip GetClip(string _name, Action<AudioClip> _callBack, bool _willDispose)
+        {
+            AudioFactoryUnit unit;
 
-					_Instance = new AudioFactory();
-				}
+            if (!dic.TryGetValue(_name, out unit))
+            {
+                unit = new AudioFactoryUnit(_name);
 
-				return _Instance;
-			}
-		}
+                dic.Add(_name, unit);
+            }
 
-		private Dictionary<string,AudioFactoryUnit> dic = new Dictionary<string, AudioFactoryUnit>();
+            return unit.GetClip(_callBack, _willDispose);
+        }
 
-		public AudioClip GetClip(string _name,Action<AudioClip> _callBack){
+        public void RemoveClip(AudioClip _clip)
+        {
+            string key = _clip.name;
 
-			return GetClip(_name,_callBack,true);
-		}
+            AudioFactoryUnit unit;
 
-		public AudioClip GetClip(string _name,Action<AudioClip> _callBack,bool _willDispose){
+            if (dic.TryGetValue(key, out unit))
+            {
+                unit.Dispose();
 
-			AudioFactoryUnit unit;
-			
-			if (!dic.ContainsKey (_name)) {
-				
-				unit = new AudioFactoryUnit (_name);
-				
-				dic.Add (_name, unit);
-				
-			} else {
-				
-				unit = dic [_name];
-			}
-			
-			return unit.GetClip(_callBack,_willDispose);
-		}
+                dic.Remove(key);
+            }
+        }
 
-		public void RemoveClip(AudioClip _clip){
+        public void Dispose(bool _force)
+        {
+            List<string> delKeyList = null;
 
-			string key = _clip.name;
+            Dictionary<string, AudioFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
 
-            if (!dic.ContainsKey(key)){
+            while (enumerator.MoveNext())
+            {
+                KeyValuePair<string, AudioFactoryUnit> pair = enumerator.Current;
 
-				return;
-			}
+                AudioFactoryUnit unit = pair.Value;
 
-			AudioFactoryUnit unit = dic[key];
+                if (_force || unit.willDispose)
+                {
+                    unit.Dispose();
 
-			unit.Dispose();
-
-			dic.Remove(key);
-		}
-
-		public void Dispose(bool _force){
-
-			List<string> delKeyList = null;
-
-			Dictionary<string,AudioFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
-
-			while(enumerator.MoveNext()){
-
-				KeyValuePair<string,AudioFactoryUnit> pair = enumerator.Current;
-
-				AudioFactoryUnit unit = pair.Value;
-
-				if(_force || unit.willDispose){
-
-					unit.Dispose();
-
-                    if(delKeyList == null)
+                    if (delKeyList == null)
                     {
                         delKeyList = new List<string>();
                     }
 
-					delKeyList.Add(pair.Key);
-				}
-			}
+                    delKeyList.Add(pair.Key);
+                }
+            }
 
-            if(delKeyList != null)
+            if (delKeyList != null)
             {
                 for (int i = 0; i < delKeyList.Count; i++)
                 {
                     dic.Remove(delKeyList[i]);
                 }
             }
-		}
-	}
+        }
+    }
 }
