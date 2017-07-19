@@ -133,10 +133,15 @@ namespace superSequenceControl
 
         private static void InitIEnumerator(IEnumerator _ie, int _index)
         {
-            if (_ie.MoveNext())
+            Action dele = delegate ()
             {
-                dic.Add(_index, _ie);
-            }
+                if (_ie.MoveNext())
+                {
+                    dic.Add(_index, _ie);
+                }
+            };
+
+            SuperTween.Instance.NextFrameCall(dele);
         }
 
         public static void MoveNext(int _index)
