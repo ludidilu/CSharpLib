@@ -60,7 +60,7 @@ namespace scene{
 				}
 			};
 
-			SuperTween.Instance.DelayCall(0,initCb);
+			SuperTween.Instance.NextFrameCall(initCb);
 
 			GameObject.Destroy(this);
 		}
