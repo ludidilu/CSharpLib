@@ -133,15 +133,15 @@ namespace superSequenceControl
 
         private static void InitIEnumerator(IEnumerator _ie, int _index)
         {
-            SuperTween.Instance.NextFrameCall(InitEnumeratorReal, _ie, _index);
-        }
-
-        private static void InitEnumeratorReal(IEnumerator _ie, int _index)
-        {
-            if (_ie.MoveNext())
+            Action dele = delegate ()
             {
-                dic.Add(_index, _ie);
-            }
+                if (_ie.MoveNext())
+                {
+                    dic.Add(_index, _ie);
+                }
+            };
+
+            SuperTween.Instance.NextFrameCall(dele);
         }
 
         public static void MoveNext(int _index)
@@ -164,19 +164,27 @@ namespace superSequenceControl
 
         public static void To(float _start, float _end, float _time, Action<float> _del, int _index)
         {
+            Action dele = null;
+
             if (_index != 0)
             {
-                SuperTween.Instance.To(_start, _end, _time, _del, false, MoveNext, _index);
+                dele = delegate ()
+                {
+                    MoveNext(_index);
+                };
             }
-            else
-            {
-                SuperTween.Instance.To(_start, _end, _time, _del, false);
-            }
+
+            SuperTween.Instance.To(_start, _end, _time, _del, dele);
         }
 
         public static void DelayCall(float _time, int _index)
         {
-            SuperTween.Instance.DelayCall(_time, false, MoveNext, _index);
+            Action dele = delegate ()
+            {
+                MoveNext(_index);
+            };
+
+            SuperTween.Instance.DelayCall(_time, dele);
         }
     }
 }
