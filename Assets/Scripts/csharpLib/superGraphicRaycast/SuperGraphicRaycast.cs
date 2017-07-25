@@ -93,9 +93,6 @@ namespace superGraphicRaycast
             }
         }
 
-        [SerializeField]
-        private bool checkBlock3DRayCast;
-
         private int touchCount = 0;
 
         void LateUpdate()
@@ -136,11 +133,6 @@ namespace superGraphicRaycast
                         resultAppendList.RemoveAt(i);
                     }
                 }
-            }
-
-            if (checkBlock3DRayCast && resultAppendList.Count > 0)
-            {
-                SuperFunction.Instance.DispatchEvent(SuperRaycast.Go, SuperRaycast.GetBlockByUi);
             }
         }
     }

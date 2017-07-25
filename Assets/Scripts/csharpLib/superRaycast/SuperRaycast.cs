@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using superFunction;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 namespace superRaycast
 {
@@ -12,8 +13,6 @@ namespace superRaycast
         public const string GetMouseEnter = "GetMouseEnter";
         public const string GetMouseExit = "GetMouseExit";
         public const string GetMouseClick = "GetMouseClick";
-
-        public const string GetBlockByUi = "GetBlockByUi";
 
         private static SuperRaycast _Instance;
 
@@ -27,9 +26,24 @@ namespace superRaycast
             Instance.AddLayerReal(_layerName);
         }
 
-        public static void DelLayer(string _layerName)
+        public static void RemoveLayer(string _layerName)
         {
-            Instance.DelLayerReal(_layerName);
+            Instance.RemoveLayerReal(_layerName);
+        }
+
+        public static void AddTag(string _tag)
+        {
+            Instance.AddTagReal(_tag);
+        }
+
+        public static void RemoveTag(string _tag)
+        {
+            Instance.RemoveTagReal(_tag);
+        }
+
+        public static void SetFilter(bool _value)
+        {
+            Instance.filter = _value;
         }
 
         public static GameObject Go
@@ -57,14 +71,14 @@ namespace superRaycast
 
         public static bool GetIsOpen()
         {
-            return Instance.m_isOpen > 0;
+            return Instance.isOpen > 0;
         }
 
         public static void SetIsOpen(bool _isOpen, string _str)
         {
-            Instance.m_isOpen = Instance.m_isOpen + (_isOpen ? 1 : -1);
+            Instance.isOpen = Instance.isOpen + (_isOpen ? 1 : -1);
 
-            if (Instance.m_isOpen == 0)
+            if (Instance.isOpen == 0)
             {
                 if (!Instance.isProcessingUpdate)
                 {
@@ -74,115 +88,20 @@ namespace superRaycast
                 {
                     Instance.needClearObjs = true;
                 }
-
             }
-            else if (Instance.m_isOpen > 1)
+            else if (Instance.isOpen > 1)
             {
-                PrintLog();
-
                 SuperDebug.Log("SuperRaycast error!!!!!!!!!!!!!");
             }
-
-            if (Instance.dic.ContainsKey(_str))
-            {
-                if (_isOpen)
-                {
-                    Instance.dic[_str]++;
-                }
-                else
-                {
-                    Instance.dic[_str]--;
-                }
-
-                if (Instance.dic[_str] == 0)
-                {
-                    Instance.dic.Remove(_str);
-                }
-            }
-            else
-            {
-                if (_isOpen)
-                {
-                    Instance.dic.Add(_str, 1);
-                }
-                else
-                {
-                    Instance.dic.Add(_str, -1);
-                }
-            }
         }
-
-        public static void PrintLog()
-        {
-            if (Instance.needClearObjs)
-            {
-                foreach (KeyValuePair<string, int> pair in Instance.dic)
-                {
-                    SuperDebug.Log("SuperRaycast key:" + pair.Key + "  value:" + pair.Value);
-                }
-            }
-        }
-
-        public static string filterTag
-        {
-            get
-            {
-                return Instance.m_filterTag;
-            }
-
-            set
-            {
-                Instance.m_filterTag = value;
-            }
-        }
-
-        public static bool filter
-        {
-            get
-            {
-                return Instance.m_filter;
-            }
-
-            set
-            {
-                Instance.m_filter = value;
-            }
-        }
-
-        public static bool checkBlockByUi
-        {
-            get
-            {
-                return Instance.m_checkBlockByUi;
-            }
-
-            set
-            {
-                if (Instance.m_checkBlockByUi != value)
-                {
-                    Instance.m_checkBlockByUi = value;
-
-                    if (Instance.m_checkBlockByUi)
-                    {
-                        SuperFunction.Instance.AddEventListener(Instance.gameObject, GetBlockByUi, Instance.CheckBlockByUiHandler);
-                    }
-                    else
-                    {
-                        SuperFunction.Instance.RemoveEventListener(Instance.gameObject, GetBlockByUi, Instance.CheckBlockByUiHandler);
-                    }
-                }
-            }
-        }
-
-        public Dictionary<string, int> dic = new Dictionary<string, int>();
 
         private int layerIndex;
 
-        private int m_isOpen = 0;
+        private int isOpen = 0;
 
-        private bool m_filter = false;
+        private bool filter = false;
 
-        private string m_filterTag;
+        private Dictionary<string, bool> filterTagDic = new Dictionary<string, bool>();
 
         private List<GameObject> downObjs = new List<GameObject>();
 
@@ -192,10 +111,6 @@ namespace superRaycast
 
         private bool needClearObjs = false;
 
-        private bool m_checkBlockByUi = false;
-
-        private bool isBlockByUi = false;
-
         private Camera renderCamera;
 
         private void AddLayerReal(string _layerName)
@@ -203,34 +118,36 @@ namespace superRaycast
             layerIndex = layerIndex | (1 << LayerMask.NameToLayer(_layerName));
         }
 
-        private void DelLayerReal(string _layerName)
+        private void RemoveLayerReal(string _layerName)
         {
             layerIndex = layerIndex & ~(1 << LayerMask.NameToLayer(_layerName));
         }
 
-        private void CheckBlockByUiHandler(int _index)
+        private void AddTagReal(string _tag)
         {
-            isBlockByUi = true;
+            filterTagDic.Add(_tag, false);
+        }
+
+        private void RemoveTagReal(string _tag)
+        {
+            filterTagDic.Remove(_tag);
         }
 
         void Update()
         {
-            if (m_checkBlockByUi && isBlockByUi)
-            {
-                isBlockByUi = false;
-
-                return;
-            }
-
-            if (m_isOpen > 0 && renderCamera != null)
+            if (isOpen > 0 && renderCamera != null)
             {
                 isProcessingUpdate = true;
 
                 RaycastHit[] hits = null;
 
+                bool blockByUI = false;
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
+
+                    blockByUI = EventSystem.current.IsPointerOverGameObject();
 
                     if (layerIndex == 0)
                     {
@@ -247,7 +164,7 @@ namespace superRaycast
                     {
                         RaycastHit hit = hits[m];
 
-                        if (m_filter && !hit.collider.gameObject.CompareTag(m_filterTag))
+                        if (filter && !filterTagDic.ContainsKey(hit.collider.gameObject.tag))
                         {
                             continue;
                         }
@@ -256,7 +173,7 @@ namespace superRaycast
 
                         downObjs.Add(hit.collider.gameObject);
 
-                        SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseButtonDown, hit, i);
+                        SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseButtonDown, blockByUI, hit, i);
 
                         i++;
                     }
@@ -267,6 +184,8 @@ namespace superRaycast
                     if (hits == null)
                     {
                         Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
+
+                        blockByUI = EventSystem.current.IsPointerOverGameObject();
 
                         if (layerIndex == 0)
                         {
@@ -280,15 +199,13 @@ namespace superRaycast
 
                     List<GameObject> newObjs = new List<GameObject>();
 
-                    List<GameObject> enterObjs = new List<GameObject>();
-
                     int i = 0;
 
                     for (int m = 0; m < hits.Length; m++)
                     {
                         RaycastHit hit = hits[m];
 
-                        if (m_filter && !hit.collider.gameObject.CompareTag(m_filterTag))
+                        if (filter && !filterTagDic.ContainsKey(hit.collider.gameObject.tag))
                         {
                             continue;
                         }
@@ -297,29 +214,24 @@ namespace superRaycast
 
                         if (!objs.Contains(hit.collider.gameObject))
                         {
-                            enterObjs.Add(hit.collider.gameObject);
+                            SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseEnter, blockByUI, hit, i);
                         }
                         else
                         {
                             objs.Remove(hit.collider.gameObject);
                         }
 
-                        SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseButton, hit, i);
+                        SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseButton, blockByUI, hit, i);
 
                         i++;
                     }
 
                     for (i = 0; i < objs.Count; i++)
                     {
-                        SuperFunction.Instance.DispatchEvent(objs[i], GetMouseExit);
+                        SuperFunction.Instance.DispatchEvent(objs[i], GetMouseExit, blockByUI);
                     }
 
                     objs = newObjs;
-
-                    for (i = 0; i < enterObjs.Count; i++)
-                    {
-                        SuperFunction.Instance.DispatchEvent(enterObjs[i], GetMouseEnter);
-                    }
                 }
 
                 if (Input.GetMouseButtonUp(0))
@@ -327,6 +239,8 @@ namespace superRaycast
                     if (hits == null)
                     {
                         Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
+
+                        blockByUI = EventSystem.current.IsPointerOverGameObject();
 
                         if (layerIndex == 0)
                         {
@@ -344,16 +258,16 @@ namespace superRaycast
                     {
                         RaycastHit hit = hits[m];
 
-                        if (m_filter && !hit.collider.gameObject.CompareTag(m_filterTag))
+                        if (filter && !filterTagDic.ContainsKey(hit.collider.gameObject.tag))
                         {
                             continue;
                         }
 
-                        SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseButtonUp, hit, i);
+                        SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseButtonUp, blockByUI, hit, i);
 
                         if (downObjs.Contains(hit.collider.gameObject))
                         {
-                            SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseClick, hit, i);
+                            SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseClick, blockByUI, hit, i);
                         }
 
                         i++;
