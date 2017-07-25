@@ -1,32 +1,31 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
-namespace superGraphicRaycast{
+namespace superGraphicRaycast
+{
+    public class SuperGraphicRaycastScript : MonoBehaviour
+    {
+        private static SuperGraphicRaycastScript _Instance;
 
-	public class SuperGraphicRaycastScript : MonoBehaviour {
+        public static SuperGraphicRaycastScript Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    GameObject go = new GameObject("SuperGraphicRaycastScriptGameObject");
 
-		private static SuperGraphicRaycastScript _Instance;
-		
-		public static SuperGraphicRaycastScript Instance{
-			
-			get{
-				
-				if(_Instance == null){
-					
-					
-					GameObject go = new GameObject("SuperGraphicRaycastScriptGameObject");
-					
-					_Instance = go.AddComponent<SuperGraphicRaycastScript>();
-				}
-				
-				return _Instance;
-			}
-		}
-		
-		public int isOpen = 1;
-		
-		public bool filter = false;
-		
-		public string filterTag;
-	}
+                    _Instance = go.AddComponent<SuperGraphicRaycastScript>();
+                }
+
+                return _Instance;
+            }
+        }
+
+        public int isOpen = 1;
+
+        public bool filter = false;
+
+        public Dictionary<string, bool> tagDic = new Dictionary<string, bool>();
+    }
 }

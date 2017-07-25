@@ -1,96 +1,34 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using superRaycast;
-using superFunction;
 
 namespace superGraphicRaycast
 {
     public class SuperGraphicRaycast : GraphicRaycaster
     {
-        public static Dictionary<string, int> dic = new Dictionary<string, int>();
-
-        /// <summary>
-        /// _str 传 类名-锁屏/解锁功能名
-        /// </summary>
-        /// <param name="_isOpen"></param>
-        /// <param name="_str"></param>
-		public static void SetIsOpen(bool _isOpen, string _str)
+        public static void SetIsOpen(bool _isOpen, string _str)
         {
-            //SuperDebug.Log("-->> _isOpen: " + _isOpen + " , _str: " + _str);
             SuperGraphicRaycastScript.Instance.isOpen = SuperGraphicRaycastScript.Instance.isOpen + (_isOpen ? 1 : -1);
-
-            if (dic.ContainsKey(_str))
-            {
-                if (_isOpen)
-                {
-                    dic[_str]++;
-                }
-                else
-                {
-                    dic[_str]--;
-                }
-
-                if (dic[_str] == 0)
-                {
-                    dic.Remove(_str);
-                }
-            }
-            else
-            {
-                if (_isOpen)
-                {
-                    dic.Add(_str, 1);
-                }
-                else
-                {
-                    dic.Add(_str, -1);
-                }
-            }
 
             if (SuperGraphicRaycastScript.Instance.isOpen > 1)
             {
-                PrintLog();
                 SuperDebug.LogError("SuperGraphicRaycast.SetOpen error!");
             }
         }
 
-        public static void PrintLog()
+        public static void SetFilter(bool _value)
         {
-            if (SuperGraphicRaycastScript.Instance.isOpen != 1)
-            {
-                foreach (KeyValuePair<string, int> pair in dic)
-                {
-                    SuperDebug.Log("SuperGraphicRaycast key:" + pair.Key + "  value:" + pair.Value);
-                }
-            }
+            SuperGraphicRaycastScript.Instance.filter = _value;
         }
 
-        public static bool filter
+        public static void AddFilterTag(string _tag)
         {
-            set
-            {
-                SuperGraphicRaycastScript.Instance.filter = value;
-            }
-
-            get
-            {
-                return SuperGraphicRaycastScript.Instance.filter;
-            }
+            SuperGraphicRaycastScript.Instance.tagDic.Add(_tag, true);
         }
 
-        public static string filterTag
+        public static void RemoveFilterTag(string _tag)
         {
-            set
-            {
-                SuperGraphicRaycastScript.Instance.filterTag = value;
-            }
-
-            get
-            {
-                return SuperGraphicRaycastScript.Instance.filterTag;
-            }
+            SuperGraphicRaycastScript.Instance.tagDic.Remove(_tag);
         }
 
         private int touchCount = 0;
@@ -123,13 +61,12 @@ namespace superGraphicRaycast
 
             base.Raycast(eventData, resultAppendList);
 
-            if (filter)
+            if (SuperGraphicRaycastScript.Instance.filter)
             {
                 for (int i = resultAppendList.Count - 1; i > -1; i--)
                 {
-                    if (!resultAppendList[i].gameObject.CompareTag(filterTag))
+                    if (!SuperGraphicRaycastScript.Instance.tagDic.ContainsKey(resultAppendList[i].gameObject.tag))
                     {
-
                         resultAppendList.RemoveAt(i);
                     }
                 }
