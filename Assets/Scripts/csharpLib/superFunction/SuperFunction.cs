@@ -1,26 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System;
-using superFunction;
 
 namespace superFunction
 {
-
     public class SuperFunction
     {
-
         private static SuperFunction _Instance;
 
         public static SuperFunction Instance
         {
-
             get
             {
-
                 if (_Instance == null)
                 {
-
                     _Instance = new SuperFunction();
                 }
 
@@ -43,80 +36,67 @@ namespace superFunction
 
         public SuperFunction()
         {
-
             dic = new Dictionary<int, SuperFunctionUnit>();
             dic2 = new Dictionary<GameObject, Dictionary<string, List<SuperFunctionUnit>>>();
         }
 
         public void AddRemoveDelegate(Action<int> _dele)
         {
-
             removeDelegate += _dele;
         }
 
         public void RemoveRemoveDelegate(Action<int> _dele)
         {
-
             removeDelegate -= _dele;
         }
 
         public int AddOnceEventListener(GameObject _target, string _eventName, SuperFunctionCallBack0 _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
         public int AddEventListener(GameObject _target, string _eventName, SuperFunctionCallBack0 _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
         public int AddOnceEventListener<T1>(GameObject _target, string _eventName, SuperFunctionCallBack1<T1> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
         public int AddEventListener<T1>(GameObject _target, string _eventName, SuperFunctionCallBack1<T1> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
         public int AddOnceEventListener<T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBack2<T1, T2> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
         public int AddEventListener<T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBack2<T1, T2> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
         public int AddOnceEventListener<T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBack3<T1, T2, T3> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
         public int AddEventListener<T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBack3<T1, T2, T3> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
         public int AddOnceEventListener<T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBack4<T1, T2, T3, T4> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
         public int AddEventListener<T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBack4<T1, T2, T3, T4> _callBack)
         {
-
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
