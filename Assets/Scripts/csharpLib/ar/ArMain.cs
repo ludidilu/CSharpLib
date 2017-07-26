@@ -173,7 +173,7 @@ public class ArMain : MonoBehaviour {
 	
 	private void SetTargetRotation(GameObject _go){
 		
-		float r = Mathf.Atan2(_go.transform.localPosition.x - cameraTrans.localPosition.x,_go.transform.localPosition.z - cameraTrans.localPosition.z) * 180 / Mathf.PI - 180;
+		float r = Mathf.Atan2(_go.transform.localPosition.x - cameraTrans.localPosition.x,_go.transform.localPosition.z - cameraTrans.localPosition.z) * Mathf.Rad2Deg - 180;
 		
 		Quaternion q = new Quaternion();
 		
