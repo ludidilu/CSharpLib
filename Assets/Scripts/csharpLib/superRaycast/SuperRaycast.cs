@@ -105,6 +105,8 @@ namespace superRaycast
 
         private List<GameObject> downObjs = new List<GameObject>();
 
+        private List<GameObject> newObjs = new List<GameObject>();
+
         private List<GameObject> objs = new List<GameObject>();
 
         private bool isProcessingUpdate = false;
@@ -197,8 +199,6 @@ namespace superRaycast
                         }
                     }
 
-                    List<GameObject> newObjs = new List<GameObject>();
-
                     int i = 0;
 
                     for (int m = 0; m < hits.Length; m++)
@@ -231,7 +231,13 @@ namespace superRaycast
                         SuperFunction.Instance.DispatchEvent(objs[i], GetMouseExit, blockByUI);
                     }
 
+                    List<GameObject> tmpObjs = objs;
+
                     objs = newObjs;
+
+                    newObjs = tmpObjs;
+
+                    newObjs.Clear();
                 }
 
                 if (Input.GetMouseButtonUp(0))

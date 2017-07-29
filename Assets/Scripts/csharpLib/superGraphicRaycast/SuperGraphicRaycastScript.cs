@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using superFunction;
 
 namespace superGraphicRaycast
 {
@@ -27,5 +28,26 @@ namespace superGraphicRaycast
         public bool filter = false;
 
         public Dictionary<string, bool> tagDic = new Dictionary<string, bool>();
+
+        void Update()
+        {
+            if (isOpen > 0)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    SuperFunction.Instance.DispatchEvent(gameObject, SuperGraphicRaycast.GetMouseButtonDown);
+                }
+
+                if (Input.GetMouseButton(0))
+                {
+                    SuperFunction.Instance.DispatchEvent(gameObject, SuperGraphicRaycast.GetMouseButton);
+                }
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    SuperFunction.Instance.DispatchEvent(gameObject, SuperGraphicRaycast.GetMouseButtonUp);
+                }
+            }
+        }
     }
 }
