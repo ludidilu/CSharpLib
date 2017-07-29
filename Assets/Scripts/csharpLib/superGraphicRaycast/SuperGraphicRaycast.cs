@@ -1,24 +1,11 @@
 ﻿using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace superGraphicRaycast
 {
     public class SuperGraphicRaycast : GraphicRaycaster
     {
-        public const string GetMouseButtonDown = "GetMouseButtonDown";
-        public const string GetMouseButton = "GetMouseButton";
-        public const string GetMouseButtonUp = "GetMouseButtonUp";
-
-        public static GameObject Go
-        {
-            get
-            {
-                return SuperGraphicRaycastScript.Instance.gameObject;
-            }
-        }
-
         public static void SetIsOpen(bool _isOpen, string _str)
         {
             SuperGraphicRaycastScript.Instance.isOpen = SuperGraphicRaycastScript.Instance.isOpen + (_isOpen ? 1 : -1);
