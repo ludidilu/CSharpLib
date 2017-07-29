@@ -31,16 +31,6 @@ namespace superGraphicRaycast
             SuperGraphicRaycastScript.Instance.tagDic.Remove(_tag);
         }
 
-        private int touchCount = 0;
-
-        void LateUpdate()
-        {
-            if (touchCount != 0)
-            {
-                touchCount = 0;
-            }
-        }
-
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
             //SuperDebug.Log("Raycast:" + SuperGraphicRaycastScript.Instance.isOpen);
@@ -49,13 +39,6 @@ namespace superGraphicRaycast
             {
                 return;
             }
-
-            if (touchCount > 0)
-            {
-                return;
-            }
-
-            touchCount++;
 
             //			if(Input.GetMouseButton(0) || Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0)){
 
