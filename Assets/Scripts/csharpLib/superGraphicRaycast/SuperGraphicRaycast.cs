@@ -4,6 +4,11 @@ using System.Collections.Generic;
 
 namespace superGraphicRaycast
 {
+    public interface IPointerHitHandler : IEventSystemHandler
+    {
+        void OnPointerHit(BaseEventData eventData);
+    }
+
     public class SuperGraphicRaycast : GraphicRaycaster
     {
         public static void SetIsOpen(bool _isOpen, string _str)
@@ -31,6 +36,11 @@ namespace superGraphicRaycast
             SuperGraphicRaycastScript.Instance.tagDic.Remove(_tag);
         }
 
+        private static ExecuteEvents.EventFunction<IPointerHitHandler> hitFun = delegate (IPointerHitHandler _handler, BaseEventData _eventData)
+        {
+            _handler.OnPointerHit(_eventData);
+        };
+
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
             //SuperDebug.Log("Raycast:" + SuperGraphicRaycastScript.Instance.isOpen);
@@ -39,8 +49,6 @@ namespace superGraphicRaycast
             {
                 return;
             }
-
-            //			if(Input.GetMouseButton(0) || Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0)){
 
             base.Raycast(eventData, resultAppendList);
 
@@ -52,6 +60,16 @@ namespace superGraphicRaycast
                     {
                         resultAppendList.RemoveAt(i);
                     }
+                }
+            }
+
+            for (int i = resultAppendList.Count - 1; i > -1; i--)
+            {
+                bool b = ExecuteEvents.Execute(resultAppendList[i].gameObject, eventData, hitFun);
+
+                if (b)
+                {
+                    resultAppendList.RemoveAt(i);
                 }
             }
         }
