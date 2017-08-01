@@ -127,7 +127,10 @@ namespace superRaycast
 
         private void AddTagReal(string _tag)
         {
-            filterTagDic.Add(_tag, false);
+            if (!filterTagDic.ContainsKey(_tag))
+            {
+                filterTagDic.Add(_tag, false);
+            }
         }
 
         private void RemoveTagReal(string _tag)

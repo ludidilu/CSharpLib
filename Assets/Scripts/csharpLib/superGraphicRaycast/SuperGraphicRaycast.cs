@@ -28,7 +28,10 @@ namespace superGraphicRaycast
 
         public static void AddFilterTag(string _tag)
         {
-            SuperGraphicRaycastScript.Instance.tagDic.Add(_tag, true);
+            if (!SuperGraphicRaycastScript.Instance.tagDic.ContainsKey(_tag))
+            {
+                SuperGraphicRaycastScript.Instance.tagDic.Add(_tag, true);
+            }
         }
 
         public static void RemoveFilterTag(string _tag)
