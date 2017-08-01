@@ -25,17 +25,22 @@ namespace gameObjectFactory
 
         public void PreloadGameObjects(string[] _paths, Action _callBack)
         {
-            int loadNum = _paths.Length;
+            Action callBack = null;
 
-            Action callBack = delegate ()
+            if(_callBack != null)
             {
-                loadNum--;
+                int loadNum = _paths.Length;
 
-                if (loadNum == 0)
+                callBack = delegate ()
                 {
-                    _callBack();
-                }
-            };
+                    loadNum--;
+
+                    if (loadNum == 0)
+                    {
+                        _callBack();
+                    }
+                };
+            }
 
             for (int i = 0; i < _paths.Length; i++)
             {
