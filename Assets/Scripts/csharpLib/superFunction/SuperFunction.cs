@@ -39,6 +39,7 @@ namespace superFunction
         private int index = 0;
 
         private Queue<List<SuperFunctionUnit>> pool = new Queue<List<SuperFunctionUnit>>();
+        private Queue<Dictionary<string, List<SuperFunctionUnit>>> pool2 = new Queue<Dictionary<string, List<SuperFunctionUnit>>>();
 
         public SuperFunction()
         {
@@ -160,7 +161,7 @@ namespace superFunction
             {
                 _target.AddComponent<SuperFunctionControl>();
 
-                tmpDic = new Dictionary<string, List<SuperFunctionUnit>>();
+                tmpDic = GetDic();
 
                 dic2.Add(_target, tmpDic);
             }
@@ -169,7 +170,7 @@ namespace superFunction
 
             if (!tmpDic.TryGetValue(_eventName, out tmpList))
             {
-                tmpList = new List<SuperFunctionUnit>();
+                tmpList = GetList();
 
                 tmpDic.Add(_eventName, tmpList);
             }
@@ -191,14 +192,26 @@ namespace superFunction
 
                 List<SuperFunctionUnit> tmpList = tmpDic[unit.eventName];
 
-                tmpList.Remove(unit);
+                for (int i = 0; i < tmpList.Count; i++)
+                {
+                    if (tmpList[i].index == unit.index)
+                    {
+                        tmpList.RemoveAt(i);
+
+                        break;
+                    }
+                }
 
                 if (tmpList.Count == 0)
                 {
+                    ReleaseList(tmpList);
+
                     tmpDic.Remove(unit.eventName);
 
                     if (tmpDic.Count == 0)
                     {
+                        ReleaseDic(tmpDic);
+
                         DestroyControl(unit.target);
                     }
                 }
@@ -225,7 +238,15 @@ namespace superFunction
 
                         dic.Remove(unit.index);
                     }
+
+                    tmpList.Clear();
+
+                    ReleaseList(tmpList);
                 }
+
+                tmpDic.Clear();
+
+                ReleaseDic(tmpDic);
             }
         }
 
@@ -246,10 +267,16 @@ namespace superFunction
                         dic.Remove(unit.index);
                     }
 
+                    list.Clear();
+
+                    ReleaseList(list);
+
                     tmpDic.Remove(_eventName);
 
                     if (tmpDic.Count == 0)
                     {
+                        ReleaseDic(tmpDic);
+
                         DestroyControl(_target);
                     }
                 }
@@ -332,10 +359,14 @@ namespace superFunction
 
                     if (list.Count == 0)
                     {
+                        ReleaseList(list);
+
                         tmpDic.Remove(_eventName);
 
                         if (tmpDic.Count == 0)
                         {
+                            ReleaseDic(tmpDic);
+
                             DestroyControl(_target);
                         }
                     }
@@ -655,7 +686,15 @@ namespace superFunction
 
                         dic.Remove(unit.index);
                     }
+
+                    tmpList.Clear();
+
+                    ReleaseList(tmpList);
                 }
+
+                tmpDic.Clear();
+
+                ReleaseDic(tmpDic);
             }
         }
 
@@ -704,6 +743,25 @@ namespace superFunction
         private void ReleaseList(List<SuperFunctionUnit> _list)
         {
             pool.Enqueue(_list);
+        }
+
+        private Dictionary<string, List<SuperFunctionUnit>> GetDic()
+        {
+            if (pool2.Count > 0)
+            {
+                return pool2.Dequeue();
+            }
+            else
+            {
+                Dictionary<string, List<SuperFunctionUnit>> dic = new Dictionary<string, List<SuperFunctionUnit>>();
+
+                return dic;
+            }
+        }
+
+        private void ReleaseDic(Dictionary<string, List<SuperFunctionUnit>> _dic)
+        {
+            pool2.Enqueue(_dic);
         }
 
         public int GetNum()
