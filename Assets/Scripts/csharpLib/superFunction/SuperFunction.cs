@@ -38,22 +38,12 @@ namespace superFunction
 
         private int index = 0;
 
-        private Action<int> removeDelegate;
+        private Queue<List<SuperFunctionUnit>> pool = new Queue<List<SuperFunctionUnit>>();
 
         public SuperFunction()
         {
             dic = new Dictionary<int, SuperFunctionUnit>();
             dic2 = new Dictionary<GameObject, Dictionary<string, List<SuperFunctionUnit>>>();
-        }
-
-        public void AddRemoveDelegate(Action<int> _dele)
-        {
-            removeDelegate += _dele;
-        }
-
-        public void RemoveRemoveDelegate(Action<int> _dele)
-        {
-            removeDelegate -= _dele;
         }
 
         public int AddOnceEventListener(GameObject _target, string _eventName, SuperFunctionCallBack0 _callBack)
@@ -197,11 +187,6 @@ namespace superFunction
             {
                 dic.Remove(_index);
 
-                if (removeDelegate != null)
-                {
-                    removeDelegate(_index);
-                }
-
                 Dictionary<string, List<SuperFunctionUnit>> tmpDic = dic2[unit.target];
 
                 List<SuperFunctionUnit> tmpList = tmpDic[unit.eventName];
@@ -239,12 +224,6 @@ namespace superFunction
                         SuperFunctionUnit unit = tmpList[i];
 
                         dic.Remove(unit.index);
-
-                        if (removeDelegate != null)
-                        {
-
-                            removeDelegate(unit.index);
-                        }
                     }
                 }
             }
@@ -265,11 +244,6 @@ namespace superFunction
                         SuperFunctionUnit unit = list[i];
 
                         dic.Remove(unit.index);
-
-                        if (removeDelegate != null)
-                        {
-                            removeDelegate(unit.index);
-                        }
                     }
 
                     tmpDic.Remove(_eventName);
@@ -350,11 +324,6 @@ namespace superFunction
                         {
                             dic.Remove(unit.index);
 
-                            if (removeDelegate != null)
-                            {
-                                removeDelegate(unit.index);
-                            }
-
                             list.RemoveAt(i);
 
                             break;
@@ -393,6 +362,10 @@ namespace superFunction
 
                     cb(unit.index);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -415,6 +388,10 @@ namespace superFunction
 
                     cb(unit.index, t1);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -437,6 +414,10 @@ namespace superFunction
 
                     cb(unit.index, t1, t2);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -459,6 +440,10 @@ namespace superFunction
 
                     cb(unit.index, t1, t2, t3);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -481,6 +466,10 @@ namespace superFunction
 
                     cb(unit.index, t1, t2, t3, t4);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -503,6 +492,10 @@ namespace superFunction
 
                     cb(unit.index, ref _t);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -525,6 +518,10 @@ namespace superFunction
 
                     cb(unit.index, ref _t, _t1);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -547,6 +544,10 @@ namespace superFunction
 
                     cb(unit.index, ref _t, _t1, _t2);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -569,6 +570,10 @@ namespace superFunction
 
                     cb(unit.index, ref _t, _t1, _t2, _t3);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -591,6 +596,10 @@ namespace superFunction
 
                     cb(unit.index, ref _t, _t1, _t2, _t3, _t4);
                 }
+
+                unitList.Clear();
+
+                ReleaseList(unitList);
             }
         }
 
@@ -614,7 +623,7 @@ namespace superFunction
                         {
                             if (result == null)
                             {
-                                result = new List<SuperFunctionUnit>();
+                                result = GetList();
                             }
 
                             result.Add(unit);
@@ -645,11 +654,6 @@ namespace superFunction
                         SuperFunctionUnit unit = tmpList[i];
 
                         dic.Remove(unit.index);
-
-                        if (removeDelegate != null)
-                        {
-                            removeDelegate(unit.index);
-                        }
                     }
                 }
             }
@@ -681,6 +685,25 @@ namespace superFunction
             int result = index;
 
             return result;
+        }
+
+        private List<SuperFunctionUnit> GetList()
+        {
+            if (pool.Count > 0)
+            {
+                return pool.Dequeue();
+            }
+            else
+            {
+                List<SuperFunctionUnit> list = new List<SuperFunctionUnit>();
+
+                return list;
+            }
+        }
+
+        private void ReleaseList(List<SuperFunctionUnit> _list)
+        {
+            pool.Enqueue(_list);
         }
 
         public int GetNum()
