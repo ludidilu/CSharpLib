@@ -27,11 +27,11 @@ namespace superFunction
         public delegate void SuperFunctionCallBack3<T1, T2, T3>(int _index, T1 t1, T2 t2, T3 t3);
         public delegate void SuperFunctionCallBack4<T1, T2, T3, T4>(int _index, T1 t1, T2 t2, T3 t3, T4 t4);
 
-        public delegate void SuperFunctionCallBackV0<T>(int _index, ref T t) where T : struct;
-        public delegate void SuperFunctionCallBackV1<T, T1>(int _index, ref T t, T1 t1) where T : struct;
-        public delegate void SuperFunctionCallBackV2<T, T1, T2>(int _index, ref T t, T1 t1, T2 t2) where T : struct;
-        public delegate void SuperFunctionCallBackV3<T, T1, T2, T3>(int _index, ref T t, T1 t1, T2 t2, T3 t3) where T : struct;
-        public delegate void SuperFunctionCallBackV4<T, T1, T2, T3, T4>(int _index, ref T t, T1 t1, T2 t2, T3 t3, T4 t4) where T : struct;
+        public delegate void SuperFunctionCallBackV0<T>(int _index, ref T t);
+        public delegate void SuperFunctionCallBackV1<T, T1>(int _index, ref T t, T1 t1);
+        public delegate void SuperFunctionCallBackV2<T, T1, T2>(int _index, ref T t, T1 t1, T2 t2);
+        public delegate void SuperFunctionCallBackV3<T, T1, T2, T3>(int _index, ref T t, T1 t1, T2 t2, T3 t3);
+        public delegate void SuperFunctionCallBackV4<T, T1, T2, T3, T4>(int _index, ref T t, T1 t1, T2 t2, T3 t3, T4 t4);
 
         private Dictionary<int, SuperFunctionUnit> dic;
         private Dictionary<GameObject, Dictionary<string, List<SuperFunctionUnit>>> dic2;
@@ -97,52 +97,52 @@ namespace superFunction
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
-        public int AddOnceEventListener<T>(GameObject _target, string _eventName, SuperFunctionCallBackV0<T> _callBack) where T : struct
+        public int AddOnceEventListener<T>(GameObject _target, string _eventName, SuperFunctionCallBackV0<T> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
-        public int AddEventListener<T>(GameObject _target, string _eventName, SuperFunctionCallBackV0<T> _callBack) where T : struct
+        public int AddEventListener<T>(GameObject _target, string _eventName, SuperFunctionCallBackV0<T> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
-        public int AddOnceEventListener<T, T1>(GameObject _target, string _eventName, SuperFunctionCallBackV1<T, T1> _callBack) where T : struct
+        public int AddOnceEventListener<T, T1>(GameObject _target, string _eventName, SuperFunctionCallBackV1<T, T1> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
-        public int AddEventListener<T, T1>(GameObject _target, string _eventName, SuperFunctionCallBackV1<T, T1> _callBack) where T : struct
+        public int AddEventListener<T, T1>(GameObject _target, string _eventName, SuperFunctionCallBackV1<T, T1> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
-        public int AddOnceEventListener<T, T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBackV2<T, T1, T2> _callBack) where T : struct
+        public int AddOnceEventListener<T, T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBackV2<T, T1, T2> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
-        public int AddEventListener<T, T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBackV2<T, T1, T2> _callBack) where T : struct
+        public int AddEventListener<T, T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBackV2<T, T1, T2> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
-        public int AddOnceEventListener<T, T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBackV3<T, T1, T2, T3> _callBack) where T : struct
+        public int AddOnceEventListener<T, T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBackV3<T, T1, T2, T3> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
-        public int AddEventListener<T, T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBackV3<T, T1, T2, T3> _callBack) where T : struct
+        public int AddEventListener<T, T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBackV3<T, T1, T2, T3> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, false);
         }
 
-        public int AddOnceEventListener<T, T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBackV4<T, T1, T2, T3, T4> _callBack) where T : struct
+        public int AddOnceEventListener<T, T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBackV4<T, T1, T2, T3, T4> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, true);
         }
 
-        public int AddEventListener<T, T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBackV4<T, T1, T2, T3, T4> _callBack) where T : struct
+        public int AddEventListener<T, T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBackV4<T, T1, T2, T3, T4> _callBack)
         {
             return AddEventListener(_target, _eventName, _callBack, false);
         }
@@ -308,27 +308,27 @@ namespace superFunction
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
-        public void RemoveEventListener<T>(GameObject _target, string _eventName, SuperFunctionCallBackV0<T> _callBack) where T : struct
+        public void RemoveEventListener<T>(GameObject _target, string _eventName, SuperFunctionCallBackV0<T> _callBack)
         {
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
-        public void RemoveEventListener<T, T1>(GameObject _target, string _eventName, SuperFunctionCallBackV1<T, T1> _callBack) where T : struct
+        public void RemoveEventListener<T, T1>(GameObject _target, string _eventName, SuperFunctionCallBackV1<T, T1> _callBack)
         {
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
-        public void RemoveEventListener<T, T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBackV2<T, T1, T2> _callBack) where T : struct
+        public void RemoveEventListener<T, T1, T2>(GameObject _target, string _eventName, SuperFunctionCallBackV2<T, T1, T2> _callBack)
         {
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
-        public void RemoveEventListener<T, T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBackV3<T, T1, T2, T3> _callBack) where T : struct
+        public void RemoveEventListener<T, T1, T2, T3>(GameObject _target, string _eventName, SuperFunctionCallBackV3<T, T1, T2, T3> _callBack)
         {
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
 
-        public void RemoveEventListener<T, T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBackV4<T, T1, T2, T3, T4> _callBack) where T : struct
+        public void RemoveEventListener<T, T1, T2, T3, T4>(GameObject _target, string _eventName, SuperFunctionCallBackV4<T, T1, T2, T3, T4> _callBack)
         {
             RemoveEventListenerReal(_target, _eventName, _callBack);
         }
@@ -504,7 +504,7 @@ namespace superFunction
             }
         }
 
-        public void DispatchEvent<T>(GameObject _target, string _eventName, ref T _t) where T : struct
+        public void DispatchEvent<T>(GameObject _target, string _eventName, ref T _t)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV0<T>>(_target, _eventName);
 
@@ -530,7 +530,7 @@ namespace superFunction
             }
         }
 
-        public void DispatchEvent<T, T1>(GameObject _target, string _eventName, ref T _t, T1 _t1) where T : struct
+        public void DispatchEvent<T, T1>(GameObject _target, string _eventName, ref T _t, T1 _t1)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV1<T, T1>>(_target, _eventName);
 
@@ -556,7 +556,7 @@ namespace superFunction
             }
         }
 
-        public void DispatchEvent<T, T1, T2>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2) where T : struct
+        public void DispatchEvent<T, T1, T2>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV2<T, T1, T2>>(_target, _eventName);
 
@@ -582,7 +582,7 @@ namespace superFunction
             }
         }
 
-        public void DispatchEvent<T, T1, T2, T3>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3) where T : struct
+        public void DispatchEvent<T, T1, T2, T3>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV3<T, T1, T2, T3>>(_target, _eventName);
 
@@ -608,7 +608,7 @@ namespace superFunction
             }
         }
 
-        public void DispatchEvent<T, T1, T2, T3, T4>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3, T4 _t4) where T : struct
+        public void DispatchEvent<T, T1, T2, T3, T4>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3, T4 _t4)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV4<T, T1, T2, T3, T4>>(_target, _eventName);
 
