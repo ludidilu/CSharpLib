@@ -374,7 +374,7 @@ namespace superFunction
             }
         }
 
-        public void DispatchEvent(GameObject _target, string _eventName)
+        public bool DispatchEvent(GameObject _target, string _eventName)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBack0>(_target, _eventName);
 
@@ -397,10 +397,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T1>(GameObject _target, string _eventName, T1 t1)
+        public bool DispatchEvent<T1>(GameObject _target, string _eventName, T1 t1)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBack1<T1>>(_target, _eventName);
 
@@ -423,10 +429,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T1, T2>(GameObject _target, string _eventName, T1 t1, T2 t2)
+        public bool DispatchEvent<T1, T2>(GameObject _target, string _eventName, T1 t1, T2 t2)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBack2<T1, T2>>(_target, _eventName);
 
@@ -449,10 +461,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T1, T2, T3>(GameObject _target, string _eventName, T1 t1, T2 t2, T3 t3)
+        public bool DispatchEvent<T1, T2, T3>(GameObject _target, string _eventName, T1 t1, T2 t2, T3 t3)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBack3<T1, T2, T3>>(_target, _eventName);
 
@@ -475,10 +493,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T1, T2, T3, T4>(GameObject _target, string _eventName, T1 t1, T2 t2, T3 t3, T4 t4)
+        public bool DispatchEvent<T1, T2, T3, T4>(GameObject _target, string _eventName, T1 t1, T2 t2, T3 t3, T4 t4)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBack4<T1, T2, T3, T4>>(_target, _eventName);
 
@@ -501,10 +525,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T>(GameObject _target, string _eventName, ref T _t)
+        public bool DispatchEvent<T>(GameObject _target, string _eventName, ref T _t)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV0<T>>(_target, _eventName);
 
@@ -527,10 +557,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T, T1>(GameObject _target, string _eventName, ref T _t, T1 _t1)
+        public bool DispatchEvent<T, T1>(GameObject _target, string _eventName, ref T _t, T1 _t1)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV1<T, T1>>(_target, _eventName);
 
@@ -553,10 +589,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T, T1, T2>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2)
+        public bool DispatchEvent<T, T1, T2>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV2<T, T1, T2>>(_target, _eventName);
 
@@ -579,10 +621,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T, T1, T2, T3>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3)
+        public bool DispatchEvent<T, T1, T2, T3>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV3<T, T1, T2, T3>>(_target, _eventName);
 
@@ -605,10 +653,16 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public void DispatchEvent<T, T1, T2, T3, T4>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3, T4 _t4)
+        public bool DispatchEvent<T, T1, T2, T3, T4>(GameObject _target, string _eventName, ref T _t, T1 _t1, T2 _t2, T3 _t3, T4 _t4)
         {
             List<SuperFunctionUnit> unitList = DispatchEventReal<SuperFunctionCallBackV4<T, T1, T2, T3, T4>>(_target, _eventName);
 
@@ -631,6 +685,12 @@ namespace superFunction
                 unitList.Clear();
 
                 ReleaseList(unitList);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
