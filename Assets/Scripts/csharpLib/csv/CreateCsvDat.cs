@@ -47,13 +47,18 @@ public class CreateCsvDat
 
         sww.WriteLine("        Dictionary<Type,IDictionary> dic = new Dictionary<Type,IDictionary>();");
 
-        Dictionary<Type, IDictionary>.Enumerator enumerator = StaticData.dic.GetEnumerator();
+        List<Type> typeList = new List<Type>();
 
-        while (enumerator.MoveNext())
+        foreach (Type type in StaticData.dic.Keys)
         {
-            Type type = enumerator.Current.Key;
+            typeList.Add(type);
+        }
 
-            IDictionary unitDic = enumerator.Current.Value;
+        typeList.Sort(SortType);
+
+        foreach (Type type in typeList)
+        {
+            IDictionary unitDic = StaticData.dic[type];
 
             string fileName = type.Name;
 
