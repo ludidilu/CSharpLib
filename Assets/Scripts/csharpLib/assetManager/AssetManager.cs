@@ -71,7 +71,7 @@ namespace assetManager
 
             Action<WWW> cb = delegate (WWW obj)
             {
-                ThreadScript.Instance.Add(InitDic, obj.bytes, _callBack, CheckInitDicOK);
+                ThreadScript.Instance.Add(InitDic, obj.bytes, _callBack);
             };
 
             WWWManager.Instance.Load(_dataName, cb);
@@ -90,11 +90,6 @@ namespace assetManager
         private void InitDic(object _dic)
         {
             dataDic = AssetManagerDataFactory.GetData(_dic as Byte[]);
-        }
-
-        private bool CheckInitDicOK()
-        {
-            return dataDic != null;
         }
 
         public AssetManagerData GetData(string _name)

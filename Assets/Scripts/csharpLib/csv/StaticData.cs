@@ -114,17 +114,12 @@ public class StaticData
 
         Action<WWW> cb = delegate (WWW obj)
         {
-            ThreadScript.Instance.Add(cb2, obj.bytes, _callBack, CheckInitDicOK);
+            ThreadScript.Instance.Add(cb2, obj.bytes, _callBack);
         };
 
         WWWManager.Instance.Load(datName, cb);
     }
-
-    private static bool CheckInitDicOK()
-    {
-        return dic != null;
-    }
-
+    
     public static void Dispose()
     {
         dic = new Dictionary<Type, IDictionary>();

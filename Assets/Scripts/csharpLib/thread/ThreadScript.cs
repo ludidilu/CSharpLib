@@ -1,91 +1,90 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Threading;
 
-namespace thread{
+namespace thread
+{
+    public class ThreadScript : MonoBehaviour
+    {
+        private static ThreadScript _Instance;
 
-	public class ThreadScript : MonoBehaviour {
+        public static ThreadScript Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    GameObject go = new GameObject("ThreadScriptGameObject");
 
-		private static ThreadScript _Instance;
+                    GameObject.DontDestroyOnLoad(go);
 
-		public static ThreadScript Instance{
+                    _Instance = go.AddComponent<ThreadScript>();
+                }
 
-			get{
+                return _Instance;
+            }
+        }
 
-				if(_Instance == null){
+        private List<Action> callBackList = new List<Action>();
 
-					GameObject go = new GameObject("ThreadScriptGameObject");
+        private List<Thread> checkList = new List<Thread>();
 
-					GameObject.DontDestroyOnLoad(go);
+        private List<Action> tmpCallBackList = new List<Action>();
 
-					_Instance = go.AddComponent<ThreadScript>();
-				}
+        public void Add(ParameterizedThreadStart _job, object _data, Action _callBack)
+        {
+            callBackList.Add(_callBack);
 
-				return _Instance;
-			}
-		}
+            Thread thread = new Thread(_job);
 
-		private List<Action> callBackList = new List<Action>();
+            checkList.Add(thread);
 
-		private List<Func<bool>> checkList = new List<Func<bool>>();
+            thread.Start(_data);
+        }
 
-		private List<Action> tmpCallBackList = new List<Action>();
+        public void Add(ThreadStart _job, Action _callBack, Func<bool> _check)
+        {
+            callBackList.Add(_callBack);
 
-		public void Add(ParameterizedThreadStart _job,object _data,Action _callBack,Func<bool> _check){
+            Thread thread = new Thread(_job);
 
-			callBackList.Add(_callBack);
+            checkList.Add(thread);
 
-			checkList.Add(_check);
+            thread.Start();
+        }
 
-			Thread thread = new Thread(_job);
-			
-			thread.Start(_data);
-		}
+        void Update()
+        {
+            if (callBackList.Count > 0)
+            {
+                for (int i = callBackList.Count - 1; i > -1; i--)
+                {
+                    if (!checkList[i].IsAlive)
+                    {
+                        tmpCallBackList.Add(callBackList[i]);
 
-		public void Add(ThreadStart _job,Action _callBack,Func<bool> _check){
+                        callBackList.RemoveAt(i);
 
-			callBackList.Add(_callBack);
-			
-			checkList.Add(_check);
-			
-			Thread thread = new Thread(_job);
-			
-			thread.Start();
-		}
+                        checkList.RemoveAt(i);
+                    }
+                }
 
-		void Update () {
+                if (tmpCallBackList.Count > 0)
+                {
+                    for (int i = 0; i < tmpCallBackList.Count; i++)
+                    {
+                        Action tmpCb = tmpCallBackList[i];
 
-			if(callBackList.Count > 0){
+                        if (tmpCb != null)
+                        {
+                            tmpCb();
+                        }
+                    }
 
-				for(int i = callBackList.Count - 1 ; i > -1 ; i--){
-
-					if(checkList[i]()){
-
-						tmpCallBackList.Add(callBackList[i]);
-
-						callBackList.RemoveAt(i);
-
-						checkList.RemoveAt(i);
-					}
-				}
-
-				if(tmpCallBackList.Count > 0){
-
-					for(int i = 0 ; i < tmpCallBackList.Count ; i++){
-
-						Action tmpCb = tmpCallBackList[i];
-
-						if(tmpCb != null){
-
-							tmpCb();
-						}
-					}
-
-					tmpCallBackList.Clear();
-				}
-			}
-		}
-	}
+                    tmpCallBackList.Clear();
+                }
+            }
+        }
+    }
 }
