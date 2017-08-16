@@ -178,7 +178,7 @@ public class StaticData
 
                             if (info != null)
                             {
-                                setData(info, csv, dataArr[m]);
+                                SetData(info, csv, dataArr[m]);
                             }
                         }
 
@@ -197,7 +197,7 @@ public class StaticData
         dic.Add(type, result);
     }
 
-    private static void setData(FieldInfo _info, CsvBase _csv, string _data)
+    private static void SetData(FieldInfo _info, CsvBase _csv, string _data)
     {
         try
         {
