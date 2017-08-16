@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public class CreateCsvDat
 {
-    public static void Start(string _path0, string _path1)
+    public static void Start(string _path)
     {
         FileInfo fib = new FileInfo(Application.streamingAssetsPath + "/csv.dat");
 
@@ -20,7 +20,7 @@ public class CreateCsvDat
 
         BinaryWriter bw = new BinaryWriter(fs);
 
-        FileInfo fix = new FileInfo(Application.dataPath + _path0 + "LoadCsv.cs");
+        FileInfo fix = new FileInfo(Application.dataPath + _path + "LoadCsv.cs");
 
         if (fix.Exists)
         {
@@ -62,7 +62,7 @@ public class CreateCsvDat
 
             string fileName = type.Name;
 
-            FileInfo fii = new FileInfo(Application.dataPath + _path1 + fileName + "_c.cs");
+            FileInfo fii = new FileInfo(Application.dataPath + _path + fileName + "_c.cs");
 
             if (fii.Exists)
             {
