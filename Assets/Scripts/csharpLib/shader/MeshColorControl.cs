@@ -4,6 +4,8 @@ using System.Collections.Generic;
 [RequireComponent(typeof(MeshFilter))]
 public class MeshColorControl : MonoBehaviour
 {
+    private Color color;
+
     private List<Color> colorList = new List<Color>();
 
     private Mesh mesh;
@@ -21,11 +23,18 @@ public class MeshColorControl : MonoBehaviour
 
     public void SetColor(Color _color)
     {
+        color = _color;
+
         for (int i = 0; i < mesh.vertexCount; i++)
         {
-            colorList[i] = _color;
+            colorList[i] = color;
         }
 
         mesh.SetColors(colorList);
+    }
+
+    public Color GetColor()
+    {
+        return color;
     }
 }

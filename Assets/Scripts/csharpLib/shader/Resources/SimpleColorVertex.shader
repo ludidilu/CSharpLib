@@ -2,6 +2,8 @@
 
 	Properties{
 
+		_ZTest("ZTest", Float) = 0
+		_ZWrite("ZWrite", Float) = 0
 	}
 
 	SubShader{
@@ -11,6 +13,8 @@
 		Pass{
 
 			Blend SrcAlpha OneMinusSrcAlpha
+			ZTest [_ZTest]
+			ZWrite [_ZWrite]
 
 			CGPROGRAM
 
