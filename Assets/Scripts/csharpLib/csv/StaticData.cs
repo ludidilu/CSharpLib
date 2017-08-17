@@ -206,7 +206,7 @@ public class StaticData
                     }
                     else
                     {
-                        _info.SetValue(_csv, Int32.Parse(_data));
+                        _info.SetValue(_csv, int.Parse(_data));
                     }
 
                     break;
@@ -257,7 +257,7 @@ public class StaticData
                     }
                     else
                     {
-                        _info.SetValue(_csv, Int16.Parse(_data));
+                        _info.SetValue(_csv, short.Parse(_data));
                     }
 
                     break;
@@ -274,7 +274,7 @@ public class StaticData
 
                         for (int i = 0; i < strArr.Length; i++)
                         {
-                            intResult[i] = Int32.Parse(strArr[i]);
+                            intResult[i] = int.Parse(strArr[i]);
                         }
                     }
                     else
@@ -395,7 +395,7 @@ public class StaticData
 
                         for (int i = 0; i < strArr.Length; i++)
                         {
-                            shortResult[i] = Int16.Parse(strArr[i]);
+                            shortResult[i] = short.Parse(strArr[i]);
                         }
                     }
                     else
