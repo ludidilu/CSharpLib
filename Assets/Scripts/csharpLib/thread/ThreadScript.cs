@@ -43,7 +43,7 @@ namespace thread
             thread.Start(_data);
         }
 
-        public void Add(ThreadStart _job, Action _callBack, Func<bool> _check)
+        public void Add(ThreadStart _job, Action _callBack)
         {
             callBackList.Add(_callBack);
 

@@ -12,6 +12,7 @@
 
 		Pass{
 
+			Cull Off
 			Blend SrcAlpha OneMinusSrcAlpha
 			ZTest [_ZTest]
 			ZWrite [_ZWrite]

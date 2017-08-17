@@ -1,47 +1,38 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using thread;
 
-namespace systemIO{
+namespace systemIO
+{
+    public class DeserializeInThreadUnit<T>
+    {
+        private Action<T> callBack;
+        private byte[] bytes;
+        private T result;
 
-	public class DeserializeInThreadUnit<T>{
+        public void Init(byte[] _bytes, Action<T> _callBack)
+        {
+            bytes = _bytes;
 
-		private Action<T> callBack;
-		private byte[] bytes;
-		private T result;
+            callBack = _callBack;
 
-		public void Init(byte[] _bytes,Action<T> _callBack){
+            ThreadScript.Instance.Add(GetData, LoadOver);
+        }
 
-			bytes = _bytes;
+        private void GetData()
+        {
+            using (Stream stream = new MemoryStream(bytes))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
 
-			callBack = _callBack;
+                result = (T)formatter.Deserialize(stream);
+            }
+        }
 
-			ThreadScript.Instance.Add(GetData,LoadOver,CheckLoadOver);
-		}
-
-		private void GetData(){
-
-			using (Stream stream = new MemoryStream(bytes))
-			{
-				BinaryFormatter formatter = new BinaryFormatter();
-				
-//				formatter.Binder = new VersionBinder();
-				
-				result = (T) formatter.Deserialize(stream);
-			}				
-		}
-
-		private void LoadOver(){
-
-			callBack(result);
-		}
-
-		private bool CheckLoadOver(){
-
-			return result != null;
-		}
-	}
+        private void LoadOver()
+        {
+            callBack(result);
+        }
+    }
 }
