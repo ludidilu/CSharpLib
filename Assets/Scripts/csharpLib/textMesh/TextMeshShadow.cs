@@ -63,6 +63,11 @@ public class TextMeshShadow : MonoBehaviour
         MeshRenderer mm = go.GetComponent<MeshRenderer>();
 
         mm.material = mr.sharedMaterial;
+
+        if (!enabled)
+        {
+            OnDisable();
+        }
     }
 
     public void SetShadowColor(Color _color)

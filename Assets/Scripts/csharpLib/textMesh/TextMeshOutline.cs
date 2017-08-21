@@ -89,6 +89,11 @@ public class TextMeshOutline : MonoBehaviour
 
             clones[i] = tt;
         }
+
+        if (!enabled)
+        {
+            OnDisable();
+        }
     }
 
     public void SetOutlineColor(Color _outlineColor)
