@@ -16,6 +16,10 @@ public class TextMeshOutline : MonoBehaviour
 
     private TextMesh[] clones;
 
+    private string text;
+
+    private float alpha;
+
     private static readonly Vector2[] vs = new Vector2[]
     {
         new Vector2( 1,  0 ),
@@ -55,9 +59,13 @@ public class TextMeshOutline : MonoBehaviour
 
             tt.font = tm.font;
 
-            tt.text = tm.text;
+            text = tm.text;
 
-            tt.color = outlineColor;
+            tt.text = text;
+
+            alpha = tt.color.a;
+
+            tt.color = new Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a * alpha * alpha);
 
             tt.offsetZ = offsetZ;
 
@@ -83,26 +91,13 @@ public class TextMeshOutline : MonoBehaviour
         }
     }
 
-    public void SetText(string _str)
+    public void SetOutlineColor(Color _outlineColor)
     {
-        tm.text = _str;
+        outlineColor = _outlineColor;
 
         for (int i = 0; i < 8; i++)
         {
-            clones[i].text = _str;
-        }
-    }
-
-    public void SetColor(Color _color)
-    {
-        tm.color = _color;
-    }
-
-    public void SetOutlineColor(Color _color)
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            clones[i].color = _color;
+            clones[i].color = new Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a * alpha * alpha);
         }
     }
 
@@ -115,6 +110,61 @@ public class TextMeshOutline : MonoBehaviour
             Vector2 v = vs[i];
 
             clones[i].transform.localPosition = new Vector3(v.x * outlineWidth, v.y * outlineWidth, 0);
+        }
+    }
+
+    public void SetOffsetZ(float _offsetZ)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            clones[i].offsetZ = _offsetZ;
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (tm.text != text)
+        {
+            text = tm.text;
+
+            for (int i = 0; i < 8; i++)
+            {
+                clones[i].text = text;
+            }
+        }
+
+        if (tm.color.a != alpha)
+        {
+            alpha = tm.color.a;
+
+            for (int i = 0; i < 8; i++)
+            {
+                clones[i].color = new Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a * alpha * alpha);
+            }
+        }
+    }
+
+    void OnDestroy()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            Destroy(clones[i].gameObject);
+        }
+    }
+
+    void OnEnable()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            clones[i].gameObject.SetActive(true);
+        }
+    }
+
+    void OnDisable()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            clones[i].gameObject.SetActive(false);
         }
     }
 }

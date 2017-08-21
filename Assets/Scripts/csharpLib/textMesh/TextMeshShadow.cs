@@ -13,6 +13,10 @@ public class TextMeshShadow : MonoBehaviour
 
     private TextMesh clone;
 
+    private string text;
+
+    private float alpha;
+
     // Use this for initialization
     void Awake()
     {
@@ -32,9 +36,13 @@ public class TextMeshShadow : MonoBehaviour
 
         clone.font = tm.font;
 
-        clone.text = tm.text;
+        text = tm.text;
 
-        clone.color = shadowColor;
+        clone.text = text;
+
+        alpha = tm.color.a;
+
+        clone.color = new Color(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * alpha);
 
         clone.alignment = tm.alignment;
 
@@ -57,21 +65,11 @@ public class TextMeshShadow : MonoBehaviour
         mm.material = mr.sharedMaterial;
     }
 
-    public void Secloneext(string _str)
-    {
-        tm.text = _str;
-
-        clone.text = _str;
-    }
-
-    public void SetColor(Color _color)
-    {
-        tm.color = _color;
-    }
-
     public void SetShadowColor(Color _color)
     {
-        clone.color = _color;
+        shadowColor = _color;
+
+        clone.color = new Color(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * alpha);
     }
 
     public void SetShadowOffset(Vector3 _offset)
@@ -81,5 +79,37 @@ public class TextMeshShadow : MonoBehaviour
         clone.transform.localPosition = new Vector3(offset.x, offset.y, 0);
 
         clone.offsetZ = offset.z;
+    }
+
+    void LateUpdate()
+    {
+        if (tm.text != text)
+        {
+            text = tm.text;
+
+            clone.text = text;
+        }
+
+        if (tm.color.a != alpha)
+        {
+            alpha = tm.color.a;
+
+            clone.color = new Color(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * alpha);
+        }
+    }
+
+    void OnDestroy()
+    {
+        Destroy(clone.gameObject);
+    }
+
+    void OnEnable()
+    {
+        clone.gameObject.SetActive(true);
+    }
+
+    void OnDisable()
+    {
+        clone.gameObject.SetActive(false);
     }
 }
