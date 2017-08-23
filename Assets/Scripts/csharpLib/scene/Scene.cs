@@ -29,7 +29,7 @@ namespace scene{
 
 				lightmaps[i] = new LightmapData();
 
-				lightmaps[i].lightmapLight = farTextures[i];
+				lightmaps[i].lightmapColor = farTextures[i];
 				lightmaps[i].lightmapDir = nearTextures[i];
 			}
 

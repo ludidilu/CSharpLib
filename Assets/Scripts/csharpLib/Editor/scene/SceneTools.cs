@@ -38,7 +38,7 @@ public class SceneTools  {
 		
 		for(int i = 0 ; i < datas.Length ; i++){
 			
-			scene.farTextures[i] = datas[i].lightmapLight;
+			scene.farTextures[i] = datas[i].lightmapColor;
 			scene.nearTextures[i] = datas[i].lightmapDir;
 		}
 		

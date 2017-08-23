@@ -1,4 +1,6 @@
-﻿Shader "Custom/UI/ImageIgnoreScale"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/UI/ImageIgnoreScale"
 {
 	Properties
 	{
@@ -72,7 +74,7 @@
 			v2f vert(appdata_t IN)
 			{
 				v2f OUT;
-				OUT.vertex = mul(UNITY_MATRIX_MVP, IN.vertex) * unScale;
+				OUT.vertex = UnityObjectToClipPos(IN.vertex) * unScale;
 				
 				OUT.texcoord = IN.texcoord;
 				

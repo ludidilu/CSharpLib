@@ -1,4 +1,6 @@
-﻿Shader "Custom/Particle_Alpha_Blended_Mesh" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/Particle_Alpha_Blended_Mesh" {
 Properties {
 	_TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
 	_MainTex ("Particle Texture", 2D) = "white" {}
@@ -56,7 +58,7 @@ Category {
 				
 	            o.vertex = _Scaling * v.vertex;  
 	            
-	            o.vertex = mul(UNITY_MATRIX_MVP, o.vertex); 
+	            o.vertex = UnityObjectToClipPos(o.vertex); 
 	                
 				#ifdef SOFTPARTICLES_ON
 				o.projPos = ComputeScreenPos (o.vertex);

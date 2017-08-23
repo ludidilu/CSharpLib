@@ -1,4 +1,6 @@
-﻿Shader "Custom/SimpleColorShader" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/SimpleColorShader" {
 
 	Properties {
 	
@@ -35,7 +37,7 @@
 			
 				v2f o;
 				
-				o.pos = mul(UNITY_MATRIX_MVP,v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				
 				return o;
 			}

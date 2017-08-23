@@ -1,4 +1,6 @@
-﻿Shader "Custom/InnerLight" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/InnerLight" {
 	Properties {
 		_Color ("Color (RGB)", Color) = (1,1,0.5,1)
 		_RimPower("RimPower",Range(1,10)) = 5
@@ -36,7 +38,7 @@
 	          
 	        v2f vert(appdata_t v) {  
 	            v2f o;
-	           	o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+	           	o.vertex = UnityObjectToClipPos(v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;
 				o.worldPos = v.vertex.xy ;

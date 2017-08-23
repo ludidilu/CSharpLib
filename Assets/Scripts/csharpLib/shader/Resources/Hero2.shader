@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Custom/Hero2" {
 	Properties {
 		_Color ("Color", Color) = (1,1,1,1)
@@ -38,7 +40,7 @@ Shader "Custom/Hero2" {
 			_Outline = 0.002;
 			_OutlineColor = float4(0,0,0,0.3921);
 			
-			o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+			o.pos = UnityObjectToClipPos(v.vertex);
 			float3 norm   = mul ((float3x3)UNITY_MATRIX_IT_MV, v.normal);
 			float2 offset = TransformViewToProjection(norm.xy);
 			o.pos.xy += offset * o.pos.z * _Outline;

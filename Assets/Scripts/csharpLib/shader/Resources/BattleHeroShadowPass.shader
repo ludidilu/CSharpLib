@@ -1,4 +1,6 @@
-﻿Shader "Custom/BattleHeroShadowPass" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/BattleHeroShadowPass" {
 	Properties {
 	
 		_MainTex("Main Texture", 2D) = ""{}
@@ -54,7 +56,7 @@
 				
 				vt = vt * stateInfo[index].y;
 				vt = mul(myMatrix[index], vt);
-              	o.pos = mul(UNITY_MATRIX_MVP, vt);
+              	o.pos = UnityObjectToClipPos(vt);
               	o.color.xyz = stateInfo[index].x;
                	
 				return o;

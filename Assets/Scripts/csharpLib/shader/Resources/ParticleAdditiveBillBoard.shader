@@ -1,4 +1,6 @@
-﻿Shader "Custom/Particle_Additive_BillBoard" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/Particle_Additive_BillBoard" {
 Properties {
 	_TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
 	_MainTex ("Particle Texture", 2D) = "white" {}
@@ -65,7 +67,7 @@ Category {
                 
                 objV.xyz += _Center;  
 			
-                o.vertex = mul(UNITY_MATRIX_MVP, objV); 
+                o.vertex = UnityObjectToClipPos(objV); 
 	                
 				#ifdef SOFTPARTICLES_ON
 				o.projPos = ComputeScreenPos (o.vertex);

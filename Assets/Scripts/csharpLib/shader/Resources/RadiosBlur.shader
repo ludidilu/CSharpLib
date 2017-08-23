@@ -1,4 +1,6 @@
-﻿Shader "Custom/RadiosBlur"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/RadiosBlur"
 {
 	Properties
 	{
@@ -44,7 +46,7 @@
 				v2f o;
 				
 				o.uv = v.uv;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 
 				return o;
 			}

@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Custom/Outline" {
 	Properties {
@@ -41,7 +43,7 @@ Shader "Custom/Outline" {
 			
 			if(_ShowOutline > 0){
 			
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				
 				float3 norm   = mul ((float3x3)UNITY_MATRIX_IT_MV, v.normal);
         		float2 offset = TransformViewToProjection(norm.xy);
@@ -170,7 +172,7 @@ float4 _MainTex_ST;
 v2f_surf vert_surf (appdata_full v) {
   v2f_surf o;
   UNITY_INITIALIZE_OUTPUT(v2f_surf,o);
-  o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+  o.pos = UnityObjectToClipPos (v.vertex);
   o.pack0.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
   float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
   fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);
@@ -377,7 +379,7 @@ struct v2f_surf {
 v2f_surf vert_surf (appdata_full v) {
   v2f_surf o;
   UNITY_INITIALIZE_OUTPUT(v2f_surf,o);
-  o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+  o.pos = UnityObjectToClipPos (v.vertex);
   float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
   fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);
   o.worldPos = worldPos;
@@ -518,7 +520,7 @@ float4 _MainTex_ST;
 v2f_surf vert_surf (appdata_full v) {
   v2f_surf o;
   UNITY_INITIALIZE_OUTPUT(v2f_surf,o);
-  o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+  o.pos = UnityObjectToClipPos (v.vertex);
   o.pack0.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
   float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
   fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);
@@ -721,7 +723,7 @@ float4 _MainTex_ST;
 v2f_surf vert_surf (appdata_full v) {
   v2f_surf o;
   UNITY_INITIALIZE_OUTPUT(v2f_surf,o);
-  o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+  o.pos = UnityObjectToClipPos (v.vertex);
   o.pack0.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
   float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
   fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);

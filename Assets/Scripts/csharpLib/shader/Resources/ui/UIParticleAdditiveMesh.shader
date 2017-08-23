@@ -1,4 +1,6 @@
-﻿Shader "Custom/UI/Particle_Additive_Mesh" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/UI/Particle_Additive_Mesh" {
 Properties {
 	_TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
 	_MainTex ("Particle Texture", 2D) = "white" {}
@@ -54,7 +56,7 @@ Category {
 	                // 控制顶点缩放，当屏幕大小发生改变的时，根据lossyScale来计算新的顶点  
 	                o.vertex = float4(_Scaling * v.vertex.x, _Scaling * v.vertex.y, _Scaling * v.vertex.z, v.vertex.w);  
 	                
-	                o.vertex = mul(UNITY_MATRIX_MVP, o.vertex); 
+	                o.vertex = UnityObjectToClipPos(o.vertex); 
 	                
 //	            }else{
 //				

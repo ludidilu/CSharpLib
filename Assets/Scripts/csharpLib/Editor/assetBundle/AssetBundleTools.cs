@@ -139,7 +139,7 @@ public class AssetBundleTools{
 
 		lightMaps[0] = new LightmapData();
 
-		lightMaps[0].lightmapLight = new Texture2D(100,100);
+		lightMaps[0].lightmapColor = new Texture2D(100,100);
 
 		LightmapSettings.lightmaps = lightMaps;
 

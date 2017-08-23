@@ -1,4 +1,6 @@
-﻿Shader "Custom/UI/Particle_Blend_BillBoard" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/UI/Particle_Blend_BillBoard" {
 Properties {
 	_TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
 	_MainTex ("Particle Texture", 2D) = "white" {}
@@ -64,7 +66,7 @@ Category {
 				
 					objV = mul(_Camera, objV);
 				
-	                o.vertex = mul(UNITY_MATRIX_MVP, objV); 
+	                o.vertex = UnityObjectToClipPos(objV); 
 	                
 //	            }else{
 //				
