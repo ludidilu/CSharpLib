@@ -40,7 +40,7 @@ public class SuperPageScrollRect : SuperScrollRect
                 {
                     if (verticalNormalizedPosition < i * verticalStep + verticalHalfStep)
                     {
-                        SuperTween.Instance.To(verticalNormalizedPosition, i * verticalStep, Mathf.Abs(i * verticalStep - verticalNormalizedPosition) * speedFix, VerticalSetPos, null);
+                        SetVerticalPosIndex(i, false);
 
                         break;
                     }
@@ -56,7 +56,7 @@ public class SuperPageScrollRect : SuperScrollRect
                 {
                     if (horizontalNormalizedPosition < i * horizontalStep + horizontalHalfStep)
                     {
-                        SuperTween.Instance.To(horizontalNormalizedPosition, i * horizontalHalfStep, Mathf.Abs(i * horizontalHalfStep - horizontalNormalizedPosition) * speedFix, HorizontalSetPos, null);
+                        SetHorizontalPosIndex(i, false);
 
                         break;
                     }
@@ -65,12 +65,36 @@ public class SuperPageScrollRect : SuperScrollRect
         }
     }
 
-    private void VerticalSetPos(float _value)
+    public void SetVerticalPosIndex(int _index, bool _instant)
+    {
+        if (_instant)
+        {
+            SetVerticalPos(_index * verticalStep);
+        }
+        else
+        {
+            SuperTween.Instance.To(verticalNormalizedPosition, _index * verticalStep, Mathf.Abs(_index * verticalStep - verticalNormalizedPosition) * speedFix, SetVerticalPos, null);
+        }
+    }
+
+    public void SetHorizontalPosIndex(int _index, bool _instant)
+    {
+        if (_instant)
+        {
+            SetHorizontalPos(_index * horizontalStep);
+        }
+        else
+        {
+            SuperTween.Instance.To(horizontalNormalizedPosition, _index * horizontalHalfStep, Mathf.Abs(_index * horizontalHalfStep - horizontalNormalizedPosition) * speedFix, SetHorizontalPos, null);
+        }
+    }
+
+    private void SetVerticalPos(float _value)
     {
         verticalNormalizedPosition = _value;
     }
 
-    private void HorizontalSetPos(float _value)
+    private void SetHorizontalPos(float _value)
     {
         horizontalNormalizedPosition = _value;
     }
@@ -79,7 +103,14 @@ public class SuperPageScrollRect : SuperScrollRect
     {
         verticalNum = _verticalNum;
 
-        verticalStep = 1f / (verticalNum - 1);
+        if (verticalNum > 1)
+        {
+            verticalStep = 1f / (verticalNum - 1);
+        }
+        else
+        {
+            verticalStep = 0;
+        }
 
         verticalHalfStep = verticalStep * 0.5f;
     }
@@ -88,7 +119,14 @@ public class SuperPageScrollRect : SuperScrollRect
     {
         horizontalNum = _horizontalNum;
 
-        horizontalStep = 1f / (horizontalNum - 1);
+        if (horizontalNum > 1)
+        {
+            horizontalStep = 1f / (horizontalNum - 1);
+        }
+        else
+        {
+            horizontalStep = 0;
+        }
 
         horizontalHalfStep = horizontalStep * 0.5f;
     }
