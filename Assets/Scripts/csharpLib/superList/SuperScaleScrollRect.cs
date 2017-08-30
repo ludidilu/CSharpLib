@@ -1,132 +1,134 @@
 ﻿using UnityEngine;
-using System.Collections;
 using superFunction;
 using UnityEngine.UI;
 using screenScale;
 
-namespace superList{
+namespace superList
+{
+    public class SuperScaleScrollRect : MonoBehaviour
+    {
+        [SerializeField]
+        private RectTransform childTransform;
 
-	public class SuperScaleScrollRect : MonoBehaviour {
+        private float childWidth;
 
-		[SerializeField]
-		private RectTransform childTransform;
+        private float childHeight;
 
-		private float childWidth;
+        private Vector2 containerHalfRect;
 
-		private float childHeight;
+        [SerializeField]
+        private float minScale;
 
-		private Vector2 containerHalfRect;
+        [SerializeField]
+        private float maxScale;
 
-		[SerializeField]
-		private float minScale;
+        // Use this for initialization
+        void Start()
+        {
+            SuperScrollRect scrollRect = gameObject.AddComponent<SuperScrollRect>();
 
-		[SerializeField]
-		private float maxScale;
+            scrollRect.content = childTransform;
 
-		// Use this for initialization
-		void Start () {
+            scrollRect.horizontal = true;
 
-			SuperScrollRect scrollRect = gameObject.AddComponent<SuperScrollRect>();
+            scrollRect.vertical = true;
 
-			scrollRect.content = childTransform;
+            scrollRect.movementType = ScrollRect.MovementType.Clamped;
 
-			scrollRect.horizontal = true;
+            //SuperFunction.Instance.RemoveEventListener (SuperScrollRect.eventDispatcher, SuperScrollRect.CLOSE_MOVE, scrollRect.CloseMove);
 
-			scrollRect.vertical = true;
+            //SuperFunction.Instance.RemoveEventListener (SuperScrollRect.eventDispatcher, SuperScrollRect.OPEN_MOVE, scrollRect.OpenMove);
 
-			scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            containerHalfRect = (transform as RectTransform).rect.size / 2;
 
-			SuperFunction.Instance.RemoveEventListener (SuperScrollRect.eventDispatcher, SuperScrollRect.CLOSE_MOVE, scrollRect.CloseMove);
+            SuperFunction.Instance.AddEventListener<float, Vector2>(ScreenScale.Instance.gameObject, ScreenScale.SCALE_CHANGE, ScaleChange);
 
-			SuperFunction.Instance.RemoveEventListener (SuperScrollRect.eventDispatcher, SuperScrollRect.OPEN_MOVE, scrollRect.OpenMove);
+            childWidth = childTransform.rect.width;
 
-			containerHalfRect = (transform as RectTransform).rect.size / 2;
+            childHeight = childTransform.rect.height;
 
-			SuperFunction.Instance.AddEventListener<float,Vector2>(ScreenScale.Instance.gameObject,ScreenScale.SCALE_CHANGE,ScaleChange);
+            if (minScale == 0)
+            {
+                float widthScale = containerHalfRect.x * 2 / childWidth * 1.001f;
 
-			childWidth = childTransform.rect.width;
+                float heightScale = containerHalfRect.y * 2 / childHeight * 1.001f;
 
-			childHeight = childTransform.rect.height;
+                minScale = Mathf.Max(widthScale, heightScale);
+            }
 
-			if(minScale == 0){
+            if (maxScale == 0)
+            {
+                maxScale = 1;
+            }
 
-				float widthScale = containerHalfRect.x * 2 / childWidth * 1.001f;
+            SuperDebug.Log("SuperScaleScrollRect  minScale:" + minScale + "   maxScale:" + maxScale);
+        }
 
-				float heightScale = containerHalfRect.y * 2 / childHeight * 1.001f;
+        private void ScaleChange(int _index, float scale, Vector2 pos)
+        {
+            float tmpScale = scale * childTransform.localScale.x;
 
-				minScale = Mathf.Max(widthScale,heightScale);
-			}
+            if (tmpScale < minScale)
+            {
+                scale = minScale / childTransform.localScale.x;
 
-			if(maxScale == 0){
+            }
+            else if (tmpScale > maxScale)
+            {
+                scale = maxScale / childTransform.localScale.x;
+            }
 
-				maxScale = 1;
-			}
+            pos = pos * (containerHalfRect.x * 2 / Screen.width);
 
-			SuperDebug.Log("SuperScaleScrollRect  minScale:" + minScale + "   maxScale:" + maxScale);
-		}
+            Vector2 resultPos = GetAnchoredPosFix(pos, scale);
 
-		private void ScaleChange(int _index,float scale,Vector2 pos){
+            if (scale < 1)
+            {
+                if (resultPos.x + childWidth / 2 * childTransform.localScale.x * scale < containerHalfRect.x)
+                {
+                    //				Debug.Log("右面漏了");
 
-			float tmpScale = scale * childTransform.localScale.x;
+                    resultPos = new Vector2(containerHalfRect.x - childWidth / 2 * childTransform.localScale.x * scale, resultPos.y);
 
-			if(tmpScale < minScale){
+                }
+                else if (resultPos.x + containerHalfRect.x - childWidth / 2 * childTransform.localScale.x * scale > 0)
+                {
+                    //				Debug.Log("左面漏了");
 
-				scale = minScale / childTransform.localScale.x;
+                    resultPos = new Vector2(childWidth / 2 * childTransform.localScale.x * scale - containerHalfRect.x, resultPos.y);
+                }
 
-			}else if(tmpScale > maxScale){
+                if (resultPos.y + childHeight / 2 * childTransform.localScale.x * scale < containerHalfRect.y)
+                {
+                    //				Debug.Log("上面漏了");
 
-				scale = maxScale / childTransform.localScale.x;
-			}
+                    resultPos = new Vector2(resultPos.x, containerHalfRect.y - childHeight / 2 * childTransform.localScale.x * scale);
 
-			pos = pos * (containerHalfRect.x * 2 / Screen.width);
+                }
+                else if (resultPos.y + containerHalfRect.y - childHeight / 2 * childTransform.localScale.x * scale > 0)
+                {
+                    //				Debug.Log("下面漏了");
 
-			Vector2 resultPos = GetAnchoredPosFix(pos,scale);
+                    resultPos = new Vector2(resultPos.x, childHeight / 2 * childTransform.localScale.x * scale - containerHalfRect.y);
+                }
+            }
 
-			if(scale < 1){
+            childTransform.anchoredPosition = resultPos;
 
-				if(resultPos.x + childWidth / 2 * childTransform.localScale.x * scale < containerHalfRect.x){
+            childTransform.localScale = childTransform.localScale * scale;
+        }
 
-	//				Debug.Log("右面漏了");
+        private Vector2 GetAnchoredPosFix(Vector2 _pos, float _scale)
+        {
+            Vector2 mPos = _pos - containerHalfRect;
 
-					resultPos = new Vector2(containerHalfRect.x - childWidth / 2 * childTransform.localScale.x * scale,resultPos.y);
+            Vector2 dv = mPos - childTransform.anchoredPosition;
 
-				}else if(resultPos.x + containerHalfRect.x - childWidth / 2 * childTransform.localScale.x * scale > 0){
+            dv = dv * _scale;
 
-	//				Debug.Log("左面漏了");
-					
-					resultPos = new Vector2(childWidth / 2 * childTransform.localScale.x * scale - containerHalfRect.x,resultPos.y);
-				}
+            Vector2 resultPos = mPos - dv;
 
-				if(resultPos.y + childHeight / 2 * childTransform.localScale.x * scale < containerHalfRect.y){
-					
-	//				Debug.Log("上面漏了");
-
-					resultPos = new Vector2(resultPos.x,containerHalfRect.y - childHeight / 2 * childTransform.localScale.x * scale);
-
-				}else if(resultPos.y + containerHalfRect.y - childHeight / 2 * childTransform.localScale.x * scale > 0){
-					
-	//				Debug.Log("下面漏了");
-
-					resultPos = new Vector2(resultPos.x,childHeight / 2 * childTransform.localScale.x * scale - containerHalfRect.y);
-				}
-			}
-			
-			childTransform.anchoredPosition = resultPos;
-
-			childTransform.localScale = childTransform.localScale * scale;
-		}
-
-		private Vector2 GetAnchoredPosFix(Vector2 _pos,float _scale){
-
-			Vector2 mPos = _pos - containerHalfRect;
-			
-			Vector2 dv = mPos - childTransform.anchoredPosition;
-			
-			dv = dv * _scale;
-			
-			Vector2 resultPos = mPos - dv;
-
-			return resultPos;
-		}
-	}
+            return resultPos;
+        }
+    }
 }

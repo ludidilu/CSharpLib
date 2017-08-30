@@ -1,124 +1,96 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using superFunction;
 
-namespace superList{
-	
-	public class SuperScrollRect : ScrollRect,IPointerExitHandler {
+namespace superList
+{
+    public class SuperScrollRect : ScrollRect, IPointerExitHandler
+    {
+        //public static GameObject eventDispatcher;
 
-		public static GameObject eventDispatcher;
+        public const string CLOSE_MOVE = "SuperListCloseMove";
 
-		public const string CLOSE_MOVE = "SuperListCloseMove";
-		
-		public const string OPEN_MOVE = "SuperListOpenMove";
+        public const string OPEN_MOVE = "SuperListOpenMove";
 
-		public static bool canDrag{
+        public static bool canDrag
+        {
+            get
+            {
+                return SuperScrollRectScript.Instance.canDrag > 0;
+            }
 
-			get{
+            set
+            {
+                SuperScrollRectScript.Instance.canDrag = SuperScrollRectScript.Instance.canDrag + (value ? 1 : -1);
+            }
+        }
 
-				return SuperScrollRectScript.Instance.canDrag > 0;
-			}
+        public bool isRestrain = false;
 
-			set{
+        private bool isRestrainDrag;
 
-				SuperScrollRectScript.Instance.canDrag = SuperScrollRectScript.Instance.canDrag + (value ? 1 : -1);
-			}
-		}
+        private bool isOneTouchDrag;
 
-		public bool isRestrain = false;
+        public override void OnBeginDrag(PointerEventData eventData)
+        {
+            if (!canDrag || Input.touchCount > 1)
+            {
+                return;
+            }
 
-		private bool isRestrainDrag;
+            if (isRestrain)
+            {
+                isRestrainDrag = true;
+            }
 
-		private bool isOneTouchDrag;
-		
-		public override void OnBeginDrag(PointerEventData eventData) {
+            isOneTouchDrag = true;
 
-			if(!canDrag || Input.touchCount > 1){
+            base.OnBeginDrag(eventData);
+        }
 
-				return;
-			}
+        public override void OnDrag(PointerEventData eventData)
+        {
+            if (!canDrag)
+            {
+                return;
+            }
 
-			if(isRestrain){
+            if (Input.touchCount > 1)
+            {
+                isOneTouchDrag = false;
 
-				isRestrainDrag = true;
-			}
+                return;
+            }
 
-			isOneTouchDrag = true;
+            if (isOneTouchDrag && (!isRestrain || isRestrainDrag))
+            {
+                base.OnDrag(eventData);
+            }
+        }
 
-			base.OnBeginDrag(eventData);
-		}
-		
-		public override void OnDrag(PointerEventData eventData) {
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (isRestrain)
+            {
+                base.OnEndDrag(eventData);
 
-			if(!canDrag){
-				
-				return;
-			}
-			
-			if(Input.touchCount > 1){
-				
-				isOneTouchDrag = false;
-				
-				return;
-			}
-
-			if(isOneTouchDrag && (!isRestrain || isRestrainDrag)){
-
-				base.OnDrag(eventData);
-			}
-		}
-		
-		public void OnPointerExit (PointerEventData eventData)
-		{
-			if(isRestrain){
-
-				base.OnEndDrag(eventData);
-				
-				isRestrainDrag = false;
-			}
-		}
+                isRestrainDrag = false;
+            }
+        }
 
         public void DirectContentAnchoredPosition(Vector2 anchoredPosition)
         {
             SetContentAnchoredPosition(anchoredPosition);
         }
 
-		protected override void Awake ()
-		{
-			base.Awake();
+        public void CloseMove(int _index)
+        {
+            movementType = MovementType.Clamped;
+        }
 
-			if (movementType == ScrollRect.MovementType.Elastic) {
-
-				if (eventDispatcher == null) {
-					
-					eventDispatcher = new GameObject ("SuperListEventDispatcher");
-					
-					GameObject.DontDestroyOnLoad (eventDispatcher);
-				}
-
-				SuperFunction.Instance.AddEventListener (eventDispatcher, OPEN_MOVE, OpenMove);
-				
-				SuperFunction.Instance.AddEventListener (eventDispatcher, CLOSE_MOVE, CloseMove);
-			}
-		}
-
-		protected override void OnDestroy (){
-				
-			SuperFunction.Instance.RemoveEventListener(eventDispatcher,OPEN_MOVE,OpenMove);
-			
-			SuperFunction.Instance.RemoveEventListener(eventDispatcher,CLOSE_MOVE,CloseMove);
-		}
-
-		public void CloseMove(int _index){
-			
-			movementType = ScrollRect.MovementType.Clamped;
-		}
-		
-		public void OpenMove(int _index){
-			
-			movementType = ScrollRect.MovementType.Elastic;
-		}
-	}
+        public void OpenMove(int _index)
+        {
+            movementType = MovementType.Elastic;
+        }
+    }
 }
