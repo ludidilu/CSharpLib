@@ -19,6 +19,13 @@ public class SuperPageScrollRect : SuperScrollRect
 
     private float horizontalHalfStep;
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        inertia = false;
+    }
+
     public override void OnEndDrag(PointerEventData eventData)
     {
         base.OnEndDrag(eventData);

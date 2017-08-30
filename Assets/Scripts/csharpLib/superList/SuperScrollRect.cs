@@ -6,12 +6,6 @@ namespace superList
 {
     public class SuperScrollRect : ScrollRect, IPointerExitHandler
     {
-        //public static GameObject eventDispatcher;
-
-        public const string CLOSE_MOVE = "SuperListCloseMove";
-
-        public const string OPEN_MOVE = "SuperListOpenMove";
-
         public static bool canDrag
         {
             get
@@ -81,16 +75,6 @@ namespace superList
         public void DirectContentAnchoredPosition(Vector2 anchoredPosition)
         {
             SetContentAnchoredPosition(anchoredPosition);
-        }
-
-        public void CloseMove(int _index)
-        {
-            movementType = MovementType.Clamped;
-        }
-
-        public void OpenMove(int _index)
-        {
-            movementType = MovementType.Elastic;
         }
     }
 }
