@@ -19,11 +19,34 @@ public class SuperPageScrollRect : SuperScrollRect
 
     private float horizontalHalfStep;
 
+    private int verticalTweenID = -1;
+
+    private int horizontalTweenID = -1;
+
     protected override void Awake()
     {
         base.Awake();
 
         inertia = false;
+    }
+
+    public override void OnBeginDrag(PointerEventData eventData)
+    {
+        base.OnBeginDrag(eventData);
+
+        if (verticalTweenID != -1)
+        {
+            SuperTween.Instance.Remove(verticalTweenID);
+
+            verticalTweenID = -1;
+        }
+
+        if (horizontalTweenID != -1)
+        {
+            SuperTween.Instance.Remove(horizontalTweenID);
+
+            horizontalTweenID = -1;
+        }
     }
 
     public override void OnEndDrag(PointerEventData eventData)
@@ -73,7 +96,7 @@ public class SuperPageScrollRect : SuperScrollRect
         }
         else
         {
-            SuperTween.Instance.To(verticalNormalizedPosition, _index * verticalStep, Mathf.Abs(_index * verticalStep - verticalNormalizedPosition) * speedFix, SetVerticalPos, null);
+            verticalTweenID = SuperTween.Instance.To(verticalNormalizedPosition, _index * verticalStep, Mathf.Abs(_index * verticalStep - verticalNormalizedPosition) * speedFix, SetVerticalPos, VerticalTweenOver);
         }
     }
 
@@ -85,7 +108,7 @@ public class SuperPageScrollRect : SuperScrollRect
         }
         else
         {
-            SuperTween.Instance.To(horizontalNormalizedPosition, _index * horizontalHalfStep, Mathf.Abs(_index * horizontalHalfStep - horizontalNormalizedPosition) * speedFix, SetHorizontalPos, null);
+            horizontalTweenID = SuperTween.Instance.To(horizontalNormalizedPosition, _index * horizontalHalfStep, Mathf.Abs(_index * horizontalHalfStep - horizontalNormalizedPosition) * speedFix, SetHorizontalPos, HorizontalTweenOver);
         }
     }
 
@@ -97,6 +120,16 @@ public class SuperPageScrollRect : SuperScrollRect
     private void SetHorizontalPos(float _value)
     {
         horizontalNormalizedPosition = _value;
+    }
+
+    private void VerticalTweenOver()
+    {
+        verticalTweenID = -1;
+    }
+
+    private void HorizontalTweenOver()
+    {
+        horizontalTweenID = -1;
     }
 
     public void SetVerticalNum(int _verticalNum)
