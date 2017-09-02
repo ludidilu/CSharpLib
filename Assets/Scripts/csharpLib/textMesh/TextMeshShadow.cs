@@ -13,8 +13,6 @@ public class TextMeshShadow : MonoBehaviour
 
     private TextMesh clone;
 
-    private string text;
-
     private float alpha;
 
     // Use this for initialization
@@ -36,9 +34,7 @@ public class TextMeshShadow : MonoBehaviour
 
         clone.font = tm.font;
 
-        text = tm.text;
-
-        clone.text = text;
+        clone.text = tm.text;
 
         alpha = tm.color.a;
 
@@ -86,15 +82,13 @@ public class TextMeshShadow : MonoBehaviour
         clone.offsetZ = offset.z;
     }
 
+    public void SetText(string _text)
+    {
+        clone.text = _text;
+    }
+
     void LateUpdate()
     {
-        if (tm.text != text)
-        {
-            text = tm.text;
-
-            clone.text = text;
-        }
-
         if (tm.color.a != alpha)
         {
             alpha = tm.color.a;

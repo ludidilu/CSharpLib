@@ -16,8 +16,6 @@ public class TextMeshOutline : MonoBehaviour
 
     private TextMesh[] clones;
 
-    private string text;
-
     private float alpha;
 
     private static readonly Vector2[] vs = new Vector2[]
@@ -36,6 +34,10 @@ public class TextMeshOutline : MonoBehaviour
     void Awake()
     {
         tm = GetComponent<TextMesh>();
+
+        string text = tm.text;
+
+        alpha = tm.color.a;
 
         MeshRenderer mr = GetComponent<MeshRenderer>();
 
@@ -59,11 +61,7 @@ public class TextMeshOutline : MonoBehaviour
 
             tt.font = tm.font;
 
-            text = tm.text;
-
             tt.text = text;
-
-            alpha = tt.color.a;
 
             tt.color = new Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a * alpha * alpha);
 
@@ -126,18 +124,16 @@ public class TextMeshOutline : MonoBehaviour
         }
     }
 
+    public void SetText(string _text)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            clones[i].text = _text;
+        }
+    }
+
     void LateUpdate()
     {
-        if (tm.text != text)
-        {
-            text = tm.text;
-
-            for (int i = 0; i < 8; i++)
-            {
-                clones[i].text = text;
-            }
-        }
-
         if (tm.color.a != alpha)
         {
             alpha = tm.color.a;
