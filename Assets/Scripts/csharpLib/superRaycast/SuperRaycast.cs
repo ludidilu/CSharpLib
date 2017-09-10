@@ -2,6 +2,7 @@
 using superFunction;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using System;
 
 namespace superRaycast
 {
@@ -163,6 +164,8 @@ namespace superRaycast
                         hits = Physics.RaycastAll(ray, float.MaxValue, layerIndex);
                     }
 
+                    Array.Sort(hits, SortHits);
+
                     int i = 0;
 
                     for (int m = 0; m < hits.Length; m++)
@@ -297,6 +300,18 @@ namespace superRaycast
                 }
 
                 isProcessingUpdate = false;
+            }
+        }
+
+        private int SortHits(RaycastHit _hit0, RaycastHit _hit1)
+        {
+            if (_hit0.distance > _hit1.distance)
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
             }
         }
     }
