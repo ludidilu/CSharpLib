@@ -8,6 +8,20 @@ namespace superRaycast
 {
     public class SuperRaycast : MonoBehaviour
     {
+        private struct MouseEnterUnit
+        {
+            public GameObject gameObject;
+            public RaycastHit hit;
+            public int index;
+
+            public MouseEnterUnit(GameObject _gameObject, RaycastHit _hit, int _index)
+            {
+                gameObject = _gameObject;
+                hit = _hit;
+                index = _index;
+            }
+        }
+
         public const string GetMouseButtonDown = "GetMouseButtonDown";
         public const string GetMouseButton = "GetMouseButton";
         public const string GetMouseButtonUp = "GetMouseButtonUp";
@@ -110,6 +124,8 @@ namespace superRaycast
 
         private List<GameObject> objs = new List<GameObject>();
 
+        private List<MouseEnterUnit> mouseEnterList = new List<MouseEnterUnit>();
+
         private bool isProcessingUpdate = false;
 
         private bool needClearObjs = false;
@@ -203,6 +219,8 @@ namespace superRaycast
                         {
                             hits = Physics.RaycastAll(ray, float.MaxValue, layerIndex);
                         }
+
+                        Array.Sort(hits, SortHits);
                     }
 
                     int i = 0;
@@ -220,7 +238,9 @@ namespace superRaycast
 
                         if (!objs.Contains(hit.collider.gameObject))
                         {
-                            SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseEnter, blockByUI, hit, i);
+                            mouseEnterList.Add(new MouseEnterUnit(hit.collider.gameObject, hit, i));
+
+                            //SuperFunction.Instance.DispatchEvent(hit.collider.gameObject, GetMouseEnter, blockByUI, hit, i);
                         }
                         else
                         {
@@ -236,6 +256,15 @@ namespace superRaycast
                     {
                         SuperFunction.Instance.DispatchEvent(objs[i], GetMouseExit, blockByUI);
                     }
+
+                    for (i = 0; i < mouseEnterList.Count; i++)
+                    {
+                        MouseEnterUnit unit = mouseEnterList[i];
+
+                        SuperFunction.Instance.DispatchEvent(unit.gameObject, GetMouseEnter, blockByUI, unit.hit, unit.index);
+                    }
+
+                    mouseEnterList.Clear();
 
                     List<GameObject> tmpObjs = objs;
 
@@ -262,6 +291,8 @@ namespace superRaycast
                         {
                             hits = Physics.RaycastAll(ray, float.MaxValue, layerIndex);
                         }
+
+                        Array.Sort(hits, SortHits);
                     }
 
                     int i = 0;
