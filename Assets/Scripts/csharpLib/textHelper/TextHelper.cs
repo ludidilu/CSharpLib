@@ -38,7 +38,9 @@ public class TextHelper
 
         tgs.textAnchor = _text.alignment;
 
-        tgs.scaleFactor = _text.GetComponentInParent<Canvas>().scaleFactor;
+        //tgs.scaleFactor = _text.GetComponentInParent<Canvas>().scaleFactor;
+
+        tgs.scaleFactor = 1;
 
         Debug.Log("tgs.scaleFactor:" + tgs.scaleFactor);
 
