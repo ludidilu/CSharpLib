@@ -66,7 +66,7 @@ namespace animatorFactoty
         {
             List<string> delKeyList = null;
 
-            Dictionary<string, AnimatorFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
+            IEnumerator<KeyValuePair<string, AnimatorFactoryUnit>> enumerator = dic.GetEnumerator();
 
             while (enumerator.MoveNext())
             {

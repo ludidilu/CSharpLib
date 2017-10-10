@@ -56,7 +56,7 @@ namespace textureFactory
 
         public void Dispose(bool _force)
         {
-            Dictionary<string, ITextureFactoryUnit>.ValueCollection.Enumerator enumerator = dicWillDispose.Values.GetEnumerator();
+            IEnumerator<ITextureFactoryUnit> enumerator = dicWillDispose.Values.GetEnumerator();
 
             while (enumerator.MoveNext())
             {

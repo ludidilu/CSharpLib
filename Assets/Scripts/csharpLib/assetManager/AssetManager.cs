@@ -113,7 +113,7 @@ namespace assetManager
 
         public void FixAssetBundleData(Dictionary<string, AssetManagerData> _addDic, BinaryWriter _bw)
         {
-            Dictionary<string, AssetManagerData>.Enumerator enumerator = _addDic.GetEnumerator();
+            IEnumerator<KeyValuePair<string, AssetManagerData>> enumerator = _addDic.GetEnumerator();
 
             while (enumerator.MoveNext())
             {

@@ -27,7 +27,7 @@ namespace gameObjectFactory
         {
             Action callBack = null;
 
-            if(_callBack != null)
+            if (_callBack != null)
             {
                 int loadNum = _paths.Length;
 
@@ -112,7 +112,7 @@ namespace gameObjectFactory
         {
             List<string> delKeyList = null;
 
-            Dictionary<string, GameObjectFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
+            IEnumerator<KeyValuePair<string, GameObjectFactoryUnit>> enumerator = dic.GetEnumerator();
 
             while (enumerator.MoveNext())
             {

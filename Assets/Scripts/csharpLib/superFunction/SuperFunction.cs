@@ -226,7 +226,7 @@ namespace superFunction
             {
                 DestroyControl(_target);
 
-                Dictionary<string, List<SuperFunctionUnit>>.ValueCollection.Enumerator enumerator = tmpDic.Values.GetEnumerator();
+                IEnumerator<List<SuperFunctionUnit>> enumerator = tmpDic.Values.GetEnumerator();
 
                 while (enumerator.MoveNext())
                 {
@@ -734,7 +734,7 @@ namespace superFunction
             {
                 dic2.Remove(_target);
 
-                Dictionary<string, List<SuperFunctionUnit>>.ValueCollection.Enumerator enumerator = tmpDic.Values.GetEnumerator();
+                IEnumerator<List<SuperFunctionUnit>> enumerator = tmpDic.Values.GetEnumerator();
 
                 while (enumerator.MoveNext())
                 {

@@ -1,104 +1,101 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
 using System.IO;
 
-namespace assetManager{
+namespace assetManager
+{
+    public class AssetManagerDataFactory
+    {
+        public static void SetData(BinaryWriter _bw, List<string> _assetNames, List<string> _assetBundleNames, Dictionary<string, List<string>> _result)
+        {
+            _bw.Write(_assetNames.Count);
 
-	public class AssetManagerDataFactory {
+            for (int i = 0; i < _assetNames.Count; i++)
+            {
+                _bw.Write(_assetNames[i]);
 
-		public static void SetData(BinaryWriter _bw,List<string> _assetNames,List<string> _assetBundleNames,Dictionary<string,List<string>> _result){
+                _bw.Write(_assetBundleNames[i]);
 
-			_bw.Write(_assetNames.Count);
+                List<string> tmpList = _result[_assetNames[i]];
 
-			for(int i = 0 ; i < _assetNames.Count ; i++){
+                _bw.Write(tmpList.Count);
 
-				_bw.Write(_assetNames[i]);
+                for (int m = 0; m < tmpList.Count; m++)
+                {
+                    _bw.Write(tmpList[m]);
+                }
+            }
+        }
 
-				_bw.Write(_assetBundleNames[i]);
+        public static void SetData(BinaryWriter _bw, Dictionary<string, AssetManagerData> _dataDic)
+        {
+            _bw.Write(_dataDic.Count);
 
-				List<string> tmpList = _result[_assetNames[i]];
+            IEnumerator<KeyValuePair<string, AssetManagerData>> enumerator = _dataDic.GetEnumerator();
 
-				_bw.Write(tmpList.Count);
+            while (enumerator.MoveNext())
+            {
+                _bw.Write(enumerator.Current.Key);
 
-				for(int m = 0 ; m < tmpList.Count ; m++){
+                AssetManagerData data = enumerator.Current.Value;
 
-					_bw.Write(tmpList[m]);
-				}
-			}
-		}
+                _bw.Write(data.assetBundle);
 
-		public static void SetData(BinaryWriter _bw,Dictionary<string,AssetManagerData> _dataDic){
+                if (data.assetBundleDep != null)
+                {
+                    _bw.Write(data.assetBundleDep.Length);
 
-			_bw.Write(_dataDic.Count);
+                    for (int i = 0; i < data.assetBundleDep.Length; i++)
+                    {
+                        _bw.Write(data.assetBundleDep[i]);
+                    }
+                }
+                else
+                {
+                    _bw.Write(0);
+                }
+            }
+        }
 
-			Dictionary<string,AssetManagerData>.Enumerator enumerator = _dataDic.GetEnumerator();
+        public static Dictionary<string, AssetManagerData> GetData(byte[] _bytes)
+        {
+            Dictionary<string, AssetManagerData> dic = new Dictionary<string, AssetManagerData>();
 
-			while(enumerator.MoveNext()){
+            MemoryStream ms = new MemoryStream(_bytes);
 
-				_bw.Write(enumerator.Current.Key);
+            BinaryReader br = new BinaryReader(ms);
 
-				AssetManagerData data = enumerator.Current.Value;
+            int assetLength = br.ReadInt32();
 
-				_bw.Write(data.assetBundle);
+            for (int i = 0; i < assetLength; i++)
+            {
+                string assetName = br.ReadString();
 
-				if(data.assetBundleDep != null){
+                AssetManagerData unit = new AssetManagerData();
 
-					_bw.Write(data.assetBundleDep.Length);
+                unit.assetBundle = br.ReadString();
 
-					for(int i = 0 ; i < data.assetBundleDep.Length ; i++){
+                int length = br.ReadInt32();
 
-						_bw.Write(data.assetBundleDep[i]);
-					}
+                if (length > 0)
+                {
+                    unit.assetBundleDep = new string[length];
 
-				}else{
+                    for (int m = 0; m < length; m++)
+                    {
+                        unit.assetBundleDep[m] = br.ReadString();
+                    }
+                }
 
-					_bw.Write(0);
-				}
-			}
-		}
+                dic.Add(assetName, unit);
+            }
 
-		public static Dictionary<string,AssetManagerData> GetData(byte[] _bytes){
+            br.Close();
 
-			Dictionary<string,AssetManagerData> dic = new Dictionary<string, AssetManagerData>();
+            ms.Close();
 
-			MemoryStream ms = new MemoryStream(_bytes);
+            ms.Dispose();
 
-			BinaryReader br = new BinaryReader(ms);
-
-			int assetLength = br.ReadInt32();
-
-			for(int i = 0 ; i < assetLength ; i++){
-
-				string assetName = br.ReadString();
-
-				AssetManagerData unit = new AssetManagerData();
-
-				unit.assetBundle = br.ReadString();
-
-				int length = br.ReadInt32();
-
-				if(length > 0){
-
-					unit.assetBundleDep = new string[length];
-
-					for(int m = 0 ; m < length ; m++){
-
-						unit.assetBundleDep[m] = br.ReadString();
-					}
-				}
-
-				dic.Add(assetName,unit);
-			}
-
-			br.Close();
-
-			ms.Close();
-
-			ms.Dispose();
-
-			return dic;
-		}
-	}
+            return dic;
+        }
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.IO;
 using System;
 
@@ -10,17 +9,18 @@ using publicTools;
 using DamienG.Security.Cryptography;
 using systemIO;
 
-namespace versionControl{
+namespace versionControl
+{
+    struct UpdateFileInfo
+    {
+        public int version;
+        public int size;
+        public string path;
+        public uint crc;
+    }
 
-	struct UpdateFileInfo{
-
-		public int version;
-		public int size;
-		public string path;
-		public UInt32 crc;
-	}
-
-	public class VersionControl{
+    public class VersionControl
+    {
 
 #if PLATFORM_PC || PLATFORM_ANDROID
 
@@ -30,192 +30,193 @@ namespace versionControl{
 
 #endif
 
-		private const string FILE_NAME = "version.dat";
+        private const string FILE_NAME = "version.dat";
 
-		private static VersionControl _Instance;
+        private static VersionControl _Instance;
 
-		public static VersionControl Instance{
+        public static VersionControl Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    _Instance = new VersionControl();
+                }
 
-			get{
+                return _Instance;
+            }
+        }
 
-				if(_Instance == null){
+        private VersionData data;
 
-					_Instance = new VersionControl();
-				}
+        public void Init(int _localVersion, int _remoteVersion, Func<int, string> _fixFun, Func<string, string> _fixFun2, Action _callBack, Action<string> _setTextCallBack, Action<float> _setPercentCallBack, int _updateWarningSize, Action<string, Action> _showWarningCallBack)
+        {
+            if (File.Exists(Application.persistentDataPath + "/" + FILE_NAME))
+            {
+                data = VersionData.LoadFromFile(Application.persistentDataPath + "/" + FILE_NAME);
 
-				return _Instance;
-			}
-		}
+                if (_localVersion > data.version)
+                {//说明残留的version.dat是老版本的  必须立即清除掉
 
-		private VersionData data;
+                    SuperDebug.Log("发现残留的version.dat 删除掉!");
 
-		public void Init(int _localVersion,int _remoteVersion,Func<int,string> _fixFun,Func<string,string> _fixFun2,Action _callBack,Action<string> _setTextCallBack,Action<float> _setPercentCallBack,int _updateWarningSize,Action<string,Action> _showWarningCallBack){
+                    data = new VersionData();
 
-			if(File.Exists(Application.persistentDataPath + "/" + FILE_NAME)){
+                    data.version = _localVersion;
 
-				data = VersionData.LoadFromFile(Application.persistentDataPath + "/" + FILE_NAME);
+                    VersionData.SaveToFile(Application.persistentDataPath + "/" + FILE_NAME, data);
+                }
+            }
+            else
+            {
+                SuperDebug.Log("这是第一次进游戏  生成新的version.dat");
 
-				if(_localVersion > data.version){//说明残留的version.dat是老版本的  必须立即清除掉
+                data = new VersionData();
 
-					SuperDebug.Log("发现残留的version.dat 删除掉!");
+                data.version = _localVersion;
 
-					data = new VersionData();
-					
-					data.version = _localVersion;
+                VersionData.SaveToFile(Application.persistentDataPath + "/" + FILE_NAME, data);
+            }
 
-					VersionData.SaveToFile(Application.persistentDataPath + "/" + FILE_NAME,data);
-				}					
+            SuperDebug.Log("客户端资源版本号:" + data.version + "  服务器资源版本号:" + _remoteVersion);
 
-			}else{
+            if (data.version < _remoteVersion)
+            {
+                _setTextCallBack("读取热更新列表");
 
-				SuperDebug.Log("这是第一次进游戏  生成新的version.dat");
+                Dictionary<string, UpdateFileInfo> dic = new Dictionary<string, UpdateFileInfo>();
 
-				data = new VersionData();
+                LoadUpdateXML(0, dic, _remoteVersion, _remoteVersion, _fixFun, _fixFun2, _callBack, _setTextCallBack, _setPercentCallBack, _updateWarningSize, _showWarningCallBack);
+            }
+            else
+            {
+                _callBack();
+            }
+        }
 
-				data.version = _localVersion;
+        private void LoadUpdateXML(int _allFileSize, Dictionary<string, UpdateFileInfo> _dic, int _remoteVersion, int _version, Func<int, string> _fixFun, Func<string, string> _fixFun2, Action _callBack, Action<string> _setTextCallBack, Action<float> _setPercentCallBack, int _updateWarningSize, Action<string, Action> _showWarningCallBack)
+        {
+            if (_version > data.version)
+            {
+                string url = _fixFun(_version);
 
-				VersionData.SaveToFile(Application.persistentDataPath + "/" + FILE_NAME,data);
-			}
+                Action<WWW> callBack = delegate (WWW obj)
+                {
+                    if (obj.error != null)
+                    {
+                        _setTextCallBack("热更新列表加载失败");
 
-			SuperDebug.Log("客户端资源版本号:" + data.version + "  服务器资源版本号:" + _remoteVersion);
+                        SuperDebug.Log("文件热更新失败 文件名:" + obj.url);
 
-			if(data.version < _remoteVersion){
+                        return;
+                    }
 
-				_setTextCallBack("读取热更新列表");
+                    XmlDocument xmlDoc = new XmlDocument();
 
-				Dictionary<string,UpdateFileInfo> dic = new Dictionary<string, UpdateFileInfo>();
+                    xmlDoc.LoadXml(PublicTools.XmlFix(obj.text));
 
-				LoadUpdateXML(0,dic,_remoteVersion,_remoteVersion,_fixFun,_fixFun2,_callBack,_setTextCallBack,_setPercentCallBack,_updateWarningSize,_showWarningCallBack);
+                    XmlNodeList hhh = xmlDoc.ChildNodes[0].ChildNodes;
 
-			}else{
+                    foreach (XmlNode node in hhh)
+                    {
+                        string nodeUrl = node.InnerText;
 
-				_callBack();
-			}
-		}
+                        if (!_dic.ContainsKey(nodeUrl))
+                        {
+                            int fileSize = int.Parse(node.Attributes["size"].Value);
 
-		private void LoadUpdateXML(int _allFileSize,Dictionary<string,UpdateFileInfo> _dic,int _remoteVersion,int _version,Func<int,string> _fixFun,Func<string,string> _fixFun2,Action _callBack,Action<string> _setTextCallBack,Action<float> _setPercentCallBack,int _updateWarningSize,Action<string,Action> _showWarningCallBack){
+                            if (fileSize == -1)
+                            {
+                                if (data.dic.ContainsKey(nodeUrl))
+                                {
+                                    data.dic.Remove(nodeUrl);
+                                }
+                            }
+                            else
+                            {
+                                _allFileSize += fileSize;
 
-			if(_version > data.version){
+                                UpdateFileInfo fileInfo = new UpdateFileInfo();
 
-				string url = _fixFun(_version);
+                                fileInfo.version = _version;
 
-				Action<WWW> callBack = delegate(WWW obj) {
+                                fileInfo.size = fileSize;
 
-					if(obj.error != null){
+                                fileInfo.path = node.Attributes["path"].Value;
 
-						_setTextCallBack("热更新列表加载失败");
+                                fileInfo.crc = Convert.ToUInt32(node.Attributes["crc"].Value, 16);
 
-						SuperDebug.Log("文件热更新失败 文件名:" + obj.url);
-						
-						return;
-					}
+                                _dic.Add(nodeUrl, fileInfo);
+                            }
+                        }
+                    }
 
-					XmlDocument xmlDoc = new XmlDocument ();
-					
-					xmlDoc.LoadXml(PublicTools.XmlFix(obj.text));
-					
-					XmlNodeList hhh = xmlDoc.ChildNodes[0].ChildNodes;
-					
-					foreach(XmlNode node in hhh){
+                    LoadUpdateXML(_allFileSize, _dic, _remoteVersion, _version - 1, _fixFun, _fixFun2, _callBack, _setTextCallBack, _setPercentCallBack, _updateWarningSize, _showWarningCallBack);
+                };
 
-						string nodeUrl = node.InnerText;
+                WWWManager.Instance.LoadRemote(url, callBack);
+            }
+            else
+            {
+                if (_allFileSize >= _updateWarningSize && _showWarningCallBack != null)
+                {
+                    Action callBack = delegate ()
+                    {
+                        LoadUpdateXMLOK(_dic, _remoteVersion, _fixFun2, _callBack, _setTextCallBack, _setPercentCallBack, _allFileSize);
+                    };
 
-						if(!_dic.ContainsKey(nodeUrl)){
+                    float tempnum = (float)Math.Round(((float)_allFileSize) / 1024 / 1024, 2);
 
-							int fileSize = int.Parse(node.Attributes["size"].Value);
+                    string msg = "需要更新" + tempnum.ToString() + "MB大小的新文件，确认更新吗？";
 
-							if(fileSize == -1){
+                    _showWarningCallBack(msg, callBack);
+                }
+                else
+                {
+                    LoadUpdateXMLOK(_dic, _remoteVersion, _fixFun2, _callBack, _setTextCallBack, _setPercentCallBack, _allFileSize);
+                }
+            }
+        }
 
-								if(data.dic.ContainsKey(nodeUrl)){
+        private void LoadUpdateXMLOK(Dictionary<string, UpdateFileInfo> _dic, int _remoteVersion, Func<string, string> _fixFun, Action _callBack, Action<string> _setTextCallBack, Action<float> _setPercentCallBack, int _allFileSize)
+        {
+            int loadNum = _dic.Count;
 
-									data.dic.Remove(nodeUrl);
-								}
+            int loadSize = 0;
 
-							}else{
+            IEnumerator<KeyValuePair<string, UpdateFileInfo>> enumerator = _dic.GetEnumerator();
 
-								_allFileSize += fileSize;
+            while (enumerator.MoveNext())
+            {
+                KeyValuePair<string, UpdateFileInfo> pair = enumerator.Current;
 
-								UpdateFileInfo fileInfo = new UpdateFileInfo();
+                string path = pair.Key;
 
-								fileInfo.version = _version;
+                UpdateFileInfo info = pair.Value;
 
-								fileInfo.size = fileSize;
+                string url = _fixFun(info.path + path);
 
-								fileInfo.path = node.Attributes["path"].Value;
+                Action<WWW> callBack = delegate (WWW obj)
+                {
+                    if (obj.error != null)
+                    {
+                        _setTextCallBack("文件热更新失败 文件名:" + obj.url);
 
-								fileInfo.crc = Convert.ToUInt32(node.Attributes["crc"].Value,16);
+                        SuperDebug.Log("文件热更新失败 文件名:" + obj.url);
 
-								_dic.Add(nodeUrl,fileInfo);
-							}
-						}
-					}
+                        return;
+                    }
 
-					LoadUpdateXML(_allFileSize,_dic,_remoteVersion,_version - 1,_fixFun,_fixFun2,_callBack,_setTextCallBack,_setPercentCallBack,_updateWarningSize,_showWarningCallBack);
-				};
+                    uint crc = CRC32.Compute(obj.bytes);
 
-				WWWManager.Instance.LoadRemote(url,callBack);
+                    if (crc != info.crc)
+                    {
+                        _setTextCallBack("文件热更新CRC比对错误 文件名:" + obj.url);
 
-			}else{
+                        SuperDebug.Log("文件热更新CRC比对错误 文件名:" + obj.url);
 
-				if(_allFileSize >= _updateWarningSize && _showWarningCallBack != null){
-					
-					Action callBack = delegate() {
-						
-						LoadUpdateXMLOK(_dic,_remoteVersion,_fixFun2,_callBack,_setTextCallBack,_setPercentCallBack,_allFileSize);
-					};
-
-					float tempnum = (float)Math.Round(((float)_allFileSize) / 1024 / 1024, 2);
-					
-					string msg = "需要更新" + tempnum.ToString() + "MB大小的新文件，确认更新吗？";
-
-					_showWarningCallBack(msg,callBack);
-
-				}else{
-
-					LoadUpdateXMLOK(_dic,_remoteVersion,_fixFun2,_callBack,_setTextCallBack,_setPercentCallBack,_allFileSize);
-				}
-			}
-		}
-
-		private void LoadUpdateXMLOK(Dictionary<string,UpdateFileInfo> _dic,int _remoteVersion,Func<string,string> _fixFun,Action _callBack,Action<string> _setTextCallBack,Action<float> _setPercentCallBack,int _allFileSize){
-
-			int loadNum = _dic.Count;
-
-			int loadSize = 0;
-
-			Dictionary<string,UpdateFileInfo>.Enumerator enumerator = _dic.GetEnumerator();
-
-			while(enumerator.MoveNext()){
-
-				KeyValuePair<string,UpdateFileInfo> pair = enumerator.Current;
-
-				string path = pair.Key;
-
-				UpdateFileInfo info = pair.Value;
-
-				string url = _fixFun(info.path + path);
-
-				Action<WWW> callBack = delegate(WWW obj) {
-
-					if(obj.error != null){
-
-						_setTextCallBack("文件热更新失败 文件名:" + obj.url);
-
-						SuperDebug.Log("文件热更新失败 文件名:" + obj.url);
-
-						return;
-					}
-
-					UInt32 crc = CRC32.Compute(obj.bytes);
-
-					if(crc != info.crc){
-
-						_setTextCallBack("文件热更新CRC比对错误 文件名:" + obj.url);
-
-						SuperDebug.Log("文件热更新CRC比对错误 文件名:" + obj.url);
-						
-						return;
-					}
+                        return;
+                    }
 
 #if PLATFORM_PC || PLATFORM_ANDROID
 
@@ -230,44 +231,44 @@ namespace versionControl{
 
 #else
 
-					SystemIO.SaveFile(Application.persistentDataPath + "/" + path,obj.bytes);
+                    SystemIO.SaveFile(Application.persistentDataPath + "/" + path, obj.bytes);
 
 #endif
 
-					if(data.dic.ContainsKey(path)){
+                    if (data.dic.ContainsKey(path))
+                    {
+                        data.dic[path] = info.version;
+                    }
+                    else
+                    {
+                        data.dic.Add(path, info.version);
+                    }
 
-						data.dic[path] = info.version;
+                    loadNum--;
 
-					}else{
+                    //_setTextCallBack("正在更新:" + (_dic.Count - loadNum) + "/" + _dic.Count);
 
-						data.dic.Add(path,info.version);
-					}
+                    loadSize += info.size;
 
-					loadNum--;
+                    _setTextCallBack("正在更新:" + Math.Round((float)loadSize / (float)_allFileSize * 100) + "%（" + Math.Round((float)loadSize / 1024 / 1024, 1) + "/" + Math.Round((float)_allFileSize / 1024 / 1024, 1) + "）");
 
-					//_setTextCallBack("正在更新:" + (_dic.Count - loadNum) + "/" + _dic.Count);
-					
-					loadSize += info.size;
+                    _setPercentCallBack((float)loadSize / (float)_allFileSize);
 
-                    _setTextCallBack("正在更新:" + Math.Round((float)loadSize / (float)_allFileSize * 100) + "%（"+Math.Round((float)loadSize/1024/1024,1)+ "/" +Math.Round((float)_allFileSize/1024/1024,1) +"）" );
+                    if (loadNum == 0)
+                    {
+                        UpdateOver(_remoteVersion, _callBack);
+                    }
+                };
 
-					_setPercentCallBack((float)loadSize / (float)_allFileSize);
+                WWWManager.Instance.LoadRemote(url, callBack);
+            }
+        }
 
-					if(loadNum == 0){
+        private void UpdateOver(int _remoteVersion, Action _callBack)
+        {
+            data.version = _remoteVersion;
 
-						UpdateOver(_remoteVersion,_callBack);
-					}
-				};
-
-				WWWManager.Instance.LoadRemote(url,callBack);
-			}
-		}
-
-		private void UpdateOver(int _remoteVersion,Action _callBack){
-
-			data.version = _remoteVersion;
-
-			VersionData.SaveToFile(Application.persistentDataPath + "/" + FILE_NAME,data);
+            VersionData.SaveToFile(Application.persistentDataPath + "/" + FILE_NAME, data);
 
 #if PLATFORM_PC || PLATFORM_ANDROID
 			
@@ -285,21 +286,22 @@ namespace versionControl{
 			}
 
 #else
-			_callBack();
+            _callBack();
 
 #endif
-		}
+        }
 
-		private void QuitApplication(){
+        private void QuitApplication()
+        {
+            Application.Quit();
+        }
 
-			Application.Quit();
-		}
-
-		public bool FixUrl(ref string _path){
-
-			if(data != null){
-
-				if(data.dic.ContainsKey(_path)){
+        public bool FixUrl(ref string _path)
+        {
+            if (data != null)
+            {
+                if (data.dic.ContainsKey(_path))
+                {
 
 #if PLATFORM_PC
 
@@ -310,21 +312,21 @@ namespace versionControl{
 					_path = "file:///" + Application.persistentDataPath + "/" + _path;
 
 #else
-					_path = "file:///" + Application.persistentDataPath + "/" + _path;
+                    _path = "file:///" + Application.persistentDataPath + "/" + _path;
 
 #endif
 
-					return true;
-
-				}else{
-
-					return false;
-				}
-
-			}else{
-
-				return false;
-			}
-		}
-	}
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
 }

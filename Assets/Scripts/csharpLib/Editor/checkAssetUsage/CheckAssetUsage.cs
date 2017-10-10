@@ -10,7 +10,7 @@ public static class DepRecord
     {
         _bw.Write(_dic.Count);
 
-        Dictionary<string, Dictionary<string, bool>>.Enumerator enumerator = _dic.GetEnumerator();
+        IEnumerator<KeyValuePair<string, Dictionary<string, bool>>> enumerator = _dic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
@@ -22,7 +22,7 @@ public static class DepRecord
 
             _bw.Write(tmpDic.Count);
 
-            Dictionary<string, bool>.KeyCollection.Enumerator enumerator2 = tmpDic.Keys.GetEnumerator();
+            IEnumerator<string> enumerator2 = tmpDic.Keys.GetEnumerator();
 
             while (enumerator2.MoveNext())
             {
@@ -99,7 +99,7 @@ public static class CheckAssetUsage
             }
         }
 
-        Dictionary<string, Dictionary<string, bool>>.Enumerator enumerator = dic.GetEnumerator();
+        IEnumerator<KeyValuePair<string, Dictionary<string, bool>>> enumerator = dic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {

@@ -1,79 +1,77 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
-namespace versionControl{
+namespace versionControl
+{
+    public class VersionData
+    {
+        public static VersionData LoadFromFile(string _path)
+        {
+            using (FileStream fs = new FileStream(_path, FileMode.Open))
+            {
+                BinaryReader br = new BinaryReader(fs);
 
-	public class VersionData{
+                VersionData data = new VersionData();
 
-		public static VersionData LoadFromFile(string _path){
+                data.version = br.ReadInt32();
 
-			using(FileStream fs = new FileStream(_path,FileMode.Open)){
+                int length = br.ReadInt32();
 
-				BinaryReader br = new BinaryReader(fs);
+                for (int i = 0; i < length; i++)
+                {
+                    string fileName = br.ReadString();
 
-				VersionData data = new VersionData();
+                    int fileVersion = br.ReadInt32();
 
-				data.version = br.ReadInt32();
+                    data.dic.Add(fileName, fileVersion);
+                }
 
-				int length = br.ReadInt32();
+                br.Close();
 
-				for(int i = 0 ; i < length ; i++){
+                fs.Close();
 
-					string fileName = br.ReadString();
+                return data;
+            }
+        }
 
-					int fileVersion = br.ReadInt32();
+        public static void SaveToFile(string _path, VersionData _data)
+        {
+            FileInfo fi = new FileInfo(_path);
 
-					data.dic.Add(fileName,fileVersion);
-				}
+            DirectoryInfo dir = fi.Directory;
 
-				br.Close();
+            if (!dir.Exists)
+            {
+                dir.Create();
+            }
 
-				fs.Close();
+            using (FileStream fs = new FileStream(_path, FileMode.OpenOrCreate))
+            {
+                BinaryWriter bw = new BinaryWriter(fs);
 
-				return data;
-			}
-		}
+                bw.Write(_data.version);
 
-		public static void SaveToFile(string _path,VersionData _data){
-			
-			FileInfo fi = new FileInfo(_path);
-			
-			DirectoryInfo dir = fi.Directory;
-			
-			if (!dir.Exists){
-				
-				dir.Create();
-			}
-			
-			using (FileStream fs = new FileStream (_path, FileMode.OpenOrCreate)) {
-				
-				BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(_data.dic.Count);
 
-				bw.Write(_data.version);
+                IEnumerator<KeyValuePair<string, int>> enumerator = _data.dic.GetEnumerator();
 
-				bw.Write(_data.dic.Count);
+                while (enumerator.MoveNext())
+                {
+                    KeyValuePair<string, int> pair = enumerator.Current;
 
-				Dictionary<string,int>.Enumerator enumerator = _data.dic.GetEnumerator();
+                    bw.Write(pair.Key);
 
-				while(enumerator.MoveNext()){
+                    bw.Write(pair.Value);
+                }
 
-					KeyValuePair<string,int> pair = enumerator.Current;
-				
-					bw.Write(pair.Key);
+                bw.Close();
 
-					bw.Write(pair.Value);
-				}
+                fs.Close();
+            }
+        }
 
-				bw.Close();
-				
-				fs.Close ();
-			}
-		}
+        public int version;
+        public Dictionary<string, int> dic = new Dictionary<string, int>();
 
-		public int version;
-		public Dictionary<string,int> dic = new Dictionary<string, int>();
-
-	}
+    }
 }

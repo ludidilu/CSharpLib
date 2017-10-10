@@ -41,11 +41,10 @@ public class StaticData
 
         FieldInfo field = type.GetField(key);
 
-        Dictionary<int, T>.ValueCollection.Enumerator enumerator = dict.Values.GetEnumerator();
+        IEnumerator<T> enumerator = dict.Values.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
-
             T item = enumerator.Current;
 
             object keyValue = field.GetValue(item);
@@ -85,7 +84,7 @@ public class StaticData
 
             data = new List<T>();
 
-            Dictionary<int, T>.ValueCollection.Enumerator enumerator = dict.Values.GetEnumerator();
+            IEnumerator<T> enumerator = dict.Values.GetEnumerator();
 
             while (enumerator.MoveNext())
             {
@@ -119,7 +118,7 @@ public class StaticData
 
         WWWManager.Instance.Load(datName, cb);
     }
-    
+
     public static void Dispose()
     {
         dic = new Dictionary<Type, IDictionary>();

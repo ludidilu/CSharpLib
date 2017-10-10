@@ -60,7 +60,7 @@ namespace audio
         {
             List<string> delKeyList = null;
 
-            Dictionary<string, AudioFactoryUnit>.Enumerator enumerator = dic.GetEnumerator();
+            IEnumerator<KeyValuePair<string, AudioFactoryUnit>> enumerator = dic.GetEnumerator();
 
             while (enumerator.MoveNext())
             {

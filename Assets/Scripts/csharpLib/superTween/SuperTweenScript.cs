@@ -99,7 +99,7 @@ namespace superTween
                 dic = new Dictionary<int, SuperTweenUnit>();
                 toDic = new Dictionary<Action<float>, SuperTweenUnit>();
 
-                Dictionary<int, SuperTweenUnit>.ValueCollection.Enumerator enumerator = tmpDic.Values.GetEnumerator();
+                IEnumerator<SuperTweenUnit> enumerator = tmpDic.Values.GetEnumerator();
 
                 while (enumerator.MoveNext())
                 {
@@ -129,7 +129,7 @@ namespace superTween
             {
                 List<SuperTweenUnit> list = new List<SuperTweenUnit>();
 
-                Dictionary<int, SuperTweenUnit>.ValueCollection.Enumerator enumerator = dic.Values.GetEnumerator();
+                IEnumerator<SuperTweenUnit> enumerator = dic.Values.GetEnumerator();
 
                 while (enumerator.MoveNext())
                 {
@@ -213,7 +213,7 @@ namespace superTween
 
                     float nowUnscaleTime = Time.unscaledTime;
 
-                    Dictionary<int, SuperTweenUnit>.Enumerator enumerator = dic.GetEnumerator();
+                    IEnumerator<KeyValuePair<int, SuperTweenUnit>> enumerator = dic.GetEnumerator();
 
                     while (enumerator.MoveNext())
                     {
