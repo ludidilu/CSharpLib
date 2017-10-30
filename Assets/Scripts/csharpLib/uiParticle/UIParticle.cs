@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using publicTools;
 
 [RequireComponent(typeof(ParticleSystem))]
-public class UIParticle : Graphic
+public class UIParticle : MaskableGraphic
 {
     private static ParticleSystem.Particle[] p = new ParticleSystem.Particle[1000];
 
