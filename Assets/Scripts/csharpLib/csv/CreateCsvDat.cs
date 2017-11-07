@@ -20,6 +20,13 @@ public class CreateCsvDat
 
         BinaryWriter bw = new BinaryWriter(fs);
 
+        DirectoryInfo di = new DirectoryInfo(Application.dataPath + _path);
+
+        if (!di.Exists)
+        {
+            di.Create();
+        }
+
         FileInfo fix = new FileInfo(Application.dataPath + _path + "LoadCsv.cs");
 
         if (fix.Exists)
