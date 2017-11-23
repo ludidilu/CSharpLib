@@ -132,6 +132,10 @@ namespace superRaycast
 
         private Camera renderCamera;
 
+        private List<RaycastResult> resultList = new List<RaycastResult>();
+
+        private PointerEventData eventDataCurrentPosition;
+
         private void AddLayerReal(string _layerName)
         {
             layerIndex = layerIndex | (1 << LayerMask.NameToLayer(_layerName));
@@ -155,6 +159,11 @@ namespace superRaycast
             filterTagDic.Remove(_tag);
         }
 
+        void Awake()
+        {
+            eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        }
+
         void Update()
         {
             if (isOpen > 0 && renderCamera != null)
@@ -169,7 +178,9 @@ namespace superRaycast
                 {
                     Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
 
-                    blockByUI = EventSystem.current.IsPointerOverGameObject();
+                    //blockByUI = EventSystem.current.IsPointerOverGameObject();
+
+                    blockByUI = IsPointerOverUIObject();
 
                     if (layerIndex == 0)
                     {
@@ -209,7 +220,9 @@ namespace superRaycast
                     {
                         Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
 
-                        blockByUI = EventSystem.current.IsPointerOverGameObject();
+                        //blockByUI = EventSystem.current.IsPointerOverGameObject();
+
+                        blockByUI = IsPointerOverUIObject();
 
                         if (layerIndex == 0)
                         {
@@ -281,7 +294,9 @@ namespace superRaycast
                     {
                         Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
 
-                        blockByUI = EventSystem.current.IsPointerOverGameObject();
+                        //blockByUI = EventSystem.current.IsPointerOverGameObject();
+
+                        blockByUI = IsPointerOverUIObject();
 
                         if (layerIndex == 0)
                         {
@@ -343,6 +358,23 @@ namespace superRaycast
             else
             {
                 return -1;
+            }
+        }
+
+        private bool IsPointerOverUIObject()
+        {
+            eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            EventSystem.current.RaycastAll(eventDataCurrentPosition, resultList);
+
+            if (resultList.Count > 0)
+            {
+                resultList.Clear();
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }
