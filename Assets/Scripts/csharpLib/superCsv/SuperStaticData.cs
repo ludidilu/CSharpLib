@@ -19,15 +19,15 @@ public static class SuperStaticData
 
     private static Dictionary<Type, IList> dicList = new Dictionary<Type, IList>();
 
-    public static T GetData<T, U>(U _key) where T : SuperCsvBase<U>
+    public static T GetData<T, U>(U _id) where T : SuperCsvBase<U>
     {
         Dictionary<U, T> tmpDic = dic[typeof(T)] as Dictionary<U, T>;
 
         T data;
 
-        if (!tmpDic.TryGetValue(_key, out data))
+        if (!tmpDic.TryGetValue(_id, out data))
         {
-            SuperDebug.LogError(typeof(T).Name + "表中未找到Key为:" + _key + "的行!");
+            SuperDebug.LogError(typeof(T).Name + "表中未找到ID为:" + _id + "的行!");
         }
 
         return data;
@@ -72,11 +72,11 @@ public static class SuperStaticData
         return data as List<T>;
     }
 
-    public static bool IsKeyExists<T, U>(U _key) where T : SuperCsvBase<U>
+    public static bool IsIDExists<T, U>(U _id) where T : SuperCsvBase<U>
     {
         Dictionary<U, T> dict = GetDic<T, U>();
 
-        return dict.ContainsKey(_key);
+        return dict.ContainsKey(_id);
     }
 
     public static void LoadCsvDataFromFile(Action _callBack, Func<byte[], Dictionary<Type, IDictionary>> _getDicCallBack)

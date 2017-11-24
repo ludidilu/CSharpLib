@@ -20,6 +20,13 @@ public static class SuperCreateCsvDat
 
         BinaryWriter bw = new BinaryWriter(fs);
 
+        DirectoryInfo di = new DirectoryInfo(Application.dataPath + _path);
+
+        if (!di.Exists)
+        {
+            di.Create();
+        }
+
         FileInfo fix = new FileInfo(Application.dataPath + _path + "SuperLoadCsv.cs");
 
         if (fix.Exists)

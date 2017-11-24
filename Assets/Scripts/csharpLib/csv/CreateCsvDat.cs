@@ -5,11 +5,11 @@ using System.Reflection;
 using System;
 using System.Collections.Generic;
 
-public class CreateCsvDat
+public static class CreateCsvDat
 {
     public static void Start(string _path)
     {
-        FileInfo fib = new FileInfo(Application.streamingAssetsPath + "/csv.dat");
+        FileInfo fib = new FileInfo(Application.streamingAssetsPath + "/" + StaticData.datName);
 
         if (fib.Exists)
         {

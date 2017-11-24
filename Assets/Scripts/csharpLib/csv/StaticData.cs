@@ -9,7 +9,7 @@ using thread;
 using System.Threading;
 using publicTools;
 
-public class StaticData
+public static class StaticData
 {
     public static string path;
 
