@@ -17,22 +17,24 @@ public static class SimulateClick
             clickEventData = new PointerEventData(EventSystem.current);
         }
 
-        Transform target;
+        RectTransform target;
 
         if (_obj is GameObject)
         {
-            target = (_obj as GameObject).transform;
+            target = (_obj as GameObject).transform as RectTransform;
         }
         else if (_obj is Component)
         {
-            target = (_obj as Component).gameObject.transform;
+            target = (_obj as Component).gameObject.transform as RectTransform;
         }
         else
         {
             throw new Exception("SimulateClick error!Unknown obj type:" + _obj);
         }
 
-        clickEventData.position = _camera.WorldToScreenPoint(target.position);
+        Vector3 pos = new Vector3(target.position.x - (target.pivot.x - 0.5f) * target.lossyScale.x * target.rect.width, target.position.y - (target.pivot.y - 0.5f) * target.lossyScale.y * target.rect.height, target.position.z);
+
+        clickEventData.position = _camera.WorldToScreenPoint(pos);
 
         ClickReal(_graphicRaycaster);
     }
