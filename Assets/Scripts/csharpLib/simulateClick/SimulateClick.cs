@@ -36,7 +36,19 @@ public static class SimulateClick
 
         clickEventData.position = _camera.WorldToScreenPoint(pos);
 
-        ClickReal(_graphicRaycaster);
+        _graphicRaycaster.Raycast(clickEventData, raycastResultList);
+
+        if (raycastResultList.Count > 0)
+        {
+            GameObject go = raycastResultList[0].gameObject;
+
+            raycastResultList.Clear();
+
+            if (go.transform.IsChildOf(target))
+            {
+                ExecuteClick(go);
+            }
+        }
     }
 
     public static bool CanClick(GraphicRaycaster _graphicRaycaster, Camera _camera, UnityEngine.Object _obj)
@@ -91,11 +103,6 @@ public static class SimulateClick
 
         clickEventData.position = _pos;
 
-        ClickReal(_graphicRaycaster);
-    }
-
-    private static void ClickReal(GraphicRaycaster _graphicRaycaster)
-    {
         _graphicRaycaster.Raycast(clickEventData, raycastResultList);
 
         if (raycastResultList.Count > 0)
