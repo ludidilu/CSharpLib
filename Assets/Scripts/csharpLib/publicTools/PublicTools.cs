@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using superTween;
 using UnityEngine.UI;
+using System.IO;
 
 namespace publicTools
 {
@@ -813,6 +814,38 @@ namespace publicTools
             }
 
             return result;
+        }
+
+        public static void SaveRenderTextureToPNG(RenderTexture _rt, string _path)
+        {
+            RenderTexture prev = RenderTexture.active;
+
+            RenderTexture.active = _rt;
+
+            Texture2D png = new Texture2D(_rt.width, _rt.height, TextureFormat.ARGB32, false);
+
+            png.ReadPixels(new Rect(0, 0, _rt.width, _rt.height), 0, 0);
+
+            byte[] bytes = png.EncodeToPNG();
+
+            FileInfo fi = new FileInfo(_path);
+
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            using (FileStream fs = File.Open(_path, FileMode.Create))
+            {
+                using (BinaryWriter writer = new BinaryWriter(fs))
+                {
+                    writer.Write(bytes);
+
+                    UnityEngine.Object.Destroy(png);
+                }
+            }
+
+            RenderTexture.active = prev;
         }
     }
 }
