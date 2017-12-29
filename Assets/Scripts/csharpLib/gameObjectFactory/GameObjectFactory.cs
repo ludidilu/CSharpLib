@@ -116,7 +116,7 @@ namespace gameObjectFactory
 
             while (enumerator.MoveNext())
             {
-                KeyValuePair<String, GameObjectFactoryUnit> pair = enumerator.Current;
+                KeyValuePair<string, GameObjectFactoryUnit> pair = enumerator.Current;
 
                 if (_force || pair.Value.useNum == 0)
                 {

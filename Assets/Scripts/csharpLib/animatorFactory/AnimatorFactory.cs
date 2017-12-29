@@ -70,7 +70,7 @@ namespace animatorFactoty
 
             while (enumerator.MoveNext())
             {
-                KeyValuePair<String, AnimatorFactoryUnit> pair = enumerator.Current;
+                KeyValuePair<string, AnimatorFactoryUnit> pair = enumerator.Current;
 
                 if (_force || pair.Value.useNum == 0)
                 {
