@@ -847,6 +847,30 @@ namespace publicTools
 
             RenderTexture.active = prev;
         }
+
+        public static void AtlasGetOriginalUV(Image _img)
+        {
+            Vector4 fix;
+
+            Vector4 fix2;
+
+            if (_img.sprite.packed)
+            {
+                fix = new Vector4(_img.sprite.textureRect.x / _img.sprite.texture.width, _img.sprite.textureRect.y / _img.sprite.texture.height, _img.sprite.textureRect.width / _img.sprite.texture.width, _img.sprite.textureRect.height / _img.sprite.texture.height);
+
+                fix2 = new Vector4(_img.sprite.textureRectOffset.x / _img.sprite.rect.width, _img.sprite.textureRectOffset.y / _img.sprite.rect.height, _img.sprite.textureRect.width / _img.sprite.rect.width, _img.sprite.textureRect.height / _img.sprite.rect.height);
+            }
+            else
+            {
+                fix = new Vector4(0, 0, 1, 1);
+
+                fix2 = new Vector4(0, 0, 1, 1);
+            }
+
+            _img.material.SetVector("fix", fix);
+
+            _img.material.SetVector("fix2", fix2);
+        }
     }
 }
 
