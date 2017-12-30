@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using gameObjectFactory;
 
 public class UIManager
 {
@@ -20,7 +19,7 @@ public class UIManager
         }
     }
 
-    private Func<Type, string> getAssetPathCallBack;
+    private Action<Type, Action<GameObject>> getAssetCallBack;
 
     private Transform root;
 
@@ -30,7 +29,7 @@ public class UIManager
 
     private List<UIBase> stack = new List<UIBase>();
 
-    public void Init(Transform _root, Transform _mask, Func<Type, string> _getAssetPathCallBack)
+    public void Init(Transform _root, Transform _mask, Action<Type, Action<GameObject>> _getAssetCallBack)
     {
         root = _root;
 
@@ -43,7 +42,7 @@ public class UIManager
             mask.gameObject.SetActive(false);
         }
 
-        getAssetPathCallBack = _getAssetPathCallBack;
+        getAssetCallBack = _getAssetCallBack;
     }
 
     public void Show<T>() where T : UIBase
@@ -68,8 +67,6 @@ public class UIManager
             pool.Add(type, new Queue<UIBase>());
         }
 
-        string path = getAssetPathCallBack(type);
-
         Action<GameObject> dele = delegate (GameObject _go)
         {
             _go.transform.SetParent(root, false);
@@ -86,7 +83,7 @@ public class UIManager
             ShowReal(ui);
         };
 
-        GameObjectFactory.Instance.GetGameObject(path, dele);
+        getAssetCallBack(type, dele);
     }
 
     public void Show<T, U>(U _data) where T : UIBase
@@ -111,8 +108,6 @@ public class UIManager
             pool.Add(type, new Queue<UIBase>());
         }
 
-        string path = getAssetPathCallBack(type);
-
         Action<GameObject> dele = delegate (GameObject _go)
         {
             _go.transform.SetParent(root, false);
@@ -129,7 +124,7 @@ public class UIManager
             ShowReal(ui, _data);
         };
 
-        GameObjectFactory.Instance.GetGameObject(path, dele);
+        getAssetCallBack(type, dele);
     }
 
     private void ShowReal(UIBase _ui)
@@ -210,7 +205,7 @@ public class UIManager
         }
     }
 
-    public void HideUnitl<T>() where T : UIBase
+    public void HideUntil<T>() where T : UIBase
     {
         for (int i = stack.Count - 1; i > -1; i--)
         {
@@ -228,7 +223,7 @@ public class UIManager
         }
     }
 
-    public void HideUnitl(UIBase _ui)
+    public void HideUntil(UIBase _ui)
     {
         int index = stack.LastIndexOf(_ui);
 
