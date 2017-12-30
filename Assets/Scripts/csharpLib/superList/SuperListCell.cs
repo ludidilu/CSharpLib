@@ -1,79 +1,75 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.EventSystems;
 using superTween;
 using System;
 
-namespace superList{
+namespace superList
+{
+    public class SuperListCell : MonoBehaviour, IPointerClickHandler
+    {
+        protected object data;
+        protected bool selected;
 
-	public class SuperListCell : MonoBehaviour,IPointerClickHandler {
+        [HideInInspector]
+        public CanvasGroup canvasGroup;
 
-		protected object data;
-		protected bool selected;
+        [HideInInspector]
+        public int index;
 
-		[HideInInspector]public CanvasGroup canvasGroup;
+        protected SuperList superList;
 
-		[HideInInspector]public int index;
+        public virtual void Init(SuperList _superList, object[] _objs)
+        {
+            superList = _superList;
+        }
 
-		protected SuperList superList;
+        public virtual void OnPointerClick(PointerEventData eventData)
+        {
+            if (data != null)
+            {
+                superList.CellClick(this);
+            }
+        }
 
-		public virtual void Init(SuperList _superList,object[] _objs){
+        public virtual bool SetData(object _data)
+        {
+            data = _data;
 
-			superList = _superList;
-		}
+            return false;
+        }
 
-		public virtual void OnPointerClick (PointerEventData eventData)
-		{
-			if(data != null){
+        public virtual void SetSelected(bool _value)
+        {
+            selected = _value;
 
-				superList.CellClick(this);
-			}
-		}  
-		
-		// Update is called once per frame
-		void Update () {
-		
-		}
+            //由于Rect2DMask有bug  所以添加这2行2B代码
+        }
 
-		public virtual bool SetData(object _data){
+        private int tweenID;
 
-			data = _data;
+        public void AlphaIn(Action _callBack)
+        {
+            Action dele = delegate ()
+            {
+                tweenID = -1;
 
-			return false;
-		}
+                _callBack();
+            };
 
-		public virtual void SetSelected(bool _value){
+            tweenID = SuperTween.Instance.To(0, 1, 0.1f, AlphaInDel, dele);
+        }
 
-			selected = _value;
+        public void StopAlphaIn()
+        {
+            if (tweenID != -1)
+            {
+                SuperTween.Instance.Remove(tweenID);
+            }
+        }
 
-			//由于Rect2DMask有bug  所以添加这2行2B代码
-		}
-
-		private int tweenID;
-
-		public void AlphaIn(Action _callBack){
-
-			Action dele = delegate() {
-
-				tweenID = -1;
-
-				_callBack();
-			};
-
-			tweenID = SuperTween.Instance.To(0,1,0.1f,AlphaInDel,dele);
-		}
-
-		public void StopAlphaIn(){
-
-			if(tweenID != -1){
-
-				SuperTween.Instance.Remove(tweenID);
-			}
-		}
-
-		private void AlphaInDel(float _value){
-
-			canvasGroup.alpha = _value;
-		}
-	}
+        private void AlphaInDel(float _value)
+        {
+            canvasGroup.alpha = _value;
+        }
+    }
 }

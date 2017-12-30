@@ -25,7 +25,7 @@ public class UIBase : MonoBehaviour
 
     }
 
-    public virtual void OnEnter<U>(U _data)
+    public virtual void OnEnter(object _data)
     {
 
     }

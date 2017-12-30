@@ -86,7 +86,7 @@ public class UIManager
         getAssetCallBack(type, dele);
     }
 
-    public void Show<T, U>(U _data) where T : UIBase
+    public void Show<T>(object _data) where T : UIBase
     {
         Type type = typeof(T);
 
@@ -134,7 +134,7 @@ public class UIManager
         _ui.OnEnter();
     }
 
-    private void ShowReal<U>(UIBase _ui, U _data)
+    private void ShowReal(UIBase _ui, object _data)
     {
         AddUI(_ui);
 
