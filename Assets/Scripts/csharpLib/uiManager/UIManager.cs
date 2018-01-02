@@ -25,7 +25,7 @@ public class UIManager
 
     private Transform mask;
 
-    private Dictionary<Type, Queue<UIBase>> pool = new Dictionary<Type, Queue<UIBase>>();
+    private Dictionary<Type, UIView> pool = new Dictionary<Type, UIView>();
 
     private List<UIBase> stack = new List<UIBase>();
 
@@ -45,42 +45,33 @@ public class UIManager
         getAssetCallBack = _getAssetCallBack;
     }
 
-    public void Show<T>() where T : UIBase
+    public void Show<T>() where T : UIView
     {
         Type type = typeof(T);
 
-        Queue<UIBase> queue;
+        UIView view;
 
-        if (pool.TryGetValue(type, out queue))
+        if (pool.TryGetValue(type, out view))
         {
-            if (queue.Count > 0)
-            {
-                UIBase ui = queue.Dequeue();
 
-                ShowReal(ui);
 
-                return;
-            }
-        }
-        else
-        {
-            pool.Add(type, new Queue<UIBase>());
+
         }
 
         Action<GameObject> dele = delegate (GameObject _go)
         {
             _go.transform.SetParent(root, false);
 
-            T ui = _go.GetComponent<T>();
+            view = _go.GetComponent<T>();
 
-            if (ui == null)
+            if (view == null)
             {
-                ui = _go.AddComponent<T>();
+                view = _go.AddComponent<T>();
             }
 
-            ui.Init();
+            view.Init();
 
-            ShowReal(ui);
+            ShowReal(view);
         };
 
         getAssetCallBack(type, dele);
