@@ -29,8 +29,12 @@ public class UIManager
 
     private List<UIBase> stack = new List<UIBase>();
 
+    private GameObject blockGo;
+
     public void Init(Transform _root, Transform _mask, Action<Type, Action<GameObject>> _getAssetCallBack)
     {
+        blockGo = new GameObject();
+
         root = _root;
 
         mask = _mask;
@@ -45,7 +49,7 @@ public class UIManager
         getAssetCallBack = _getAssetCallBack;
     }
 
-    public void Show<T>() where T : UIView
+    public void Show<T>(object _data) where T : UIView
     {
         Type type = typeof(T);
 
@@ -53,219 +57,338 @@ public class UIManager
 
         if (pool.TryGetValue(type, out view))
         {
+            int index = stack.IndexOf(view);
 
-
-
-        }
-
-        Action<GameObject> dele = delegate (GameObject _go)
-        {
-            _go.transform.SetParent(root, false);
-
-            view = _go.GetComponent<T>();
-
-            if (view == null)
+            if (index == -1)
             {
-                view = _go.AddComponent<T>();
+                ShowReal(view, null, _data);
             }
-
-            view.Init();
-
-            ShowReal(view);
-        };
-
-        getAssetCallBack(type, dele);
-    }
-
-    public void Show<T>(object _data) where T : UIBase
-    {
-        Type type = typeof(T);
-
-        Queue<UIBase> queue;
-
-        if (pool.TryGetValue(type, out queue))
-        {
-            if (queue.Count > 0)
+            else
             {
-                UIBase ui = queue.Dequeue();
+                UIBlock block = blockGo.AddComponent<UIBlock>();
 
-                ShowReal(ui, _data);
+                block.Replace(view);
 
-                return;
+                stack[index] = block;
+
+                ShowReal(view, null, _data);
             }
         }
         else
         {
-            pool.Add(type, new Queue<UIBase>());
-        }
-
-        Action<GameObject> dele = delegate (GameObject _go)
-        {
-            _go.transform.SetParent(root, false);
-
-            T ui = _go.GetComponent<T>();
-
-            if (ui == null)
+            Action<GameObject> dele = delegate (GameObject _go)
             {
-                ui = _go.AddComponent<T>();
-            }
+                _go.transform.SetParent(root, false);
 
-            ui.Init();
+                view = _go.GetComponent<T>();
 
-            ShowReal(ui, _data);
-        };
+                pool.Add(typeof(T), view);
 
-        getAssetCallBack(type, dele);
+                if (view == null)
+                {
+                    view = _go.AddComponent<T>();
+                }
+
+                view.Init();
+
+                ShowReal(view, null, _data);
+            };
+
+            getAssetCallBack(type, dele);
+        }
     }
 
-    private void ShowReal(UIBase _ui)
+    public void Show<T, U>(object _data) where T : UIView where U : UIView
     {
-        AddUI(_ui);
+        UIView parent;
 
-        _ui.OnEnter();
-    }
-
-    private void ShowReal(UIBase _ui, object _data)
-    {
-        AddUI(_ui);
-
-        _ui.OnEnter(_data);
-    }
-
-    private void AddUI(UIBase _ui)
-    {
-        if (_ui.IsFullScreen())
+        if (pool.TryGetValue(typeof(U), out parent))
         {
-            HideAll();
+            if (stack.Contains(parent))
+            {
+                Type type = typeof(T);
+
+                UIView view;
+
+                if (pool.TryGetValue(type, out view))
+                {
+                    int index = stack.IndexOf(view);
+
+                    if (index == -1)
+                    {
+                        ShowReal(view, parent, _data);
+                    }
+                    else
+                    {
+                        UIBlock block = blockGo.AddComponent<UIBlock>();
+
+                        block.Replace(view);
+
+                        stack[index] = block;
+
+                        ShowReal(view, parent, _data);
+                    }
+                }
+                else
+                {
+                    Action<GameObject> dele = delegate (GameObject _go)
+                    {
+                        _go.transform.SetParent(root, false);
+
+                        view = _go.GetComponent<T>();
+
+                        pool.Add(typeof(T), view);
+
+                        if (view == null)
+                        {
+                            view = _go.AddComponent<T>();
+                        }
+
+                        view.Init();
+
+                        ShowReal(view, parent, _data);
+                    };
+
+                    getAssetCallBack(type, dele);
+                }
+            }
+        }
+    }
+
+    private void ShowReal(UIView _view, UIBase _parent, object _data)
+    {
+        AddUI(_view, _parent);
+
+        _view.OnEnter(_data);
+    }
+
+    private void AddUI(UIView _view, UIBase _parent)
+    {
+        if (_view.IsFullScreen())
+        {
+            HideBefore();
         }
 
-        _ui.gameObject.SetActive(true);
+        _view.gameObject.SetActive(true);
 
-        _ui.cg.alpha = 1;
+        _view.SetVisible(true);
 
-        _ui.cg.blocksRaycasts = true;
+        _view.transform.SetAsLastSibling();
 
-        _ui.transform.SetAsLastSibling();
+        if (_parent != null)
+        {
+            _parent.children.Add(_view);
 
-        stack.Add(_ui);
+            _view.parent = _parent;
+        }
+
+        stack.Add(_view);
 
         RefreshMask();
     }
 
-    private void HideAll()
+    private void HideBefore()
     {
         for (int i = stack.Count - 1; i > -1; i--)
         {
             UIBase ui = stack[i];
 
-            ui.cg.alpha = 0;
-
-            ui.cg.blocksRaycasts = false;
-
-            ui.OnHide();
-
-            if (ui.IsFullScreen())
+            if (ui is UIView)
             {
-                break;
+                UIView view = ui as UIView;
+
+                view.SetVisible(false);
+
+                view.OnHide();
+
+                if (view.IsFullScreen())
+                {
+                    break;
+                }
+            }
+            else
+            {
+                UIBlock block = ui as UIBlock;
+
+                if (block.origin.IsFullScreen())
+                {
+                    break;
+                }
             }
         }
     }
 
-    public void Hide<T>() where T : UIBase
+    public void Hide<T>() where T : UIView
     {
-        for (int i = stack.Count - 1; i > -1; i--)
+        UIView view;
+
+        if (pool.TryGetValue(typeof(T), out view))
         {
-            UIBase ui = stack[i];
-
-            if (ui is T)
+            if (stack.Contains(view))
             {
-                HideReal(i);
-
-                break;
+                HideReal(view);
             }
         }
     }
 
     public void Hide(UIBase _ui)
     {
-        int index = stack.LastIndexOf(_ui);
-
-        if (index != -1)
+        if (stack.Contains(_ui))
         {
-            HideReal(index);
+            HideReal(_ui);
         }
     }
 
-    public void HideUntil<T>() where T : UIBase
+    private void HideReal(UIBase _ui)
     {
-        for (int i = stack.Count - 1; i > -1; i--)
+        bool showBefore = false;
+
+        if (_ui is UIView)
         {
-            UIBase ui = stack[i];
+            UIView view = _ui as UIView;
 
-            if (ui is T)
-            {
-                if (i < stack.Count - 1)
-                {
-                    HideReal(i + 1);
-                }
-
-                break;
-            }
+            showBefore = view.IsFullScreen();
         }
-    }
-
-    public void HideUntil(UIBase _ui)
-    {
-        int index = stack.LastIndexOf(_ui);
-
-        if (index != -1 && index < stack.Count - 1)
+        else
         {
-            HideReal(index + 1);
-        }
-    }
+            UIBlock block = _ui as UIBlock;
 
-    private void HideReal(int _index)
-    {
-        UIBase tmpUI = stack[_index];
-
-        for (int i = _index; i < stack.Count; i++)
-        {
-            UIBase ui = stack[i];
-
-            RemoveUI(ui);
+            showBefore = block.origin.IsFullScreen();
         }
 
-        stack.RemoveRange(_index, stack.Count - _index);
-
-        if (tmpUI.IsFullScreen())
+        if (showBefore)
         {
-            for (int i = stack.Count - 1; i > -1; i--)
+            int index = stack.IndexOf(_ui);
+
+            for (int i = index - 1; i > -1; i--)
             {
                 UIBase ui = stack[i];
 
-                ui.cg.alpha = 1;
-
-                ui.cg.blocksRaycasts = true;
-
-                ui.OnShow();
-
-                if (ui.IsFullScreen())
+                if (ui is UIView)
                 {
-                    break;
+                    UIView view = ui as UIView;
+
+                    view.SetVisible(true);
+
+                    if (view.IsFullScreen())
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    UIBlock block = ui as UIBlock;
+
+                    if (block.origin.IsFullScreen())
+                    {
+                        break;
+                    }
                 }
             }
+        }
+
+        bool needSortView = false;
+
+        RemoveUI(_ui, ref needSortView);
+
+        if (needSortView)
+        {
+            SortView();
         }
 
         RefreshMask();
     }
 
-    private void RemoveUI(UIBase _ui)
+    private void RemoveUI(UIBase _ui, ref bool _needSortView)
     {
-        _ui.gameObject.SetActive(false);
+        stack.Remove(_ui);
 
-        _ui.OnExit();
+        if (_ui.parent != null)
+        {
+            _ui.parent.children.Remove(_ui);
 
-        pool[_ui.GetType()].Enqueue(_ui);
+            _ui.parent = null;
+        }
+
+        List<UIBase> children = null;
+
+        if (_ui.children.Count > 0)
+        {
+            children = new List<UIBase>();
+
+            for (int i = 0; i < _ui.children.Count; i++)
+            {
+                children.Add(_ui.children[i]);
+            }
+        }
+
+        if (_ui is UIView)
+        {
+            UIView view = _ui as UIView;
+
+            bool replaceBlock = false;
+
+            for (int i = stack.Count - 1; i > -1; i--)
+            {
+                UIBase tmpUI = stack[i];
+
+                if (tmpUI is UIBlock)
+                {
+                    UIBlock tmpBlock = tmpUI as UIBlock;
+
+                    if (tmpBlock.origin == view)
+                    {
+                        stack[i] = view;
+
+                        tmpBlock.Revert(view);
+
+                        view.OnEnter(tmpBlock.data);
+
+                        UnityEngine.Object.Destroy(tmpBlock);
+
+                        replaceBlock = true;
+
+                        _needSortView = true;
+
+                        break;
+                    }
+                }
+            }
+
+            if (!replaceBlock)
+            {
+                view.gameObject.SetActive(false);
+
+                view.OnExit();
+            }
+        }
+        else
+        {
+            UIBlock block = _ui as UIBlock;
+
+            UnityEngine.Object.Destroy(block);
+        }
+
+        if (children != null)
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                RemoveUI(children[i], ref _needSortView);
+            }
+        }
+    }
+
+    private void SortView()
+    {
+        for (int i = 0; i < stack.Count; i++)
+        {
+            UIBase ui = stack[i];
+
+            if (ui is UIView)
+            {
+                ui.transform.SetAsLastSibling();
+            }
+        }
     }
 
     private void RefreshMask()
@@ -274,9 +397,20 @@ public class UIManager
         {
             if (stack.Count > 0)
             {
-                UIBase tmpUI = stack[stack.Count - 1];
+                UIBase ui = stack[stack.Count - 1];
 
-                if (!tmpUI.IsFullScreen())
+                UIView view;
+
+                if (ui is UIView)
+                {
+                    view = ui as UIView;
+                }
+                else
+                {
+                    view = (ui as UIBlock).origin;
+                }
+
+                if (!view.IsFullScreen())
                 {
                     if (!mask.gameObject.activeSelf)
                     {
@@ -285,7 +419,7 @@ public class UIManager
 
                     mask.SetAsLastSibling();
 
-                    tmpUI.transform.SetAsLastSibling();
+                    view.transform.SetAsLastSibling();
                 }
                 else
                 {

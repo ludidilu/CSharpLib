@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class UIView : UIBase
 {
-    public CanvasGroup cg { private set; get; }
+    protected CanvasGroup cg { private set; get; }
 
     public virtual void Init()
     {
@@ -15,14 +15,27 @@ public class UIView : UIBase
         }
     }
 
+    public override void SetVisible(bool _visible)
+    {
+        base.SetVisible(_visible);
+
+        if (visible)
+        {
+            cg.alpha = 1;
+
+            cg.blocksRaycasts = true;
+        }
+        else
+        {
+            cg.alpha = 0;
+
+            cg.blocksRaycasts = false;
+        }
+    }
+
     public virtual bool IsFullScreen()
     {
         throw new NotImplementedException();
-    }
-
-    public virtual void OnEnter()
-    {
-
     }
 
     public virtual void OnEnter(object _data)
