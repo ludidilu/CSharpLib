@@ -29,6 +29,8 @@
 
             ui.parent = this;
         }
+
+        _origin.children.Clear();
     }
 
     public void Revert(UIView _origin)
