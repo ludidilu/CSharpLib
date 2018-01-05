@@ -11,6 +11,8 @@ namespace superGraphicRaycast
 
     public class SuperGraphicRaycast : GraphicRaycaster
     {
+        public static int resultAppendListCount { private set; get; }
+
         public static void SetIsOpen(bool _isOpen, string _str)
         {
             SuperGraphicRaycastScript.Instance.isOpen = SuperGraphicRaycastScript.Instance.isOpen + (_isOpen ? 1 : -1);
@@ -75,6 +77,13 @@ namespace superGraphicRaycast
                     resultAppendList.RemoveAt(i);
                 }
             }
+
+            resultAppendListCount += resultAppendList.Count;
+        }
+
+        void LateUpdate()
+        {
+            resultAppendListCount = 0;
         }
     }
 }

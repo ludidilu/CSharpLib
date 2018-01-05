@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using superFunction;
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
 using System;
+using superGraphicRaycast;
 
 namespace superRaycast
 {
@@ -132,10 +132,6 @@ namespace superRaycast
 
         private Camera renderCamera;
 
-        private List<RaycastResult> resultList = new List<RaycastResult>();
-
-        private PointerEventData eventDataCurrentPosition;
-
         private void AddLayerReal(string _layerName)
         {
             layerIndex = layerIndex | (1 << LayerMask.NameToLayer(_layerName));
@@ -159,11 +155,6 @@ namespace superRaycast
             filterTagDic.Remove(_tag);
         }
 
-        void Awake()
-        {
-            eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        }
-
         void Update()
         {
             if (isOpen > 0 && renderCamera != null)
@@ -177,8 +168,6 @@ namespace superRaycast
                 if (Input.GetMouseButtonDown(0))
                 {
                     Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
-
-                    //blockByUI = EventSystem.current.IsPointerOverGameObject();
 
                     blockByUI = IsPointerOverUIObject();
 
@@ -219,8 +208,6 @@ namespace superRaycast
                     if (hits == null)
                     {
                         Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
-
-                        //blockByUI = EventSystem.current.IsPointerOverGameObject();
 
                         blockByUI = IsPointerOverUIObject();
 
@@ -294,8 +281,6 @@ namespace superRaycast
                     {
                         Ray ray = renderCamera.ScreenPointToRay(Input.mousePosition);
 
-                        //blockByUI = EventSystem.current.IsPointerOverGameObject();
-
                         blockByUI = IsPointerOverUIObject();
 
                         if (layerIndex == 0)
@@ -363,19 +348,7 @@ namespace superRaycast
 
         private bool IsPointerOverUIObject()
         {
-            eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-            EventSystem.current.RaycastAll(eventDataCurrentPosition, resultList);
-
-            if (resultList.Count > 0)
-            {
-                resultList.Clear();
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return SuperGraphicRaycast.resultAppendListCount > 0;
         }
     }
 }
