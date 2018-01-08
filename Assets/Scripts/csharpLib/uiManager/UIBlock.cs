@@ -6,11 +6,18 @@
     {
         origin = _origin;
 
-        SetVisible(_origin.visible);
-
         data = origin.data;
 
         parent = origin.parent;
+
+        uid = origin.uid;
+
+        if (origin.visible)
+        {
+            origin.OnHide();
+        }
+
+        SetVisible(origin.visible);
 
         if (parent != null)
         {
@@ -30,12 +37,16 @@
             ui.parent = this;
         }
 
-        _origin.children.Clear();
+        origin.children.Clear();
     }
 
     public void Revert(UIView _origin)
     {
+        _origin.data = data;
+
         _origin.parent = parent;
+
+        _origin.uid = uid;
 
         _origin.SetVisible(visible);
 

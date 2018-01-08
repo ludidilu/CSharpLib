@@ -3,7 +3,9 @@ using UnityEngine;
 
 public class UIBase : MonoBehaviour
 {
-    public object data { protected set; get; }
+    public object data;
+
+    public int uid;
 
     public UIBase parent;
 

@@ -31,6 +31,8 @@ public class UIManager
 
     private GameObject blockGo;
 
+    private int uid = 1;
+
     public void Init(Transform _root, Transform _mask, Action<Type, Action<GameObject>> _getAssetCallBack)
     {
         blockGo = new GameObject();
@@ -49,8 +51,43 @@ public class UIManager
         getAssetCallBack = _getAssetCallBack;
     }
 
-    public void Show<T>(object _data) where T : UIView
+    public int Show<T>(object _data) where T : UIView
     {
+        return Show<T>(_data, null);
+    }
+
+    public int Show<T>(object _data, int _parentUid) where T : UIView
+    {
+        UIBase parent = null;
+
+        for (int i = 0; i < stack.Count; i++)
+        {
+            UIBase tmpUI = stack[i];
+
+            if (tmpUI.uid == _parentUid)
+            {
+                parent = tmpUI;
+
+                break;
+            }
+        }
+
+        if (parent != null)
+        {
+            return Show<T>(_data, parent);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    private int Show<T>(object _data, UIBase _parent) where T : UIView
+    {
+        int tmpUid = uid;
+
+        uid++;
+
         Type type = typeof(T);
 
         UIView view;
@@ -59,20 +96,18 @@ public class UIManager
         {
             int index = stack.IndexOf(view);
 
-            if (index == -1)
-            {
-                ShowReal(view, null, _data);
-            }
-            else
+            if (index != -1)
             {
                 UIBlock block = blockGo.AddComponent<UIBlock>();
 
                 block.Replace(view);
 
                 stack[index] = block;
-
-                ShowReal(view, null, _data);
             }
+
+            view.uid = tmpUid;
+
+            ShowReal(view, _parent, _data);
         }
         else
         {
@@ -82,77 +117,24 @@ public class UIManager
 
                 view = _go.GetComponent<T>();
 
-                pool.Add(typeof(T), view);
-
                 if (view == null)
                 {
                     view = _go.AddComponent<T>();
                 }
 
+                pool.Add(typeof(T), view);
+
                 view.Init();
 
-                ShowReal(view, null, _data);
+                view.uid = tmpUid;
+
+                ShowReal(view, _parent, _data);
             };
 
             getAssetCallBack(type, dele);
         }
-    }
 
-    public void Show<T, U>(object _data) where T : UIView where U : UIView
-    {
-        UIView parent;
-
-        if (pool.TryGetValue(typeof(U), out parent))
-        {
-            if (stack.Contains(parent))
-            {
-                Type type = typeof(T);
-
-                UIView view;
-
-                if (pool.TryGetValue(type, out view))
-                {
-                    int index = stack.IndexOf(view);
-
-                    if (index == -1)
-                    {
-                        ShowReal(view, parent, _data);
-                    }
-                    else
-                    {
-                        UIBlock block = blockGo.AddComponent<UIBlock>();
-
-                        block.Replace(view);
-
-                        stack[index] = block;
-
-                        ShowReal(view, parent, _data);
-                    }
-                }
-                else
-                {
-                    Action<GameObject> dele = delegate (GameObject _go)
-                    {
-                        _go.transform.SetParent(root, false);
-
-                        view = _go.GetComponent<T>();
-
-                        pool.Add(typeof(T), view);
-
-                        if (view == null)
-                        {
-                            view = _go.AddComponent<T>();
-                        }
-
-                        view.Init();
-
-                        ShowReal(view, parent, _data);
-                    };
-
-                    getAssetCallBack(type, dele);
-                }
-            }
-        }
+        return tmpUid;
     }
 
     private void ShowReal(UIView _view, UIBase _parent, object _data)
@@ -199,8 +181,6 @@ public class UIManager
 
                 view.SetVisible(false);
 
-                view.OnHide();
-
                 if (view.IsFullScreen())
                 {
                     break;
@@ -218,24 +198,18 @@ public class UIManager
         }
     }
 
-    public void Hide<T>() where T : UIView
+    public void Hide(int _uid)
     {
-        UIView view;
-
-        if (pool.TryGetValue(typeof(T), out view))
+        for (int i = 0; i < stack.Count; i++)
         {
-            if (stack.Contains(view))
+            UIBase ui = stack[i];
+
+            if (ui.uid == _uid)
             {
-                HideReal(view);
-            }
-        }
-    }
+                HideReal(ui);
 
-    public void Hide(UIBase _ui)
-    {
-        if (stack.Contains(_ui))
-        {
-            HideReal(_ui);
+                break;
+            }
         }
     }
 
@@ -326,6 +300,8 @@ public class UIManager
         {
             UIView view = _ui as UIView;
 
+            view.OnExit();
+
             bool replaceBlock = false;
 
             for (int i = stack.Count - 1; i > -1; i--)
@@ -342,8 +318,6 @@ public class UIManager
 
                         tmpBlock.Revert(view);
 
-                        view.OnEnter(tmpBlock.data);
-
                         UnityEngine.Object.Destroy(tmpBlock);
 
                         replaceBlock = true;
@@ -358,8 +332,6 @@ public class UIManager
             if (!replaceBlock)
             {
                 view.gameObject.SetActive(false);
-
-                view.OnExit();
             }
         }
         else

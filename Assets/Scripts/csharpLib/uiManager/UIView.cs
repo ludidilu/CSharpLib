@@ -17,6 +17,15 @@ public class UIView : UIBase
 
     public override void SetVisible(bool _visible)
     {
+        if (visible && !_visible)
+        {
+            OnHide();
+        }
+        else
+        {
+            OnShow();
+        }
+
         base.SetVisible(_visible);
 
         if (visible)
