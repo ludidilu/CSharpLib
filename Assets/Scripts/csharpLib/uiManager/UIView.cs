@@ -46,24 +46,12 @@ public class UIView : UIBase
     {
         throw new NotImplementedException();
     }
-
-    public virtual void OnEnter(object _data)
-    {
-        data = _data;
-    }
-
-    public virtual void OnExit()
-    {
-
-    }
-
+    
     public virtual void OnShow()
     {
-
     }
 
     public virtual void OnHide()
     {
-
     }
 }

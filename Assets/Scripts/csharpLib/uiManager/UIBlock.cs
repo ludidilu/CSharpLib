@@ -1,6 +1,6 @@
 ﻿public class UIBlock : UIBase
 {
-    public UIView origin { private set; get; }
+    public UIView origin;
 
     public void Replace(UIView _origin)
     {
