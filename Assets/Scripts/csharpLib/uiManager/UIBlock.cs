@@ -6,35 +6,53 @@
     {
         origin = _origin;
 
+        bool tmpVisible = origin.visible;
+
+        object tmpData = data;
+
+        int tmpUid = uid;
+
+        int tmpLayerIndex = layerIndex;
+
+        UIBase tmpParent = parent;
+
+        origin.SetVisible(false);
+
         data = origin.data;
 
         parent = origin.parent;
 
         uid = origin.uid;
 
-        if (origin.visible)
+        layerIndex = origin.layerIndex;
+
+        SetVisible(tmpVisible);
+
+        if (origin.parent != null)
         {
-            origin.OnHide();
+            int index = origin.parent.children.IndexOf(origin);
+
+            origin.parent.children[index] = this;
         }
-
-        SetVisible(origin.visible);
-
-        if (parent != null)
-        {
-            int index = parent.children.IndexOf(origin);
-
-            parent.children[index] = this;
-        }
-
-        children.Clear();
 
         for (int i = 0; i < origin.children.Count; i++)
         {
-            UIBase ui = origin.children[i];
+            children.Add(origin.children[i]);
+        }
 
-            children.Add(ui);
+        origin.data = tmpData;
 
-            ui.parent = this;
+        origin.uid = tmpUid;
+
+        origin.layerIndex = tmpLayerIndex;
+
+        origin.parent = tmpParent;
+
+        if (tmpParent != null)
+        {
+            int index = tmpParent.children.IndexOf(this);
+
+            tmpParent.children[index] = origin;
         }
 
         origin.children.Clear();
