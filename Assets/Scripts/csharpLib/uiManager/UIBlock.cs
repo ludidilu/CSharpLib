@@ -35,6 +35,8 @@
             origin.parent.children[index] = this;
         }
 
+        children.Clear();
+
         for (int i = 0; i < origin.children.Count; i++)
         {
             children.Add(origin.children[i]);

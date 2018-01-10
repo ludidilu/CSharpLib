@@ -27,7 +27,7 @@ public class UIManager
 
     private Dictionary<Type, UIView> pool = new Dictionary<Type, UIView>();
 
-    private LinkedList<KeyValuePair<int, List<UIBase>>> stack = new LinkedList<KeyValuePair<int, List<UIBase>>>();
+    private LinkedList<List<UIBase>> stack = new LinkedList<List<UIBase>>();
 
     //private List<UIBase> stack = new List<UIBase>();
 
@@ -53,7 +53,7 @@ public class UIManager
         getAssetCallBack = _getAssetCallBack;
     }
 
-    public int ShowInLayer<T>(object _data, int _layerIndex) where T : UIView
+    public int ShowInRoot<T>(object _data, int _layerIndex) where T : UIView
     {
         return Show<T>(_data, _layerIndex, null);
     }
@@ -74,11 +74,11 @@ public class UIManager
 
     private UIBase GetUi(int _uid)
     {
-        IEnumerator<KeyValuePair<int, List<UIBase>>> enumerator = stack.GetEnumerator();
+        IEnumerator<List<UIBase>> enumerator = stack.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
-            List<UIBase> list = enumerator.Current.Value;
+            List<UIBase> list = enumerator.Current;
 
             for (int i = 0; i < list.Count; i++)
             {
@@ -116,6 +116,8 @@ public class UIManager
             }
             else
             {
+                view.gameObject.SetActive(true);
+
                 ShowReal(view, _parent, _data, _layerIndex, tmpUid);
             }
         }
@@ -123,6 +125,8 @@ public class UIManager
         {
             Action<GameObject> dele = delegate (GameObject _go)
             {
+                _go.SetActive(true);
+
                 _go.transform.SetParent(root, false);
 
                 view = _go.GetComponent<T>();
@@ -154,19 +158,15 @@ public class UIManager
         AddUI(_ui, _parent, _layerIndex);
 
         SortView();
-
-        RefreshMask();
-
-        //_view.OnEnter();
     }
 
     private void AddUI(UIBase _ui, UIBase _parent, int _layerIndex)
     {
+        _ui.parent = _parent;
+
         if (_parent != null)
         {
             _parent.children.Add(_ui);
-
-            _ui.parent = _parent;
 
             _ui.layerIndex = _parent.layerIndex;
         }
@@ -174,7 +174,7 @@ public class UIManager
         {
             _ui.layerIndex = _layerIndex;
 
-            LinkedListNode<KeyValuePair<int, List<UIBase>>> node = stack.First;
+            LinkedListNode<List<UIBase>> node = stack.First;
 
             List<UIBase> list;
 
@@ -182,27 +182,25 @@ public class UIManager
             {
                 list = new List<UIBase>();
 
-                KeyValuePair<int, List<UIBase>> pair = new KeyValuePair<int, List<UIBase>>(_layerIndex, list);
-
-                stack.AddFirst(pair);
+                stack.AddFirst(list);
             }
             else
             {
                 while (true)
                 {
-                    if (_layerIndex == node.Value.Key)
+                    int layerIndex = node.Value[0].layerIndex;
+
+                    if (_layerIndex == layerIndex)
                     {
-                        list = node.Value.Value;
+                        list = node.Value;
 
                         break;
                     }
-                    else if (_layerIndex < node.Value.Key)
+                    else if (_layerIndex < layerIndex)
                     {
                         list = new List<UIBase>();
 
-                        KeyValuePair<int, List<UIBase>> pair = new KeyValuePair<int, List<UIBase>>(_layerIndex, list);
-
-                        stack.AddBefore(node, pair);
+                        stack.AddBefore(node, list);
 
                         break;
                     }
@@ -214,9 +212,7 @@ public class UIManager
                         {
                             list = new List<UIBase>();
 
-                            KeyValuePair<int, List<UIBase>> pair = new KeyValuePair<int, List<UIBase>>(_layerIndex, list);
-
-                            stack.AddLast(pair);
+                            stack.AddLast(list);
 
                             break;
                         }
@@ -240,225 +236,148 @@ public class UIManager
 
     public void Hide(int _uid)
     {
-        IEnumerator<KeyValuePair<int, List<UIBase>>> enumerator = stack.GetEnumerator();
+        UIBase ui = GetUi(_uid);
 
-        while (enumerator.MoveNext())
+        if (ui.parent == null)
         {
-            List<UIBase> list = enumerator.Current.Value;
+            LinkedListNode<List<UIBase>> node = stack.First;
 
-            for (int i = 0; i < list.Count; i++)
+            while (true)
             {
-                UIBase ui = list[i];
+                List<UIBase> list = node.Value;
 
-                if (ui.uid == _uid)
+                if (list[0].layerIndex == ui.layerIndex)
                 {
-                    HideReal(ui);
-
-                    return;
-                }
-            }
-        }
-    }
-
-    private void HideReal(UIBase _ui)
-    {
-        bool showBefore = false;
-
-        if (_ui is UIView)
-        {
-            UIView view = _ui as UIView;
-
-            showBefore = view.IsFullScreen();
-        }
-        else
-        {
-            UIBlock block = _ui as UIBlock;
-
-            showBefore = block.origin.IsFullScreen();
-        }
-
-        if (showBefore)
-        {
-            LinkedListNode<KeyValuePair<int, List<UIBase>>> node = stack.Last;
-
-            bool over = false;
-
-            while (!over && node != null)
-            {
-                List<UIBase> list = node.Value.Value;
-
-                for (int i = list.Count - 1; i > -1; i--)
-                {
-                    UIBase ui = list[i];
-
-                    if (ui is UIView)
+                    for (int i = list.Count - 1; i > -1; i--)
                     {
-                        UIView view = ui as UIView;
+                        UIBase tmpUi = list[i];
 
-                        view.SetVisible(true);
-
-                        if (view.IsFullScreen())
+                        if (tmpUi == ui)
                         {
-                            over = true;
+                            list.RemoveAt(i);
 
                             break;
                         }
                     }
-                    else
+
+                    if (list.Count == 0)
                     {
-                        UIBlock block = ui as UIBlock;
-
-                        throw new Exception("error:3214");
+                        stack.Remove(node);
                     }
-                }
 
-                if (!over)
+                    break;
+                }
+                else
                 {
-                    node = node.Previous;
+                    node = node.Next;
                 }
-            }
-        }
-
-        RemoveUI(_ui);
-
-        SortView();
-
-        RefreshMask();
-    }
-
-    private void RemoveUI(UIBase _ui)
-    {
-        stack.Remove(_ui);
-
-        if (_ui.parent != null)
-        {
-            _ui.parent.children.Remove(_ui);
-
-            _ui.parent = null;
-        }
-
-        List<UIBase> children = null;
-
-        if (_ui.children.Count > 0)
-        {
-            children = new List<UIBase>();
-
-            for (int i = 0; i < _ui.children.Count; i++)
-            {
-                children.Add(_ui.children[i]);
-            }
-        }
-
-        if (_ui is UIView)
-        {
-            UIView view = _ui as UIView;
-
-            view.OnExit();
-
-            bool replaceBlock = false;
-
-            for (int i = stack.Count - 1; i > -1; i--)
-            {
-                UIBase tmpUI = stack[i];
-
-                if (tmpUI is UIBlock)
-                {
-                    UIBlock tmpBlock = tmpUI as UIBlock;
-
-                    if (tmpBlock.origin == view)
-                    {
-                        stack[i] = view;
-
-                        tmpBlock.Revert(view);
-
-                        UnityEngine.Object.Destroy(tmpBlock);
-
-                        replaceBlock = true;
-
-                        break;
-                    }
-                }
-            }
-
-            if (!replaceBlock)
-            {
-                view.gameObject.SetActive(false);
             }
         }
         else
         {
-            UIBlock block = _ui as UIBlock;
-
-            UnityEngine.Object.Destroy(block);
+            ui.parent.children.Remove(ui);
         }
 
-        if (children != null)
+        RemoveUI(ui);
+
+        SortView();
+    }
+
+    private void RemoveUI(UIBase _ui)
+    {
+        for (int i = 0; i < _ui.children.Count; i++)
         {
-            for (int i = 0; i < children.Count; i++)
-            {
-                RemoveUI(children[i]);
-            }
+            RemoveUI(_ui.children[i]);
+        }
+
+        if (_ui is UIView)
+        {
+            _ui.parent = null;
+
+            _ui.gameObject.SetActive(false);
+
+            _ui.SetVisible(false);
+
+            _ui.children.Clear();
+        }
+        else
+        {
+            UnityEngine.Object.Destroy(_ui);
         }
     }
 
-    private void SortView()
+    private List<UIView> SortView()
     {
-        for (int i = 0; i < stack.Count; i++)
-        {
-            UIBase ui = stack[i];
+        List<UIView> viewList = new List<UIView>();
 
-            if (ui is UIView)
+        IEnumerator<List<UIBase>> enumerator = stack.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            List<UIBase> list = enumerator.Current;
+
+            for (int i = 0; i < list.Count; i++)
             {
-                ui.transform.SetAsLastSibling();
+                SortViewReal(list[i], viewList);
             }
         }
-    }
 
-    private void RefreshMask()
-    {
-        if (mask != null)
+        bool show = true;
+
+        bool showMask = false;
+
+        for (int i = viewList.Count - 1; i > -1; i--)
         {
-            if (stack.Count > 0)
+            UIView view = viewList[i];
+
+            if (show)
             {
-                UIBase ui = stack[stack.Count - 1];
+                view.SetVisible(true);
 
-                UIView view;
-
-                if (ui is UIView)
+                if (view.IsFullScreen())
                 {
-                    view = ui as UIView;
+                    show = false;
                 }
                 else
                 {
-                    view = (ui as UIBlock).origin;
-                }
-
-                if (!view.IsFullScreen())
-                {
-                    if (!mask.gameObject.activeSelf)
+                    if (!showMask && mask != null)
                     {
+                        showMask = true;
+
                         mask.gameObject.SetActive(true);
-                    }
 
-                    mask.SetAsLastSibling();
+                        mask.SetAsLastSibling();
 
-                    view.transform.SetAsLastSibling();
-                }
-                else
-                {
-                    if (mask.gameObject.activeSelf)
-                    {
-                        mask.gameObject.SetActive(false);
+                        mask.SetSiblingIndex(view.transform.GetSiblingIndex());
                     }
                 }
             }
             else
             {
-                if (mask.gameObject.activeSelf)
-                {
-                    mask.gameObject.SetActive(false);
-                }
+                view.SetVisible(false);
             }
+        }
+
+        if (!showMask && mask != null)
+        {
+            mask.gameObject.SetActive(false);
+        }
+
+        return viewList;
+    }
+
+    private void SortViewReal(UIBase _ui, List<UIView> _viewList)
+    {
+        if (_ui is UIView)
+        {
+            _ui.transform.SetAsLastSibling();
+
+            _viewList.Add(_ui as UIView);
+        }
+
+        for (int i = 0; i < _ui.children.Count; i++)
+        {
+            SortViewReal(_ui.children[i], _viewList);
         }
     }
 
@@ -492,15 +411,13 @@ public class UIManager
                     {
                         List<UIBase> list = null;
 
-                        IEnumerator<KeyValuePair<int, List<UIBase>>> enumerator = stack.GetEnumerator();
+                        IEnumerator<List<UIBase>> enumerator = stack.GetEnumerator();
 
                         while (enumerator.MoveNext())
                         {
-                            KeyValuePair<int, List<UIBase>> pair = enumerator.Current;
-
-                            if (pair.Key == ui0.layerIndex)
+                            if (enumerator.Current[0].layerIndex == ui0.layerIndex)
                             {
-                                list = pair.Value;
+                                list = enumerator.Current;
 
                                 break;
                             }

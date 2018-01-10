@@ -17,13 +17,9 @@ public class UIView : UIBase
 
     public override void SetVisible(bool _visible)
     {
-        if (visible && !_visible)
+        if (visible == _visible)
         {
-            OnHide();
-        }
-        else
-        {
-            OnShow();
+            return;
         }
 
         base.SetVisible(_visible);
@@ -33,12 +29,16 @@ public class UIView : UIBase
             cg.alpha = 1;
 
             cg.blocksRaycasts = true;
+
+            OnShow();
         }
         else
         {
             cg.alpha = 0;
 
             cg.blocksRaycasts = false;
+
+            OnHide();
         }
     }
 
@@ -46,7 +46,7 @@ public class UIView : UIBase
     {
         throw new NotImplementedException();
     }
-    
+
     public virtual void OnShow()
     {
     }
