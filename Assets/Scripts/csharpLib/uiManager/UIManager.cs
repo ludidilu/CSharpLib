@@ -29,7 +29,9 @@ public class UIManager
 
     private LinkedList<List<UIBase>> stack = new LinkedList<List<UIBase>>();
 
-    //private List<UIBase> stack = new List<UIBase>();
+    private List<UIBase> tmpList = new List<UIBase>();
+
+    private Dictionary<UIView, int> tmpDic = new Dictionary<UIView, int>();
 
     private GameObject blockGo;
 
@@ -222,16 +224,6 @@ public class UIManager
 
             list.Add(_ui);
         }
-
-        if (_ui is UIBlock)
-        {
-            UIBlock block = _ui as UIBlock;
-
-            if (Compare(block, block.origin) == 1)
-            {
-                block.Replace(block.origin);
-            }
-        }
     }
 
     public void Hide(int _uid)
@@ -248,17 +240,7 @@ public class UIManager
 
                 if (list[0].layerIndex == ui.layerIndex)
                 {
-                    for (int i = list.Count - 1; i > -1; i--)
-                    {
-                        UIBase tmpUi = list[i];
-
-                        if (tmpUi == ui)
-                        {
-                            list.RemoveAt(i);
-
-                            break;
-                        }
-                    }
+                    list.Remove(ui);
 
                     if (list.Count == 0)
                     {
@@ -292,13 +274,15 @@ public class UIManager
 
         if (_ui is UIView)
         {
-            _ui.parent = null;
+            UIView viwe = _ui as UIView;
 
-            _ui.gameObject.SetActive(false);
+            viwe.parent = null;
 
-            _ui.SetVisible(false);
+            viwe.gameObject.SetActive(false);
 
-            _ui.children.Clear();
+            viwe.SetVisible(false);
+
+            viwe.children.Clear();
         }
         else
         {
@@ -306,55 +290,110 @@ public class UIManager
         }
     }
 
-    private List<UIView> SortView()
+    private void SortView()
     {
-        List<UIView> viewList = new List<UIView>();
+        GetUiList();
 
-        IEnumerator<List<UIBase>> enumerator = stack.GetEnumerator();
-
-        while (enumerator.MoveNext())
+        for (int i = tmpList.Count - 1; i > -1; i--)
         {
-            List<UIBase> list = enumerator.Current;
+            UIBase ui = tmpList[i];
 
-            for (int i = 0; i < list.Count; i++)
+            if (ui is UIBlock)
             {
-                SortViewReal(list[i], viewList);
+                UIBlock block = ui as UIBlock;
+
+                if (!tmpDic.ContainsKey(block.origin))
+                {
+                    if (block.origin.gameObject.activeSelf)
+                    {
+                        int index = tmpList.IndexOf(block.origin);
+
+                        tmpList[index] = block;
+                    }
+
+                    tmpList[i] = block.origin;
+
+                    block.Replace(stack);
+
+                    tmpDic.Add(block.origin, i);
+                }
+            }
+            else
+            {
+                UIView view = ui as UIView;
+
+                tmpDic.Add(view, i);
             }
         }
+
+        for (int i = 0; i < tmpList.Count; i++)
+        {
+            UIBase ui = tmpList[i];
+
+            if (ui is UIView)
+            {
+                UIView view = ui as UIView;
+
+                view.transform.SetAsLastSibling();
+            }
+        }
+
+        //List<UIBase> uiList = new List<UIBase>();
+
+        //IEnumerator<List<UIBase>> enumerator = stack.GetEnumerator();
+
+        //while (enumerator.MoveNext())
+        //{
+        //    List<UIBase> list = enumerator.Current;
+
+        //    for (int i = 0; i < list.Count; i++)
+        //    {
+        //        SortViewReal(list[i], uiList);
+        //    }
+        //}
 
         bool show = true;
 
         bool showMask = false;
 
-        for (int i = viewList.Count - 1; i > -1; i--)
+        for (int i = tmpList.Count - 1; i > -1; i--)
         {
-            UIView view = viewList[i];
+            UIBase ui = tmpList[i];
 
-            if (show)
+            if (ui is UIBlock)
             {
-                view.SetVisible(true);
 
-                if (view.IsFullScreen())
-                {
-                    show = false;
-                }
-                else
-                {
-                    if (!showMask && mask != null)
-                    {
-                        showMask = true;
-
-                        mask.gameObject.SetActive(true);
-
-                        mask.SetAsLastSibling();
-
-                        mask.SetSiblingIndex(view.transform.GetSiblingIndex());
-                    }
-                }
             }
             else
             {
-                view.SetVisible(false);
+                UIView view = ui as UIView;
+
+                if (show)
+                {
+                    view.SetVisible(true);
+
+                    if (view.IsFullScreen())
+                    {
+                        show = false;
+                    }
+                    else
+                    {
+                        if (!showMask && mask != null)
+                        {
+                            showMask = true;
+
+                            mask.gameObject.SetActive(true);
+
+                            mask.SetAsLastSibling();
+
+                            mask.SetSiblingIndex(view.transform.GetSiblingIndex());
+                        }
+                    }
+                }
+                else
+                {
+                    view.SetVisible(false);
+                }
             }
         }
 
@@ -363,17 +402,44 @@ public class UIManager
             mask.gameObject.SetActive(false);
         }
 
-        return viewList;
+        tmpList.Clear();
+
+        tmpDic.Clear();
     }
 
-    private void SortViewReal(UIBase _ui, List<UIView> _viewList)
+    private void GetUiList()
+    {
+        IEnumerator<List<UIBase>> enumerator = stack.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            List<UIBase> list = enumerator.Current;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                GetUiListReal(list[i]);
+            }
+        }
+    }
+
+    private void GetUiListReal(UIBase _ui)
+    {
+        tmpList.Add(_ui);
+
+        for (int i = 0; i < _ui.children.Count; i++)
+        {
+            GetUiListReal(_ui.children[i]);
+        }
+    }
+
+    private void SortViewReal(UIBase _ui, List<UIBase> _viewList)
     {
         if (_ui is UIView)
         {
             _ui.transform.SetAsLastSibling();
-
-            _viewList.Add(_ui as UIView);
         }
+
+        _viewList.Add(_ui as UIView);
 
         for (int i = 0; i < _ui.children.Count; i++)
         {

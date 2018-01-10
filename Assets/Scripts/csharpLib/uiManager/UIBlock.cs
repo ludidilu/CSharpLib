@@ -1,12 +1,72 @@
-﻿public class UIBlock : UIBase
+﻿using System.Collections.Generic;
+
+public class UIBlock : UIBase
 {
     public UIView origin;
 
-    public void Replace(UIView _origin)
+    public void Replace(LinkedList<List<UIBase>> _stack)
     {
-        origin = _origin;
+        if (origin.gameObject.activeSelf)
+        {
+            origin.SetVisible(false);
 
-        bool tmpVisible = origin.visible;
+            if (origin.parent == null)
+            {
+                IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
+
+                while (enumerator.MoveNext())
+                {
+                    List<UIBase> list = enumerator.Current;
+
+                    if (list[0].layerIndex == origin.layerIndex)
+                    {
+                        int index = list.IndexOf(origin);
+
+                        list[index] = this;
+
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                int index = origin.parent.children.IndexOf(origin);
+
+                origin.parent.children[index] = this;
+            }
+        }
+        else
+        {
+            origin.gameObject.SetActive(true);
+
+            Destroy(this);
+        }
+
+        if (parent == null)
+        {
+            IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                List<UIBase> list = enumerator.Current;
+
+                if (list[0].layerIndex == layerIndex)
+                {
+                    int index = list.IndexOf(this);
+
+                    list[index] = origin;
+
+                    break;
+                }
+            }
+        }
+        else
+        {
+            int index = parent.children.IndexOf(this);
+
+            parent.children[index] = origin;
+        }
+
 
         object tmpData = data;
 
@@ -16,31 +76,19 @@
 
         UIBase tmpParent = parent;
 
-        origin.SetVisible(false);
+        List<UIBase> tmpChildren = children;
+
 
         data = origin.data;
-
-        parent = origin.parent;
 
         uid = origin.uid;
 
         layerIndex = origin.layerIndex;
 
-        SetVisible(tmpVisible);
+        parent = origin.parent;
 
-        if (origin.parent != null)
-        {
-            int index = origin.parent.children.IndexOf(origin);
+        children = origin.children;
 
-            origin.parent.children[index] = this;
-        }
-
-        children.Clear();
-
-        for (int i = 0; i < origin.children.Count; i++)
-        {
-            children.Add(origin.children[i]);
-        }
 
         origin.data = tmpData;
 
@@ -50,42 +98,6 @@
 
         origin.parent = tmpParent;
 
-        if (tmpParent != null)
-        {
-            int index = tmpParent.children.IndexOf(this);
-
-            tmpParent.children[index] = origin;
-        }
-
-        origin.children.Clear();
-    }
-
-    public void Revert(UIView _origin)
-    {
-        _origin.data = data;
-
-        _origin.parent = parent;
-
-        _origin.uid = uid;
-
-        _origin.SetVisible(visible);
-
-        if (_origin.parent != null)
-        {
-            int index = _origin.parent.children.IndexOf(this);
-
-            _origin.parent.children[index] = _origin;
-        }
-
-        _origin.children.Clear();
-
-        for (int i = 0; i < children.Count; i++)
-        {
-            UIBase ui = children[i];
-
-            _origin.children.Add(ui);
-
-            ui.parent = _origin;
-        }
+        origin.children = tmpChildren;
     }
 }

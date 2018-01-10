@@ -15,14 +15,14 @@ public class UIView : UIBase
         }
     }
 
-    public override void SetVisible(bool _visible)
+    public bool visible { protected set; get; }
+
+    public void SetVisible(bool _visible)
     {
         if (visible == _visible)
         {
             return;
         }
-
-        base.SetVisible(_visible);
 
         if (visible)
         {
