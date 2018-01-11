@@ -13,61 +13,25 @@ public class UIBase : MonoBehaviour
 
     public List<UIBase> children = new List<UIBase>();
 
-    public UIBase root
+    public UIBase FindChild(int _uid)
     {
-        get
+        for (int i = 0; i < children.Count; i++)
         {
-            if (parent != null)
-            {
-                UIBase ui = parent;
+            UIBase child = children[i];
 
-                while (true)
-                {
-                    if (ui.parent != null)
-                    {
-                        ui = ui.parent;
-                    }
-                    else
-                    {
-                        return ui;
-                    }
-                }
-            }
-            else
+            if (child.uid == _uid)
             {
-                return this;
+                return child;
+            }
+
+            UIBase result = child.FindChild(_uid);
+
+            if (result != null)
+            {
+                return result;
             }
         }
-    }
 
-    public List<UIBase> chain
-    {
-        get
-        {
-            List<UIBase> result = new List<UIBase>();
-
-            result.Add(this);
-
-            if (parent != null)
-            {
-                UIBase ui = parent;
-
-                while (true)
-                {
-                    result.Add(ui);
-
-                    if (ui.parent != null)
-                    {
-                        ui = ui.parent;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
+        return null;
     }
 }

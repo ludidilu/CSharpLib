@@ -6,33 +6,104 @@ public class UIBlock : UIBase
 
     public void Replace(LinkedList<List<UIBase>> _stack)
     {
+        int index;
+
         if (origin.gameObject.activeSelf)
         {
             origin.SetVisible(false);
 
             if (origin.parent == null)
             {
-                IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
-
-                while (enumerator.MoveNext())
+                if (parent == null)
                 {
-                    List<UIBase> list = enumerator.Current;
+                    List<UIBase> list0 = null;
 
-                    if (list[0].layerIndex == origin.layerIndex)
+                    int index0 = -1;
+
+                    List<UIBase> list1 = null;
+
+                    int index1 = -1;
+
+                    IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
+
+                    while (enumerator.MoveNext())
                     {
-                        int index = list.IndexOf(origin);
+                        List<UIBase> list = enumerator.Current;
 
-                        list[index] = this;
+                        int tmpLayerIndex2 = list[0].layerIndex;
 
-                        break;
+                        if (tmpLayerIndex2 == origin.layerIndex)
+                        {
+                            list0 = list;
+
+                            index0 = list.IndexOf(origin);
+                        }
+
+                        if (tmpLayerIndex2 == layerIndex)
+                        {
+                            list1 = list;
+
+                            index1 = list.IndexOf(this);
+                        }
                     }
+
+                    list0[index0] = this;
+
+                    list1[index1] = origin;
+                }
+                else
+                {
+                    IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
+
+                    while (enumerator.MoveNext())
+                    {
+                        List<UIBase> list = enumerator.Current;
+
+                        if (list[0].layerIndex == origin.layerIndex)
+                        {
+                            index = list.IndexOf(origin);
+
+                            list[index] = this;
+
+                            break;
+                        }
+                    }
+
+                    index = parent.children.IndexOf(this);
+
+                    parent.children[index] = origin;
                 }
             }
             else
             {
-                int index = origin.parent.children.IndexOf(origin);
+                index = origin.parent.children.IndexOf(origin);
 
                 origin.parent.children[index] = this;
+
+                if (parent == null)
+                {
+                    IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
+
+                    while (enumerator.MoveNext())
+                    {
+                        List<UIBase> list = enumerator.Current;
+
+                        if (list[0].layerIndex == layerIndex)
+                        {
+                            index = list.IndexOf(this);
+
+                            list[index] = origin;
+
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    index = parent.children.IndexOf(this);
+
+                    parent.children[index] = origin;
+                }
             }
         }
         else
@@ -40,33 +111,32 @@ public class UIBlock : UIBase
             origin.gameObject.SetActive(true);
 
             Destroy(this);
-        }
 
-        if (parent == null)
-        {
-            IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
-
-            while (enumerator.MoveNext())
+            if (parent == null)
             {
-                List<UIBase> list = enumerator.Current;
+                IEnumerator<List<UIBase>> enumerator = _stack.GetEnumerator();
 
-                if (list[0].layerIndex == layerIndex)
+                while (enumerator.MoveNext())
                 {
-                    int index = list.IndexOf(this);
+                    List<UIBase> list = enumerator.Current;
 
-                    list[index] = origin;
+                    if (list[0].layerIndex == layerIndex)
+                    {
+                        index = list.IndexOf(this);
 
-                    break;
+                        list[index] = origin;
+
+                        break;
+                    }
                 }
             }
-        }
-        else
-        {
-            int index = parent.children.IndexOf(this);
+            else
+            {
+                index = parent.children.IndexOf(this);
 
-            parent.children[index] = origin;
+                parent.children[index] = origin;
+            }
         }
-
 
         object tmpData = data;
 

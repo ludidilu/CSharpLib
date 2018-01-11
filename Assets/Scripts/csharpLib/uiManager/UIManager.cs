@@ -90,6 +90,15 @@ public class UIManager
                 {
                     return ui;
                 }
+                else
+                {
+                    UIBase result = ui.FindChild(_uid);
+
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
             }
         }
 
@@ -444,106 +453,6 @@ public class UIManager
         for (int i = 0; i < _ui.children.Count; i++)
         {
             SortViewReal(_ui.children[i], _viewList);
-        }
-    }
-
-    private int Compare(UIBase _ui0, UIBase _ui1)
-    {
-        if (_ui0.layerIndex > _ui1.layerIndex)
-        {
-            return 1;
-        }
-        else if (_ui0.layerIndex < _ui1.layerIndex)
-        {
-            return -1;
-        }
-        else
-        {
-            List<UIBase> chain0 = _ui0.chain;
-
-            List<UIBase> chain1 = _ui1.chain;
-
-            int index = 0;
-
-            while (true)
-            {
-                UIBase ui0 = chain0[chain0.Count - 1 - index];
-
-                UIBase ui1 = chain1[chain1.Count - 1 - index];
-
-                if (ui0 != ui1)
-                {
-                    if (index == 0)
-                    {
-                        List<UIBase> list = null;
-
-                        IEnumerator<List<UIBase>> enumerator = stack.GetEnumerator();
-
-                        while (enumerator.MoveNext())
-                        {
-                            if (enumerator.Current[0].layerIndex == ui0.layerIndex)
-                            {
-                                list = enumerator.Current;
-
-                                break;
-                            }
-                        }
-
-                        int index0 = list.IndexOf(_ui0);
-
-                        int index1 = list.IndexOf(_ui1);
-
-                        if (index0 > index1)
-                        {
-                            return 1;
-                        }
-                        else if (index0 < index1)
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    }
-                    else
-                    {
-                        int index0 = ui0.parent.children.IndexOf(ui0);
-
-                        int index1 = ui1.parent.children.IndexOf(ui1);
-
-                        if (index0 > index1)
-                        {
-                            return 1;
-                        }
-                        else if (index0 < index1)
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    }
-                }
-                else
-                {
-                    index++;
-
-                    if (index == chain0.Count && index == chain1.Count)
-                    {
-                        return 0;
-                    }
-                    else if (index == chain0.Count)
-                    {
-                        return -1;
-                    }
-                    else if (index == chain1.Count)
-                    {
-                        return 1;
-                    }
-                }
-            }
         }
     }
 }
