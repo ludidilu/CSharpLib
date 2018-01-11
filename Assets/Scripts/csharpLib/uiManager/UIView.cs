@@ -24,6 +24,8 @@ public class UIView : UIBase
             return;
         }
 
+        visible = _visible;
+
         if (visible)
         {
             cg.alpha = 1;
