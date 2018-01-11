@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class UIBase : MonoBehaviour
 {
-    public object data;
+    public ValueType data;
 
     public int layerIndex;
 

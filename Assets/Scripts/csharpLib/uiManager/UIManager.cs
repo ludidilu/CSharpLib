@@ -35,7 +35,7 @@ public class UIManager
 
     private GameObject blockGo;
 
-    private int uid = 1;
+    private int uid = 0;
 
     public void Init(Transform _root, Transform _mask, Action<Type, Action<GameObject>> _getAssetCallBack)
     {
@@ -55,22 +55,22 @@ public class UIManager
         getAssetCallBack = _getAssetCallBack;
     }
 
-    public int ShowInRoot<T>(object _data, int _layerIndex) where T : UIView
+    public int ShowInRoot<T>(ValueType _data, int _layerIndex) where T : UIView
     {
         return Show<T>(_data, _layerIndex, null);
     }
 
-    public int ShowInParent<T>(object _data, int _parentUid) where T : UIView
+    public int ShowInParent<T>(ValueType _data, int _parentUid) where T : UIView
     {
         UIBase parent = GetUi(_parentUid);
 
         if (parent != null)
         {
-            return Show<T>(_data, 0, parent);
+            return Show<T>(_data, -1, parent);
         }
         else
         {
-            return 0;
+            return -1;
         }
     }
 
@@ -105,7 +105,7 @@ public class UIManager
         return null;
     }
 
-    private int Show<T>(object _data, int _layerIndex, UIBase _parent) where T : UIView
+    private int Show<T>(ValueType _data, int _layerIndex, UIBase _parent) where T : UIView
     {
         int tmpUid = uid;
 
@@ -160,7 +160,7 @@ public class UIManager
         return tmpUid;
     }
 
-    private void ShowReal(UIBase _ui, UIBase _parent, object _data, int _layerIndex, int _uid)
+    private void ShowReal(UIBase _ui, UIBase _parent, ValueType _data, int _layerIndex, int _uid)
     {
         _ui.uid = _uid;
 
