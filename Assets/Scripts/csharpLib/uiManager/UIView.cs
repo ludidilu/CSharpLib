@@ -26,6 +26,12 @@ public class UIView : MonoBehaviour
         {
             cg = gameObject.AddComponent<CanvasGroup>();
         }
+
+        cg.alpha = 0;
+
+        cg.blocksRaycasts = false;
+
+        visible = false;
     }
 
     public UIView FindChild(int _uid)
@@ -50,7 +56,7 @@ public class UIView : MonoBehaviour
         return null;
     }
 
-    public void SetVisible(bool _visible)
+    public void SetVisible(bool _visible, ref Action _action)
     {
         if (visible == _visible)
         {
@@ -65,7 +71,7 @@ public class UIView : MonoBehaviour
 
             cg.blocksRaycasts = true;
 
-            OnShow();
+            _action += OnShow;
         }
         else
         {
@@ -73,7 +79,7 @@ public class UIView : MonoBehaviour
 
             cg.blocksRaycasts = false;
 
-            OnHide();
+            _action += OnHide;
         }
     }
 

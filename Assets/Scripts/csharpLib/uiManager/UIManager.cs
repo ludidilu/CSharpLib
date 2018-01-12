@@ -115,6 +115,8 @@ public class UIManager
             {
                 T view = queue.Dequeue() as T;
 
+                view.gameObject.SetActive(true);
+
                 ShowReal(view, _parent, _data, _layerIndex, tmpUid);
             }
             else
@@ -176,14 +178,19 @@ public class UIManager
 
         _view.data = _data;
 
-        _view.OnEnter();
+        Action action = null;
 
-        AddView(_view, _parent, _layerIndex);
+        AddView(_view, _parent, _layerIndex, ref action);
 
-        SortView();
+        SortView(ref action);
+
+        if (action != null)
+        {
+            action();
+        }
     }
 
-    private void AddView(UIView _view, UIView _parent, int _layerIndex)
+    private void AddView(UIView _view, UIView _parent, int _layerIndex, ref Action _action)
     {
         _view.parent = _parent;
 
@@ -245,6 +252,8 @@ public class UIManager
 
             list.Add(_view);
         }
+
+        _action += _view.OnEnter;
     }
 
     public void Hide(int _uid)
@@ -281,16 +290,23 @@ public class UIManager
             view.parent.children.Remove(view);
         }
 
-        RemoveView(view);
+        Action action = null;
 
-        SortView();
+        RemoveView(view, ref action);
+
+        SortView(ref action);
+
+        if (action != null)
+        {
+            action();
+        }
     }
 
-    private void RemoveView(UIView _view)
+    private void RemoveView(UIView _view, ref Action _action)
     {
         for (int i = 0; i < _view.children.Count; i++)
         {
-            RemoveView(_view.children[i]);
+            RemoveView(_view.children[i], ref _action);
         }
 
         _view.parent = null;
@@ -299,12 +315,14 @@ public class UIManager
 
         pool[_view.GetType()].Enqueue(_view);
 
-        _view.OnExit();
-
         _view.children.Clear();
+
+        _view.SetVisible(false, ref _action);
+
+        _action += _view.OnExit;
     }
 
-    private void SortView()
+    private void SortView(ref Action _action)
     {
         GetViewList();
 
@@ -323,7 +341,7 @@ public class UIManager
         {
             UIView view = tmpList[i];
 
-            view.SetVisible(show);
+            view.SetVisible(show, ref _action);
 
             if (show)
             {
