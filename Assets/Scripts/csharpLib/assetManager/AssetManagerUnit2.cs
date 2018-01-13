@@ -86,8 +86,8 @@ namespace assetManager
                 {
                     AssetManager.Instance.script.Load<T>(name, _assetBundle, LoadOver);
                 }
-                else {
-
+                else
+                {
                     T[] asset = _assetBundle.LoadAssetWithSubAssets<T>(name);
 
                     LoadOver(asset);
