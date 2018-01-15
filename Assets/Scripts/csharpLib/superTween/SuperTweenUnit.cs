@@ -3,7 +3,7 @@ using System;
 
 namespace superTween
 {
-    public class SuperTweenUnit
+    public struct SuperTweenUnit
     {
         public int index;
 
@@ -18,9 +18,9 @@ namespace superTween
 
         public Action<float> dele;
 
-        public bool isFixed = false;
+        public bool isFixed;
 
-        public bool isRemoved = false;
+        public bool isRemoved;
 
         public void Init(int _index, float _startValue, float _endValue, float _time, Action<float> _delegate, Action _endCallBack, bool _isFixed)
         {
@@ -34,6 +34,9 @@ namespace superTween
             dele = _delegate;
 
             endCallBack = _endCallBack;
+
+            isRemoved = false;
+
             if (isFixed)
             {
                 startTime = Time.unscaledTime;
