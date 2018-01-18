@@ -164,7 +164,7 @@ public static class StaticData
 
                         T csv = new T();
 
-                        csv.ID = Int32.Parse(dataArr[0]);
+                        csv.ID = int.Parse(dataArr[0]);
 
                         for (int m = 1; m < infoArr.Length; m++)
                         {
