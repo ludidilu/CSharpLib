@@ -162,6 +162,11 @@ namespace superSequenceControl
             dic.Remove(_index);
         }
 
+        public static void Clear()
+        {
+            dic.Clear();
+        }
+
         public static void To(float _start, float _end, float _time, Action<float> _del, int _index)
         {
             Action dele = null;
