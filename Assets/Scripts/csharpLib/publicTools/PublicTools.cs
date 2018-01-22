@@ -816,9 +816,9 @@ namespace publicTools
             return result;
         }
 
-        public static void SaveRenderTextureToPNG(RenderTexture _rt, string _path)
+        public static void SaveRenderTextureToPNG(int _texWidth, int _texHeight, RenderTexture _rt, Rect _sourceRect, int _destX, int _destY, string _path)
         {
-            Texture2D png = RenderTextureToTexture2D(_rt);
+            Texture2D png = RenderTextureToTexture2D(_texWidth, _texHeight, _rt, _sourceRect, _destX, _destY);
 
             byte[] bytes = png.EncodeToPNG();
 
@@ -841,15 +841,42 @@ namespace publicTools
 
         }
 
-        public static Texture2D RenderTextureToTexture2D(RenderTexture _rt)
+        public static void CaptureScreen(RenderTexture _rt, Camera[] _cameraArr, int[] _cameraCullingMaskArr)
+        {
+            for (int i = 0; i < _cameraArr.Length; i++)
+            {
+                Camera camera = _cameraArr[i];
+
+
+
+                RenderTexture rt = camera.targetTexture;
+
+                int cullingMask = camera.cullingMask;
+
+
+                camera.targetTexture = _rt;
+
+                camera.cullingMask = _cameraCullingMaskArr[i];
+
+
+                camera.Render();
+
+
+                camera.targetTexture = rt;
+
+                camera.cullingMask = cullingMask;
+            }
+        }
+
+        public static Texture2D RenderTextureToTexture2D(int _texWidth, int _texHeight, RenderTexture _rt, Rect _sourceRect, int _destX, int _destY)
         {
             RenderTexture prev = RenderTexture.active;
 
             RenderTexture.active = _rt;
 
-            Texture2D png = new Texture2D(_rt.width, _rt.height, TextureFormat.ARGB32, false);
+            Texture2D png = new Texture2D(_texWidth, _texHeight, TextureFormat.ARGB32, false);
 
-            png.ReadPixels(new Rect(0, 0, _rt.width, _rt.height), 0, 0);
+            png.ReadPixels(_sourceRect, _destX, _destY);
 
             RenderTexture.active = prev;
 
