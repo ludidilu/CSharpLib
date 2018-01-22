@@ -818,13 +818,7 @@ namespace publicTools
 
         public static void SaveRenderTextureToPNG(RenderTexture _rt, string _path)
         {
-            RenderTexture prev = RenderTexture.active;
-
-            RenderTexture.active = _rt;
-
-            Texture2D png = new Texture2D(_rt.width, _rt.height, TextureFormat.ARGB32, false);
-
-            png.ReadPixels(new Rect(0, 0, _rt.width, _rt.height), 0, 0);
+            Texture2D png = RenderTextureToTexture2D(_rt);
 
             byte[] bytes = png.EncodeToPNG();
 
@@ -845,7 +839,21 @@ namespace publicTools
                 }
             }
 
+        }
+
+        public static Texture2D RenderTextureToTexture2D(RenderTexture _rt)
+        {
+            RenderTexture prev = RenderTexture.active;
+
+            RenderTexture.active = _rt;
+
+            Texture2D png = new Texture2D(_rt.width, _rt.height, TextureFormat.ARGB32, false);
+
+            png.ReadPixels(new Rect(0, 0, _rt.width, _rt.height), 0, 0);
+
             RenderTexture.active = prev;
+
+            return png;
         }
 
         public static void AtlasGetOriginalUV(Image _img)
