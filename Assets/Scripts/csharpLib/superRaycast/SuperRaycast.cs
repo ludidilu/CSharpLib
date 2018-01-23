@@ -46,14 +46,14 @@ namespace superRaycast
             Instance.RemoveLayerReal(_layerName);
         }
 
-        public static void AddTag(string _tag)
+        public static void AddFilterTag(string _tag)
         {
-            Instance.AddTagReal(_tag);
+            Instance.AddFilterTagReal(_tag);
         }
 
-        public static void RemoveTag(string _tag)
+        public static void RemoveFilterTag(string _tag)
         {
-            Instance.RemoveTagReal(_tag);
+            Instance.RemoveFilterTagReal(_tag);
         }
 
         public static void SetFilter(bool _value)
@@ -142,7 +142,7 @@ namespace superRaycast
             layerIndex = layerIndex & ~(1 << LayerMask.NameToLayer(_layerName));
         }
 
-        private void AddTagReal(string _tag)
+        private void AddFilterTagReal(string _tag)
         {
             if (!filterTagDic.ContainsKey(_tag))
             {
@@ -150,7 +150,7 @@ namespace superRaycast
             }
         }
 
-        private void RemoveTagReal(string _tag)
+        private void RemoveFilterTagReal(string _tag)
         {
             filterTagDic.Remove(_tag);
         }
