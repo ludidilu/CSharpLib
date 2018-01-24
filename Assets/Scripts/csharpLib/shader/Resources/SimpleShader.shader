@@ -32,6 +32,8 @@ Shader "Custom/SimpleShader" {
 			};
 
 			sampler2D _MainTex;
+
+			float4 _MainTex_ST;
 			
 			v2f vert(appdata v){
 			
@@ -39,7 +41,7 @@ Shader "Custom/SimpleShader" {
 			
 				o.pos = UnityObjectToClipPos(v.vertex);
 				
-				o.uv = v.uv;
+				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				
 				return o;
 			}
