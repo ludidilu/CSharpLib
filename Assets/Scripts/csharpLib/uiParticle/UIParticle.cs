@@ -28,6 +28,8 @@ public class UIParticle : MaskableGraphic
 
     private float maxSize;
 
+    private ParticleSystem.MinMaxCurve frameOverTime;
+
     protected override void Start()
     {
         base.Start();
@@ -121,6 +123,11 @@ public class UIParticle : MaskableGraphic
             tmpTrans.SetParent(transform, false);
         }
 
+        if (ps.textureSheetAnimation.enabled)
+        {
+            frameOverTime = ps.textureSheetAnimation.frameOverTime;
+        }
+
         psr.enabled = false;
     }
 
@@ -175,6 +182,13 @@ public class UIParticle : MaskableGraphic
 
     protected override void OnPopulateMesh(VertexHelper vh)
     {
+
+
+        if (ps.textureSheetAnimation.enabled)
+        {
+
+        }
+
         Matrix4x4 matrix = Matrix4x4.TRS(Vector3.zero, transform.rotation, Vector3.one);
 
         vh.Clear();
@@ -260,27 +274,27 @@ public class UIParticle : MaskableGraphic
 
                 int frame;
 
-                if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.Curve)
+                if (frameOverTime.mode == ParticleSystemCurveMode.Curve)
                 {
                     float t = (pp.startLifetime - pp.remainingLifetime) / pp.startLifetime;
 
-                    frame = (int)(ps.textureSheetAnimation.frameOverTime.curve.Evaluate(t) * frameNum);
+                    frame = (int)(frameOverTime.curve.Evaluate(t) * frameNum);
                 }
-                else if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.TwoConstants)
+                else if (frameOverTime.mode == ParticleSystemCurveMode.TwoConstants)
                 {
                     Random.InitState((int)pp.randomSeed);
 
-                    frame = (int)(Random.Range(ps.textureSheetAnimation.frameOverTime.constantMin, ps.textureSheetAnimation.frameOverTime.constantMax) * frameNum);
+                    frame = (int)(Random.Range(frameOverTime.constantMin, frameOverTime.constantMax) * frameNum);
 
-                    //frame = (int)(Mathf.Clamp(Random.value, ps.textureSheetAnimation.frameOverTime.constantMin, ps.textureSheetAnimation.frameOverTime.constantMax) * frameNum);
+                    //frame = (int)(Mathf.Clamp(Random.value, frameOverTime.constantMin, frameOverTime.constantMax) * frameNum);
                 }
-                else if (ps.textureSheetAnimation.frameOverTime.mode == ParticleSystemCurveMode.Constant)
+                else if (frameOverTime.mode == ParticleSystemCurveMode.Constant)
                 {
-                    frame = (int)(ps.textureSheetAnimation.frameOverTime.constant * frameNum);
+                    frame = (int)(frameOverTime.constant * frameNum);
                 }
                 else
                 {
-                    throw new System.Exception("unknown ps.textureSheetAnimation.frameOverTime.mode");
+                    throw new System.Exception("unknown frameOverTime.mode");
                 }
 
                 if (ps.textureSheetAnimation.animation == ParticleSystemAnimationType.WholeSheet)
