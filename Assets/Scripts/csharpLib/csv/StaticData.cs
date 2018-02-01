@@ -145,43 +145,46 @@ public static class StaticData
 
                 FieldInfo[] infoArr = null;
 
-                while (lineStr != null)
+                while (!string.IsNullOrEmpty(lineStr))
                 {
-                    if (i == 2)
+                    if (!lineStr.StartsWith("//"))
                     {
-                        string[] dataArr = lineStr.Split(',');
-
-                        infoArr = new FieldInfo[dataArr.Length];
-
-                        for (int m = 1; m < dataArr.Length; m++)
+                        if (i == 2)
                         {
-                            infoArr[m] = type.GetField(dataArr[m]);
-                        }
-                    }
-                    else if (i > 2)
-                    {
-                        string[] dataArr = lineStr.Split(',');
+                            string[] dataArr = lineStr.Split(',');
 
-                        T csv = new T();
+                            infoArr = new FieldInfo[dataArr.Length];
 
-                        csv.ID = int.Parse(dataArr[0]);
-
-                        for (int m = 1; m < infoArr.Length; m++)
-                        {
-                            FieldInfo info = infoArr[m];
-
-                            if (info != null)
+                            for (int m = 1; m < dataArr.Length; m++)
                             {
-                                SetData(info, csv, dataArr[m]);
+                                infoArr[m] = type.GetField(dataArr[m]);
                             }
                         }
+                        else if (i > 2)
+                        {
+                            string[] dataArr = lineStr.Split(',');
 
-                        csv.Fix();
+                            T csv = new T();
 
-                        result.Add(csv.ID, csv);
+                            csv.ID = int.Parse(dataArr[0]);
+
+                            for (int m = 1; m < infoArr.Length; m++)
+                            {
+                                FieldInfo info = infoArr[m];
+
+                                if (info != null)
+                                {
+                                    SetData(info, csv, dataArr[m]);
+                                }
+                            }
+
+                            csv.Fix();
+
+                            result.Add(csv.ID, csv);
+                        }
+
+                        i++;
                     }
-
-                    i++;
 
                     lineStr = reader.ReadLine();
                 }
