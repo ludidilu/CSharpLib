@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System;
 using assetManager;
 
-namespace animatorFactoty
+namespace materialFactory
 {
-    public class AnimatorFactoryUnit
+    public class MaterialFactoryUnit
     {
         private string name;
-        private RuntimeAnimatorController data;
+        private Material data;
 
         private int type = -1;
 
-        private List<Action<RuntimeAnimatorController>> callBackList = new List<Action<RuntimeAnimatorController>>();
+        private List<Action<Material>> callBackList = new List<Action<Material>>();
 
         public int useNum;
 
-        public AnimatorFactoryUnit(string _name)
+        public MaterialFactoryUnit(string _name)
         {
             name = _name;
         }
 
-        public RuntimeAnimatorController GetAnimator(Action<RuntimeAnimatorController> _callBack)
+        public Material GetMaterial(Action<Material> _callBack)
         {
             if (type == -1)
             {
@@ -29,7 +29,7 @@ namespace animatorFactoty
 
                 callBackList.Add(_callBack);
 
-                AssetManager.Instance.GetAsset<RuntimeAnimatorController>(name, GetAsset);
+                AssetManager.Instance.GetAsset<Material>(name, GetAsset);
 
                 return null;
             }
@@ -50,11 +50,9 @@ namespace animatorFactoty
             }
         }
 
-        private void GetAsset(RuntimeAnimatorController _data)
+        private void GetAsset(Material _data)
         {
             data = _data;
-
-            data.name = name;
 
             type = 1;
 
