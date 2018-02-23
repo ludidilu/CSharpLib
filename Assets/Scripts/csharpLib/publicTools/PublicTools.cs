@@ -906,6 +906,11 @@ namespace publicTools
 
             _img.material.SetVector("fix2", fix2);
         }
+
+        public static float FloatLerp(float _a, float _b, float _v)
+        {
+            return _a + (_b - _a) * _v;
+        }
     }
 }
 
