@@ -28,6 +28,11 @@ namespace superGraphicRaycast
             SuperGraphicRaycastScript.Instance.filter = _value;
         }
 
+        public static bool GetFilter()
+        {
+            return SuperGraphicRaycastScript.Instance.filter;
+        }
+
         public static void AddFilterTag(string _tag)
         {
             if (!SuperGraphicRaycastScript.Instance.tagDic.ContainsKey(_tag))

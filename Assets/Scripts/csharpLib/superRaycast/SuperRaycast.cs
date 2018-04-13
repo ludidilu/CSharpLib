@@ -61,6 +61,11 @@ namespace superRaycast
             Instance.filter = _value;
         }
 
+        public static bool GetFilter()
+        {
+            return Instance.filter;
+        }
+
         public static GameObject Go
         {
             get
