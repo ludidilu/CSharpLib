@@ -12,124 +12,193 @@ namespace superTween
 
         private int index;
 
-        private List<SuperTweenUnit> endList = new List<SuperTweenUnit>();
+        private List<int> endList = new List<int>();
 
-        private List<KeyValuePair<SuperTweenUnit, float>> toList = new List<KeyValuePair<SuperTweenUnit, float>>();
+        private Dictionary<int, float> toList = new Dictionary<int, float>();
 
         public int To(float _startValue, float _endValue, float _time, Action<float> _delegate, Action _endCallBack, bool isFixed)
         {
-            lock (dic)
+            SuperTweenUnit unit;
+
+            int result = GetIndex();
+
+            if (toDic.TryGetValue(_delegate, out unit))
             {
-                SuperTweenUnit unit;
-
-                if (toDic.TryGetValue(_delegate, out unit))
-                {
-                    unit.Init(unit.index, _startValue, _endValue, _time, _delegate, _endCallBack, isFixed);
-
-                    return unit.index;
-                }
-                else
-                {
-                    int result = GetIndex();
-
-                    unit = new SuperTweenUnit();
-
-                    unit.Init(result, _startValue, _endValue, _time, _delegate, _endCallBack, isFixed);
-
-                    dic.Add(result, unit);
-
-                    toDic.Add(_delegate, unit);
-
-                    return result;
-                }
+                dic.Remove(unit.index);
             }
+            else
+            {
+                unit = GetUnit();
+
+                toDic.Add(_delegate, unit);
+            }
+
+            unit.Init(result, _startValue, _endValue, _time, _delegate, _endCallBack, isFixed);
+
+            dic.Add(result, unit);
+
+            return result;
         }
 
         public void SetTag(int _index, string _tag)
         {
-            lock (dic)
-            {
-                SuperTweenUnit unit;
+            SuperTweenUnit unit;
 
-                if (dic.TryGetValue(_index, out unit))
-                {
-                    unit.tag = _tag;
-                }
+            if (dic.TryGetValue(_index, out unit))
+            {
+                unit.tag = _tag;
             }
         }
 
         public void Remove(int _index, bool _toEnd)
         {
-            lock (dic)
+            SuperTweenUnit unit;
+
+            if (dic.TryGetValue(_index, out unit))
             {
-                SuperTweenUnit unit;
+                dic.Remove(_index);
 
-                if (dic.TryGetValue(_index, out unit))
+                if (unit.dele != null)
                 {
-                    dic.Remove(_index);
+                    toDic.Remove(unit.dele);
+                }
 
+                if (_toEnd)
+                {
                     if (unit.dele != null)
                     {
-                        toDic.Remove(unit.dele);
+                        unit.dele(unit.endValue);
                     }
 
-                    if (_toEnd)
+                    if (unit.endCallBack != null)
                     {
-                        if (unit.dele != null)
-                        {
-                            unit.dele(unit.endValue);
-                        }
-
-                        if (unit.endCallBack != null)
-                        {
-                            unit.endCallBack();
-                        }
+                        unit.endCallBack();
                     }
-
-                    unit.isRemoved = true;
                 }
+
+                ReleaseUnit(unit);
             }
         }
 
         public void RemoveAll(bool _toEnd)
         {
-            lock (dic)
+            Dictionary<int, SuperTweenUnit> tmpDic = dic;
+
+            dic = new Dictionary<int, SuperTweenUnit>();
+
+            toDic = new Dictionary<Action<float>, SuperTweenUnit>();
+
+            IEnumerator<SuperTweenUnit> enumerator = tmpDic.Values.GetEnumerator();
+
+            while (enumerator.MoveNext())
             {
-                Dictionary<int, SuperTweenUnit> tmpDic = dic;
+                SuperTweenUnit unit = enumerator.Current;
 
-                dic = new Dictionary<int, SuperTweenUnit>();
-
-                toDic = new Dictionary<Action<float>, SuperTweenUnit>();
-
-                IEnumerator<SuperTweenUnit> enumerator = tmpDic.Values.GetEnumerator();
-
-                while (enumerator.MoveNext())
+                if (_toEnd)
                 {
-                    SuperTweenUnit unit = enumerator.Current;
-
-                    if (_toEnd)
+                    if (unit.dele != null)
                     {
-                        if (unit.dele != null)
-                        {
-                            unit.dele(unit.endValue);
-                        }
-
-                        if (unit.endCallBack != null)
-                        {
-                            unit.endCallBack();
-                        }
+                        unit.dele(unit.endValue);
                     }
 
-                    unit.isRemoved = true;
+                    if (unit.endCallBack != null)
+                    {
+                        unit.endCallBack();
+                    }
                 }
+
+                ReleaseUnit(unit);
             }
         }
 
         public void RemoveWithTag(string _tag, bool _toEnd)
         {
-            lock (dic)
+            List<SuperTweenUnit> list = new List<SuperTweenUnit>();
+
+            IEnumerator<SuperTweenUnit> enumerator = dic.Values.GetEnumerator();
+
+            while (enumerator.MoveNext())
             {
-                List<SuperTweenUnit> list = new List<SuperTweenUnit>();
+                SuperTweenUnit unit = enumerator.Current;
+
+                if (unit.tag == _tag)
+                {
+                    list.Add(unit);
+                }
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                SuperTweenUnit unit = list[i];
+
+                dic.Remove(unit.index);
+
+                if (unit.dele != null)
+                {
+                    toDic.Remove(unit.dele);
+                }
+
+                if (!_toEnd)
+                {
+                    ReleaseUnit(unit);
+                }
+            }
+
+            if (_toEnd)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    SuperTweenUnit unit = list[i];
+
+                    if (unit.dele != null)
+                    {
+                        unit.dele(unit.endValue);
+                    }
+
+                    if (unit.endCallBack != null)
+                    {
+                        unit.endCallBack();
+                    }
+
+                    ReleaseUnit(unit);
+                }
+            }
+        }
+
+        public int DelayCall(float _time, Action _endCallBack, bool isFixed)
+        {
+            int result = GetIndex();
+
+            SuperTweenUnit unit = GetUnit();
+
+            unit.Init(result, 0, 0, _time, null, _endCallBack, isFixed);
+
+            dic.Add(result, unit);
+
+            return result;
+        }
+
+        public int NextFrameCall(Action _endCallBack)
+        {
+            int result = GetIndex();
+
+            SuperTweenUnit unit = GetUnit();
+
+            unit.Init(result, 0, 0, 0, null, _endCallBack, false);
+
+            dic.Add(result, unit);
+
+            return result;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (dic.Count > 0)
+            {
+                float nowTime = Time.time;
+
+                float nowUnscaleTime = Time.unscaledTime;
 
                 IEnumerator<SuperTweenUnit> enumerator = dic.Values.GetEnumerator();
 
@@ -137,148 +206,80 @@ namespace superTween
                 {
                     SuperTweenUnit unit = enumerator.Current;
 
-                    if (unit.tag != null && unit.tag.Equals(_tag))
+                    float tempTime = 0;
+
+                    if (unit.isFixed)
                     {
-                        list.Add(unit);
+                        tempTime = nowUnscaleTime;
                     }
-                }
-
-                for (int i = 0; i < list.Count; i++)
-                {
-                    SuperTweenUnit unit = list[i];
-
-                    dic.Remove(unit.index);
-
-                    if (unit.dele != null)
+                    else
                     {
-                        toDic.Remove(unit.dele);
+                        tempTime = nowTime;
                     }
 
-                    if (_toEnd)
+                    if (tempTime > unit.startTime + unit.time)
                     {
                         if (unit.dele != null)
                         {
-                            unit.dele(unit.endValue);
+                            toList.Add(unit.index, unit.endValue);
                         }
 
-                        if (unit.endCallBack != null)
+                        endList.Add(unit.index);
+                    }
+                    else if (unit.dele != null)
+                    {
+                        float value = unit.startValue + (unit.endValue - unit.startValue) * (tempTime - unit.startTime) / unit.time;
+
+                        toList.Add(unit.index, value);
+                    }
+                }
+
+                if (toList.Count > 0)
+                {
+                    IEnumerator<KeyValuePair<int, float>> enumerator2 = toList.GetEnumerator();
+
+                    while (enumerator2.MoveNext())
+                    {
+                        int index = enumerator2.Current.Key;
+
+                        SuperTweenUnit unit;
+
+                        if (dic.TryGetValue(index, out unit))
                         {
-                            unit.endCallBack();
+                            unit.dele(enumerator2.Current.Value);
                         }
                     }
 
-                    unit.isRemoved = true;
+                    toList.Clear();
                 }
-            }
-        }
 
-        public int DelayCall(float _time, Action _endCallBack, bool isFixed)
-        {
-            lock (dic)
-            {
-                int result = GetIndex();
-
-                SuperTweenUnit unit = new SuperTweenUnit();
-
-                unit.Init(result, 0, 0, _time, null, _endCallBack, isFixed);
-
-                dic.Add(result, unit);
-
-                return result;
-            }
-        }
-
-        public int NextFrameCall(Action _endCallBack)
-        {
-            lock (dic)
-            {
-                int result = GetIndex();
-
-                SuperTweenUnit unit = new SuperTweenUnit();
-
-                unit.Init(result, 0, 0, 0, null, _endCallBack, false);
-
-                dic.Add(result, unit);
-
-                return result;
-            }
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            lock (dic)
-            {
-                if (dic.Count > 0)
+                if (endList.Count > 0)
                 {
-                    float nowTime = Time.time;
-
-                    float nowUnscaleTime = Time.unscaledTime;
-
-                    IEnumerator<KeyValuePair<int, SuperTweenUnit>> enumerator = dic.GetEnumerator();
-
-                    while (enumerator.MoveNext())
+                    for (int i = 0; i < endList.Count; i++)
                     {
-                        SuperTweenUnit unit = enumerator.Current.Value;
+                        int index = endList[i];
 
-                        float tempTime = 0;
+                        SuperTweenUnit unit;
 
-                        if (unit.isFixed)
+                        if (dic.TryGetValue(index, out unit))
                         {
-                            tempTime = nowUnscaleTime;
-                        }
-                        else
-                        {
-                            tempTime = nowTime;
-                        }
+                            dic.Remove(index);
 
-                        if (tempTime > unit.startTime + unit.time)
-                        {
                             if (unit.dele != null)
                             {
-                                toList.Add(new KeyValuePair<SuperTweenUnit, float>(unit, unit.endValue));
-
                                 toDic.Remove(unit.dele);
                             }
 
-                            endList.Add(unit);
-                        }
-                        else if (unit.dele != null)
-                        {
-                            float value = unit.startValue + (unit.endValue - unit.startValue) * (tempTime - unit.startTime) / unit.time;
-
-                            toList.Add(new KeyValuePair<SuperTweenUnit, float>(unit, value));
-                        }
-                    }
-
-                    if (toList.Count > 0)
-                    {
-                        for (int i = 0; i < toList.Count; i++)
-                        {
-                            KeyValuePair<SuperTweenUnit, float> pair = toList[i];
-
-                            pair.Key.dele(pair.Value);
-                        }
-
-                        toList.Clear();
-                    }
-
-                    if (endList.Count > 0)
-                    {
-                        for (int i = 0; i < endList.Count; i++)
-                        {
-                            SuperTweenUnit unit = endList[i];
-
-                            dic.Remove(unit.index);
-
-                            if (!unit.isRemoved && unit.endCallBack != null)
+                            if (unit.endCallBack != null)
                             {
                                 unit.endCallBack();
                             }
-                        }
 
-                        endList.Clear();
+                            ReleaseUnit(unit);
+                        }
                     }
+
+                    endList.Clear();
                 }
             }
         }
@@ -290,6 +291,25 @@ namespace superTween
             index++;
 
             return result;
+        }
+
+        private Queue<SuperTweenUnit> pool = new Queue<SuperTweenUnit>();
+
+        private SuperTweenUnit GetUnit()
+        {
+            if (pool.Count > 0)
+            {
+                return pool.Dequeue();
+            }
+            else
+            {
+                return new SuperTweenUnit();
+            }
+        }
+
+        private void ReleaseUnit(SuperTweenUnit _unit)
+        {
+            pool.Enqueue(_unit);
         }
     }
 }

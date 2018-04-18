@@ -3,7 +3,7 @@ using System;
 
 namespace superTween
 {
-    public struct SuperTweenUnit
+    public class SuperTweenUnit
     {
         public int index;
 
@@ -20,8 +20,6 @@ namespace superTween
 
         public bool isFixed;
 
-        public bool isRemoved;
-
         public void Init(int _index, float _startValue, float _endValue, float _time, Action<float> _delegate, Action _endCallBack, bool _isFixed)
         {
             index = _index;
@@ -35,7 +33,7 @@ namespace superTween
 
             endCallBack = _endCallBack;
 
-            isRemoved = false;
+            tag = string.Empty;
 
             if (isFixed)
             {

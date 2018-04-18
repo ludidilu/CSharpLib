@@ -41,6 +41,15 @@ namespace superSequenceControl
             InitIEnumerator(ie, tmpIndex);
         }
 
+        public static void Start(Func<int, IEnumerator> _del, string _tag)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
+        }
+
         public static void Start<T1>(Func<int, T1, IEnumerator> _del, T1 _t1)
         {
             int tmpIndex = GetIndex();
@@ -48,6 +57,15 @@ namespace superSequenceControl
             IEnumerator ie = _del(tmpIndex, _t1);
 
             InitIEnumerator(ie, tmpIndex);
+        }
+
+        public static void Start<T1>(Func<int, T1, IEnumerator> _del, string _tag, T1 _t1)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
         }
 
         public static void Start<T1, T2>(Func<int, T1, T2, IEnumerator> _del, T1 _t1, T2 _t2)
@@ -59,6 +77,15 @@ namespace superSequenceControl
             InitIEnumerator(ie, tmpIndex);
         }
 
+        public static void Start<T1, T2>(Func<int, T1, T2, IEnumerator> _del, string _tag, T1 _t1, T2 _t2)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
+        }
+
         public static void Start<T1, T2, T3>(Func<int, T1, T2, T3, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3)
         {
             int tmpIndex = GetIndex();
@@ -66,6 +93,15 @@ namespace superSequenceControl
             IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3);
 
             InitIEnumerator(ie, tmpIndex);
+        }
+
+        public static void Start<T1, T2, T3>(Func<int, T1, T2, T3, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
         }
 
         public static void Start<T1, T2, T3, T4>(Func<int, T1, T2, T3, T4, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3, T4 _t4)
@@ -77,6 +113,15 @@ namespace superSequenceControl
             InitIEnumerator(ie, tmpIndex);
         }
 
+        public static void Start<T1, T2, T3, T4>(Func<int, T1, T2, T3, T4, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3, T4 _t4)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
+        }
+
         public static void Start<T1, T2, T3, T4, T5>(Func<int, T1, T2, T3, T4, T5, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5)
         {
             int tmpIndex = GetIndex();
@@ -84,6 +129,15 @@ namespace superSequenceControl
             IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5);
 
             InitIEnumerator(ie, tmpIndex);
+        }
+
+        public static void Start<T1, T2, T3, T4, T5>(Func<int, T1, T2, T3, T4, T5, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
         }
 
         public static void Start<T1, T2, T3, T4, T5, T6>(Func<int, T1, T2, T3, T4, T5, T6, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6)
@@ -95,6 +149,15 @@ namespace superSequenceControl
             InitIEnumerator(ie, tmpIndex);
         }
 
+        public static void Start<T1, T2, T3, T4, T5, T6>(Func<int, T1, T2, T3, T4, T5, T6, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5, _t6);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
+        }
+
         public static void Start<T1, T2, T3, T4, T5, T6, T7>(Func<int, T1, T2, T3, T4, T5, T6, T7, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7)
         {
             int tmpIndex = GetIndex();
@@ -102,6 +165,15 @@ namespace superSequenceControl
             IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5, _t6, _t7);
 
             InitIEnumerator(ie, tmpIndex);
+        }
+
+        public static void Start<T1, T2, T3, T4, T5, T6, T7>(Func<int, T1, T2, T3, T4, T5, T6, T7, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5, _t6, _t7);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
         }
 
         public static void Start<T1, T2, T3, T4, T5, T6, T7, T8>(Func<int, T1, T2, T3, T4, T5, T6, T7, T8, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7, T8 _t8)
@@ -113,6 +185,15 @@ namespace superSequenceControl
             InitIEnumerator(ie, tmpIndex);
         }
 
+        public static void Start<T1, T2, T3, T4, T5, T6, T7, T8>(Func<int, T1, T2, T3, T4, T5, T6, T7, T8, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7, T8 _t8)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5, _t6, _t7, _t8);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
+        }
+
         public static void Start<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Func<int, T1, T2, T3, T4, T5, T6, T7, T8, T9, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7, T8 _t8, T9 _t9)
         {
             int tmpIndex = GetIndex();
@@ -120,6 +201,15 @@ namespace superSequenceControl
             IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5, _t6, _t7, _t8, _t9);
 
             InitIEnumerator(ie, tmpIndex);
+        }
+
+        public static void Start<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Func<int, T1, T2, T3, T4, T5, T6, T7, T8, T9, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7, T8 _t8, T9 _t9)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5, _t6, _t7, _t8, _t9);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
         }
 
         public static void Start<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Func<int, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, IEnumerator> _del, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7, T8 _t8, T9 _t9, T10 _t10)
@@ -131,7 +221,21 @@ namespace superSequenceControl
             InitIEnumerator(ie, tmpIndex);
         }
 
+        public static void Start<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Func<int, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, IEnumerator> _del, string _tag, T1 _t1, T2 _t2, T3 _t3, T4 _t4, T5 _t5, T6 _t6, T7 _t7, T8 _t8, T9 _t9, T10 _t10)
+        {
+            int tmpIndex = GetIndex();
+
+            IEnumerator ie = _del(tmpIndex, _t1, _t2, _t3, _t4, _t5, _t6, _t7, _t8, _t9, _t10);
+
+            InitIEnumerator(ie, tmpIndex, _tag);
+        }
+
         private static void InitIEnumerator(IEnumerator _ie, int _index)
+        {
+            InitIEnumerator(_ie, _index, string.Empty);
+        }
+
+        private static void InitIEnumerator(IEnumerator _ie, int _index, string _tag)
         {
             Action dele = delegate ()
             {
@@ -141,7 +245,12 @@ namespace superSequenceControl
                 }
             };
 
-            SuperTween.Instance.NextFrameCall(dele);
+            int id = SuperTween.Instance.NextFrameCall(dele);
+
+            if (!string.IsNullOrEmpty(_tag))
+            {
+                SuperTween.Instance.SetTag(id, _tag);
+            }
         }
 
         public static void MoveNext(int _index)

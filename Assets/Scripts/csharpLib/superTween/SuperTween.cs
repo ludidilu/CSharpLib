@@ -28,7 +28,7 @@ namespace superTween
         {
             go = new GameObject("SuperTweenGameObject");
 
-            GameObject.DontDestroyOnLoad(go);
+            UnityEngine.Object.DontDestroyOnLoad(go);
 
             script = go.AddComponent<SuperTweenScript>();
         }
