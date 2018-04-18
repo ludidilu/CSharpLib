@@ -169,6 +169,11 @@ namespace superSequenceControl
 
         public static void To(float _start, float _end, float _time, Action<float> _del, int _index)
         {
+            To(_start, _end, _time, _del, _index, string.Empty);
+        }
+
+        public static void To(float _start, float _end, float _time, Action<float> _del, int _index, string _tag)
+        {
             Action dele = null;
 
             if (_index != 0)
@@ -179,17 +184,32 @@ namespace superSequenceControl
                 };
             }
 
-            SuperTween.Instance.To(_start, _end, _time, _del, dele);
+            int id = SuperTween.Instance.To(_start, _end, _time, _del, dele);
+
+            if (!string.IsNullOrEmpty(_tag))
+            {
+                SuperTween.Instance.SetTag(id, _tag);
+            }
         }
 
         public static void DelayCall(float _time, int _index)
+        {
+            DelayCall(_time, _index, string.Empty);
+        }
+
+        public static void DelayCall(float _time, int _index, string _tag)
         {
             Action dele = delegate ()
             {
                 MoveNext(_index);
             };
 
-            SuperTween.Instance.DelayCall(_time, dele);
+            int id = SuperTween.Instance.DelayCall(_time, dele);
+
+            if (!string.IsNullOrEmpty(_tag))
+            {
+                SuperTween.Instance.SetTag(id, _tag);
+            }
         }
     }
 }

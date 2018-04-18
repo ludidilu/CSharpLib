@@ -9,6 +9,7 @@ namespace superTween
         private Dictionary<int, SuperTweenUnit> dic = new Dictionary<int, SuperTweenUnit>();
 
         private Dictionary<Action<float>, SuperTweenUnit> toDic = new Dictionary<Action<float>, SuperTweenUnit>();
+
         private int index;
 
         private List<SuperTweenUnit> endList = new List<SuperTweenUnit>();
@@ -97,6 +98,7 @@ namespace superTween
                 Dictionary<int, SuperTweenUnit> tmpDic = dic;
 
                 dic = new Dictionary<int, SuperTweenUnit>();
+
                 toDic = new Dictionary<Action<float>, SuperTweenUnit>();
 
                 IEnumerator<SuperTweenUnit> enumerator = tmpDic.Values.GetEnumerator();
@@ -225,7 +227,8 @@ namespace superTween
                         {
                             tempTime = nowUnscaleTime;
                         }
-                        else {
+                        else
+                        {
                             tempTime = nowTime;
                         }
 
@@ -234,8 +237,6 @@ namespace superTween
                             if (unit.dele != null)
                             {
                                 toList.Add(new KeyValuePair<SuperTweenUnit, float>(unit, unit.endValue));
-
-                                //								unit.dele (unit.endValue);
 
                                 toDic.Remove(unit.dele);
                             }
@@ -247,8 +248,6 @@ namespace superTween
                             float value = unit.startValue + (unit.endValue - unit.startValue) * (tempTime - unit.startTime) / unit.time;
 
                             toList.Add(new KeyValuePair<SuperTweenUnit, float>(unit, value));
-
-                            //							unit.dele (value);
                         }
                     }
 
