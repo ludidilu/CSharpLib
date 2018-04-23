@@ -1,13 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
-using wwwManager;
 using thread;
 using System.Threading;
-using publicTools;
+using System.Text.RegularExpressions;
 
 public static class StaticData
 {
@@ -31,31 +29,6 @@ public static class StaticData
         }
 
         return data;
-    }
-
-    public static T GetDataOfKey<T>(string key, object keyValueParam) where T : CsvBase
-    {
-        Dictionary<int, T> dict = GetDic<T>();
-
-        Type type = typeof(T);
-
-        FieldInfo field = type.GetField(key);
-
-        IEnumerator<T> enumerator = dict.Values.GetEnumerator();
-
-        while (enumerator.MoveNext())
-        {
-            T item = enumerator.Current;
-
-            object keyValue = field.GetValue(item);
-
-            if (keyValue.Equals(keyValueParam))
-            {
-                return item;
-            }
-        }
-
-        return default(T);
     }
 
     public static Dictionary<int, T> GetDic<T>() where T : CsvBase
@@ -104,19 +77,14 @@ public static class StaticData
         return dict.ContainsKey(_id);
     }
 
-    public static void LoadCsvDataFromFile(Action _callBack, Func<byte[], Dictionary<Type, IDictionary>> _getDicCallBack)
+    public static void LoadCsvDataFromFile(byte[] _bytes, Action _callBack, Func<byte[], Dictionary<Type, IDictionary>> _getDicCallBack)
     {
         ParameterizedThreadStart cb2 = delegate (object obj)
         {
             dic = _getDicCallBack(obj as byte[]);
         };
 
-        Action<WWW> cb = delegate (WWW obj)
-        {
-            ThreadScript.Instance.Add(cb2, obj.bytes, _callBack);
-        };
-
-        WWWManager.Instance.Load(datName, cb);
+        ThreadScript.Instance.Add(cb2, _bytes, _callBack);
     }
 
     public static void Dispose()
@@ -151,7 +119,7 @@ public static class StaticData
                     {
                         if (i == 2)
                         {
-                            string[] dataArr = lineStr.Split(',');
+                            string[] dataArr = SplitCsvLine(lineStr);
 
                             infoArr = new FieldInfo[dataArr.Length];
 
@@ -162,7 +130,7 @@ public static class StaticData
                         }
                         else if (i > 2)
                         {
-                            string[] dataArr = lineStr.Split(',');
+                            string[] dataArr = SplitCsvLine(lineStr);
 
                             T csv = new T();
 
@@ -215,7 +183,7 @@ public static class StaticData
 
                 case "String":
 
-                    _info.SetValue(_csv, PublicTools.FixStringChangeLine(_data));
+                    _info.SetValue(_csv, FixStringChangeLine(_data));
 
                     break;
 
@@ -301,7 +269,7 @@ public static class StaticData
                         for (int i = 0; i < tmpStr.Length; i++)
                         {
 
-                            stringResult[i] = PublicTools.FixStringChangeLine(tmpStr[i]);
+                            stringResult[i] = FixStringChangeLine(tmpStr[i]);
                         }
                     }
                     else
@@ -420,5 +388,71 @@ public static class StaticData
 
             Console.WriteLine(str + "   " + e.ToString());
         }
+    }
+
+    private static string FixStringChangeLine(string _str)
+    {
+        return _str.Replace("\\n", "\n");
+    }
+
+    private static readonly Regex reg = new Regex("\".*?\"");
+
+    private static string[] SplitCsvLine(string _str)
+    {
+        List<KeyValuePair<string, string>> list = null;
+
+        int index = 0;
+
+        MatchEvaluator me = delegate (Match _match)
+        {
+            if (list == null)
+            {
+                list = new List<KeyValuePair<string, string>>();
+            }
+
+            string result = string.Format("$replace:{0}$", index);
+
+            string str = _match.Value.Substring(1, _match.Length - 2);
+
+            list.Add(new KeyValuePair<string, string>(result, str));
+
+            index++;
+
+            return result;
+        };
+
+        string strFix = reg.Replace(_str, me);
+
+        string[] final = strFix.Split(',');
+
+        if (list != null)
+        {
+            index = 0;
+
+            KeyValuePair<string, string> replaceData = list[index];
+
+            for (int i = 0; i < final.Length; i++)
+            {
+                string ss = final[i];
+
+                if (ss == replaceData.Key)
+                {
+                    final[i] = replaceData.Value;
+
+                    index++;
+
+                    if (index < list.Count)
+                    {
+                        replaceData = list[index];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return final;
     }
 }
