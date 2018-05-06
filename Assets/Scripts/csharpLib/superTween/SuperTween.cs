@@ -38,9 +38,9 @@ namespace superTween
             return To(_startValue, _endValue, _time, _delegate, _endCallBack, false);
         }
 
-        public int To(float _startValue, float _endValue, float _time, Action<float> _delegate, Action _endCallBack, bool isFixed)
+        public int To(float _startValue, float _endValue, float _time, Action<float> _delegate, Action _endCallBack, bool _isFixed)
         {
-            return script.To(_startValue, _endValue, _time, _delegate, _endCallBack, isFixed);
+            return script.To(_startValue, _endValue, _time, _delegate, _endCallBack, _isFixed);
         }
 
         public void Remove(int _index)
@@ -73,9 +73,9 @@ namespace superTween
             return DelayCall(_time, _endCallBack, false);
         }
 
-        public int DelayCall(float _time, Action _endCallBack, bool isFixed)
+        public int DelayCall(float _time, Action _endCallBack, bool _isFixed)
         {
-            return script.DelayCall(_time, _endCallBack, isFixed);
+            return script.DelayCall(_time, _endCallBack, _isFixed);
         }
 
         public int NextFrameCall(Action _endCallBack)
