@@ -317,30 +317,24 @@ namespace LitJson
 
                             if (ctx is JSONArray)
                             {
-
                                 if (tokenIsString)
                                 {
-
                                     ctx.Add(new JSONData(Token));
-
                                 }
-                                else {
-
+                                else
+                                {
                                     ctx.Add(GetJSONData(Token));
                                 }
 
                             }
                             else if (TokenName != "")
                             {
-
                                 if (tokenIsString)
                                 {
-
                                     ctx.Add(TokenName, new JSONData(Token));
-
                                 }
-                                else {
-
+                                else
+                                {
                                     ctx.Add(TokenName, GetJSONData(Token));
                                 }
                             }
@@ -378,30 +372,24 @@ namespace LitJson
                         {
                             if (ctx is JSONArray)
                             {
-
                                 if (tokenIsString)
                                 {
-
                                     ctx.Add(new JSONData(Token));
-
                                 }
-                                else {
-
+                                else
+                                {
                                     ctx.Add(GetJSONData(Token));
                                 }
 
                             }
                             else if (TokenName != "")
                             {
-
                                 if (tokenIsString)
                                 {
-
                                     ctx.Add(TokenName, new JSONData(Token));
-
                                 }
-                                else {
-
+                                else
+                                {
                                     ctx.Add(TokenName, GetJSONData(Token));
                                 }
                             }
@@ -460,37 +448,30 @@ namespace LitJson
 
         public static JSONData GetJSONData(string s)
         {
-
             bool boolResult;
 
             if (bool.TryParse(s, out boolResult))
             {
-
                 return new JSONData(boolResult);
-
             }
-            else {
-
+            else
+            {
                 int intResult;
 
                 if (int.TryParse(s, out intResult))
                 {
-
                     return new JSONData(intResult);
-
                 }
-                else {
-
+                else
+                {
                     float floatResult;
 
                     if (float.TryParse(s, out floatResult))
                     {
-
                         return new JSONData(floatResult);
-
                     }
-                    else {
-
+                    else
+                    {
                         return new JSONData(s);
                     }
                 }
@@ -886,6 +867,12 @@ namespace LitJson
             foreach (KeyValuePair<string, JSONNode> N in m_Dict)
                 yield return N;
         }
+
+        public IEnumerator<KeyValuePair<string, JSONNode>> GetEnumeratorReal()
+        {
+            return m_Dict.GetEnumerator();
+        }
+
         public override string ToString()
         {
             string result = "{";
