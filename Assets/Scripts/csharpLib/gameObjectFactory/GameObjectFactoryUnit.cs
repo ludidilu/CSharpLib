@@ -1,12 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 using assetManager;
-
 using System;
 
 namespace gameObjectFactory
 {
-
     public class GameObjectFactoryUnit
 	{
 		private string name;
