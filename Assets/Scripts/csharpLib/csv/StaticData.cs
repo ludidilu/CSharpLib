@@ -181,6 +181,19 @@ public static class StaticData
 
                     break;
 
+                case "Int64":
+
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        _info.SetValue(_csv, 0);
+                    }
+                    else
+                    {
+                        _info.SetValue(_csv, long.Parse(_data));
+                    }
+
+                    break;
+
                 case "String":
 
                     _info.SetValue(_csv, FixStringChangeLine(_data));
@@ -253,6 +266,30 @@ public static class StaticData
                     }
 
                     _info.SetValue(_csv, intResult);
+
+                    break;
+
+                case "Int64[]":
+
+                    long[] longResult;
+
+                    if (!string.IsNullOrEmpty(_data))
+                    {
+                        string[] strArr = _data.Split('$');
+
+                        longResult = new long[strArr.Length];
+
+                        for (int i = 0; i < strArr.Length; i++)
+                        {
+                            longResult[i] = long.Parse(strArr[i]);
+                        }
+                    }
+                    else
+                    {
+                        longResult = new long[0];
+                    }
+
+                    _info.SetValue(_csv, longResult);
 
                     break;
 

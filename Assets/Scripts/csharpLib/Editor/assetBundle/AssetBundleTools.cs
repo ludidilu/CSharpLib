@@ -1,97 +1,91 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
-
 using System;
 using assetManager;
 using System.Collections.Generic;
 using assetBundleManager;
 using System.IO;
-using System.Reflection;
-using UnityEngine.Rendering;
 using System.Threading;
 
-public class AssetBundleTools{
-
+public class AssetBundleTools
+{
     private const bool DELETE_OLD_FILES = false;
 
-	private static readonly BuildAssetBundleOptions BUILD_OPTION = BuildAssetBundleOptions.ChunkBasedCompression;
+    private static readonly BuildAssetBundleOptions BUILD_OPTION = BuildAssetBundleOptions.ChunkBasedCompression;
 
-//	private static readonly BuildAssetBundleOptions BUILD_OPTION = BuildAssetBundleOptions.UncompressedAssetBundle;
+    //	private static readonly BuildAssetBundleOptions BUILD_OPTION = BuildAssetBundleOptions.UncompressedAssetBundle;
 
-	[MenuItem("AssetBundle/清除所有选中对象的AssetBundle名字")]
-	public static void ClearSelectedAssetBundleName(){
+    [MenuItem("AssetBundle/清除所有选中对象的AssetBundle名字")]
+    public static void ClearSelectedAssetBundleName()
+    {
+        UnityEngine.Object[] objects = Selection.objects;
 
-		UnityEngine.Object[] objects = Selection.objects;
-		
-		foreach(UnityEngine.Object obj in objects){
-			
-			string path = AssetDatabase.GetAssetPath(obj);
+        foreach (UnityEngine.Object obj in objects)
+        {
+            string path = AssetDatabase.GetAssetPath(obj);
 
-			SetAssetBundleName(path,null);
-		}
+            SetAssetBundleName(path, null);
+        }
 
-		AssetDatabase.RemoveUnusedAssetBundleNames();
-	}
+        AssetDatabase.RemoveUnusedAssetBundleNames();
+    }
 
-	[MenuItem("AssetBundle/设置所有选中对象的AssetBundle名字")]
-	public static void SetSelectedAssetBundleName(){
-		
-		UnityEngine.Object[] objects = Selection.objects;
-		
-		foreach(UnityEngine.Object obj in objects){
-			
-			string path = AssetDatabase.GetAssetPath(obj);
+    [MenuItem("AssetBundle/设置所有选中对象的AssetBundle名字")]
+    public static void SetSelectedAssetBundleName()
+    {
+        UnityEngine.Object[] objects = Selection.objects;
 
-			SetAssetBundleName(path,obj.name);
-		}
-	}
+        foreach (UnityEngine.Object obj in objects)
+        {
+            string path = AssetDatabase.GetAssetPath(obj);
 
-	public static string GetAssetBundleName(string _path){
+            SetAssetBundleName(path, obj.name);
+        }
+    }
 
-		AssetImporter importer = AssetImporter.GetAtPath(_path);
+    public static string GetAssetBundleName(string _path)
+    {
+        AssetImporter importer = AssetImporter.GetAtPath(_path);
 
-		return importer.assetBundleName;
-	}
+        return importer.assetBundleName;
+    }
 
-	public static void SetAssetBundleName(string _path,string _name){
+    public static void SetAssetBundleName(string _path, string _name)
+    {
+        AssetImporter importer = AssetImporter.GetAtPath(_path);
 
-		AssetImporter importer = AssetImporter.GetAtPath(_path);
+        importer.assetBundleName = _name;
+    }
 
-		importer.assetBundleName = _name;
-	}
+    [MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:PC")]
+    public static void CreateAssetBundlePC()
+    {
+        AssetBundleManifest manifest = CreateAssetBundle(BUILD_OPTION, BuildTarget.StandaloneWindows64);
 
-	[MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:PC")]
-	public static void CreateAssetBundlePC(){
+        CreateAssetBundleDat(manifest, BUILD_OPTION, BuildTarget.StandaloneWindows64);
 
-//		CreateAssetBundleDat(null);
+        Debug.Log("AssetBundle生成成功！PC");
+    }
 
-		AssetBundleManifest manifest = CreateAssetBundle(BUILD_OPTION,BuildTarget.StandaloneWindows64);
-		
-		CreateAssetBundleDat(manifest,BUILD_OPTION,BuildTarget.StandaloneWindows64);
+    [MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:IOS")]
+    public static void CreateAssetBundleIOS()
+    {
+        AssetBundleManifest manifest = CreateAssetBundle(BUILD_OPTION, BuildTarget.iOS);
 
-		Debug.Log("AssetBundle生成成功！PC");
-	}
+        CreateAssetBundleDat(manifest, BUILD_OPTION, BuildTarget.iOS);
 
-	[MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:IOS")]
-	public static void CreateAssetBundleIOS(){
-		
-		AssetBundleManifest manifest = CreateAssetBundle(BUILD_OPTION,BuildTarget.iOS);
-		
-		CreateAssetBundleDat(manifest,BUILD_OPTION,BuildTarget.iOS);
+        Debug.Log("AssetBundle生成成功！IOS");
+    }
 
-		Debug.Log("AssetBundle生成成功！IOS");
-	}
+    [MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:Android")]
+    public static void CreateAssetBundleAndroid()
+    {
+        AssetBundleManifest manifest = CreateAssetBundle(BUILD_OPTION, BuildTarget.Android);
 
-	[MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:Android")]
-	public static void CreateAssetBundleAndroid(){
+        CreateAssetBundleDat(manifest, BUILD_OPTION, BuildTarget.Android);
 
-		AssetBundleManifest manifest = CreateAssetBundle(BUILD_OPTION,BuildTarget.Android);
-
-		CreateAssetBundleDat(manifest,BUILD_OPTION,BuildTarget.Android);
-
-		Debug.Log("AssetBundle生成成功！Android");
-	}
+        Debug.Log("AssetBundle生成成功！Android");
+    }
 
     [MenuItem("AssetBundle/打包生成AssetBundle以及依赖列表:Mac")]
     public static void CreateAssetBundleMac()
@@ -103,26 +97,28 @@ public class AssetBundleTools{
         Debug.Log("AssetBundle生成成功！Mac");
     }
 
-    private static void PrepareToBuildAssetBundle(){
+    private static void PrepareToBuildAssetBundle()
+    {
+        DirectoryInfo directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/" + AssetBundleManager.path);
 
-		DirectoryInfo directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/" + AssetBundleManager.path);
+        if (!directoryInfo.Exists)
+        {
+            directoryInfo.Create();
 
-		if(!directoryInfo.Exists){
+        }
+        else if (DELETE_OLD_FILES)
+        {
+            FileInfo[] fileInfos = directoryInfo.GetFiles();
 
-			directoryInfo.Create();
+            foreach (FileInfo fileInfo in fileInfos)
+            {
+                fileInfo.Delete();
+            }
+        }
+    }
 
-		}else if(DELETE_OLD_FILES){
-
-			FileInfo[] fileInfos = directoryInfo.GetFiles();
-
-			foreach(FileInfo fileInfo in fileInfos){
-
-				fileInfo.Delete();
-			}
-		}
-	}
-
-	private static AssetBundleManifest CreateAssetBundle(BuildAssetBundleOptions _option,BuildTarget _buildTarget){
+    private static AssetBundleManifest CreateAssetBundle(BuildAssetBundleOptions _option, BuildTarget _buildTarget)
+    {
 
 #if !USE_ASSETBUNDLE
 
@@ -131,84 +127,84 @@ public class AssetBundleTools{
 
         PrepareToBuildAssetBundle();
 
-		RenderSettings.fog = true;
-		
-		RenderSettings.fogMode = FogMode.Linear;
+        RenderSettings.fog = true;
 
-		LightmapData[] lightMaps = new LightmapData[1];
+        RenderSettings.fogMode = FogMode.Linear;
 
-		lightMaps[0] = new LightmapData();
+        LightmapData[] lightMaps = new LightmapData[1];
 
-		lightMaps[0].lightmapColor = new Texture2D(100,100);
+        lightMaps[0] = new LightmapData();
 
-		LightmapSettings.lightmaps = lightMaps;
+        lightMaps[0].lightmapColor = new Texture2D(100, 100);
 
-		LightmapSettings.lightmapsMode = LightmapsMode.NonDirectional;
+        LightmapSettings.lightmaps = lightMaps;
 
-		AssetBundleManifest manifest = BuildPipeline.BuildAssetBundles (Application.streamingAssetsPath + "/" + AssetBundleManager.path,_option,_buildTarget);
+        LightmapSettings.lightmapsMode = LightmapsMode.NonDirectional;
 
-		RenderSettings.fog = false;
+        AssetBundleManifest manifest = BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath + "/" + AssetBundleManager.path, _option, _buildTarget);
 
-		LightmapSettings.lightmaps = new LightmapData[0];
+        RenderSettings.fog = false;
 
-		return manifest;
-	}
+        LightmapSettings.lightmaps = new LightmapData[0];
 
-	private static void CreateAssetBundleDat(AssetBundleManifest manifest,BuildAssetBundleOptions _buildOptions,BuildTarget _buildTarget){
+        return manifest;
+    }
 
-		if(manifest == null){
+    private static void CreateAssetBundleDat(AssetBundleManifest manifest, BuildAssetBundleOptions _buildOptions, BuildTarget _buildTarget)
+    {
+        if (manifest == null)
+        {
+            return;
+        }
 
-			return;
-		}
+        string[] abs = manifest.GetAllAssetBundles();
 
-		string[] abs = manifest.GetAllAssetBundles ();
-		
-		AssetBundle[] aaaa = new AssetBundle[abs.Length];
-		
-		try{
-			
-			List<string> assetNames = new List<string> ();
-			
-			List<string> assetBundleNames = new List<string> ();
+        AssetBundle[] aaaa = new AssetBundle[abs.Length];
 
-			Dictionary<string,List<string>> result = new Dictionary<string, List<string>> ();
-			
-			for(int i = 0 ; i < abs.Length ; i++){
+        try
+        {
+            List<string> assetNames = new List<string>();
 
+            List<string> assetBundleNames = new List<string>();
+
+            Dictionary<string, List<string>> result = new Dictionary<string, List<string>>();
+
+            for (int i = 0; i < abs.Length; i++)
+            {
                 //AssetBundle ab = LoadAssetBundle("file:///" + Application.streamingAssetsPath + "/" + AssetBundleManager.path + abs[i]);
 
                 AssetBundle ab = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/" + AssetBundleManager.path + abs[i]);
 
                 aaaa[i] = ab;
-				
-				string[] strs = ab.GetAllAssetNames();
+
+                string[] strs = ab.GetAllAssetNames();
 
                 for (int m = 0; m < strs.Length; m++)
                 {
                     string str = strs[m];
-					
-					if(assetNames.Contains(str)){
-						
-						SuperDebug.LogError("error!");
-						
-					}else{
-						
-						assetNames.Add(str);
-						
-						assetBundleNames.Add(abs[i]);
 
-						List<string> ll = new List<string>();
-						
-						result.Add(str,ll);
-					}
-				}
-			}
-			
-			for (int i = 0; i < assetNames.Count; i++) {
-				
-				string assetName = assetNames[i];
-				string abName = assetBundleNames[i];
-				List<string> list = result[assetName];
+                    if (assetNames.Contains(str))
+                    {
+                        SuperDebug.LogError("error!");
+                    }
+                    else
+                    {
+                        assetNames.Add(str);
+
+                        assetBundleNames.Add(abs[i]);
+
+                        List<string> ll = new List<string>();
+
+                        result.Add(str, ll);
+                    }
+                }
+            }
+
+            for (int i = 0; i < assetNames.Count; i++)
+            {
+                string assetName = assetNames[i];
+                string abName = assetBundleNames[i];
+                List<string> list = result[assetName];
 
                 string[] strs = AssetDatabase.GetDependencies(assetName);
 
@@ -216,11 +212,11 @@ public class AssetBundleTools{
                 {
                     string tmpAssetName = strs[m].ToLower();
 
-                    if(tmpAssetName != assetName)
+                    if (tmpAssetName != assetName)
                     {
                         int index = assetNames.IndexOf(tmpAssetName);
 
-                        if(index != -1)
+                        if (index != -1)
                         {
                             string assetBundleName = assetBundleNames[index];
 
@@ -232,67 +228,67 @@ public class AssetBundleTools{
                         }
                     }
                 }
-			}
+            }
 
-			FileInfo fi = new FileInfo(Application.streamingAssetsPath + "/" + AssetManager.dataName);
+            FileInfo fi = new FileInfo(Application.streamingAssetsPath + "/" + AssetManager.dataName);
 
-			if(fi.Exists){
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
 
-				fi.Delete();
-			}
+            FileStream fs = fi.Create();
 
-			FileStream fs = fi.Create();
+            BinaryWriter bw = new BinaryWriter(fs);
 
-			BinaryWriter bw = new BinaryWriter(fs);
+            AssetManagerDataFactory.SetData(bw, assetNames, assetBundleNames, result);
 
-			AssetManagerDataFactory.SetData(bw,assetNames,assetBundleNames,result);
+            fs.Flush();
 
-			fs.Flush();
+            bw.Close();
 
-			bw.Close();
+            fs.Close();
 
-			fs.Close();
+            fs.Dispose();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("error:" + e.Message);
+        }
+        finally
+        {
+            foreach (AssetBundle aaa in aaaa)
+            {
+                aaa.Unload(true);
+            }
+        }
+    }
 
-			fs.Dispose();
+    private static AssetBundle LoadAssetBundle(string _path)
+    {
+        using (WWW www = new WWW(_path))
+        {
+            while (www.progress < 1)
+            {
+                Thread.Sleep(0);
+            }
 
-		}catch(Exception e){
-			
-			Debug.Log("error:" + e.Message);
-			
-		}finally{
-			
-			foreach (AssetBundle aaa in aaaa) {
-				
-				aaa.Unload (true);
-			}
-		}
-	}
+            AssetBundle ab = www.assetBundle;
 
-	private static AssetBundle LoadAssetBundle(string _path){
+            return ab;
+        }
+    }
 
-		using(WWW www = new WWW(_path)){
-		
-			while(www.progress < 1){
-				
-				Thread.Sleep(0);
-			}
-			
-			AssetBundle ab = www.assetBundle;
+    [MenuItem("AssetBundle/清除所有AssetBundle设置  千万不要乱点！！！")]
+    public static void ClearAllAssetBundleName()
+    {
+        string[] names = AssetDatabase.GetAllAssetBundleNames();
 
-			return ab;
-		}
-	}
+        foreach (string assetBundleName in names)
+        {
+            AssetDatabase.RemoveAssetBundleName(assetBundleName, true);
+        }
 
-	[MenuItem("AssetBundle/清除所有AssetBundle设置  千万不要乱点！！！")]
-	public static void ClearAllAssetBundleName(){
-		
-		string[] names = AssetDatabase.GetAllAssetBundleNames();
-		
-		foreach(string assetBundleName in names){
-			
-			AssetDatabase.RemoveAssetBundleName(assetBundleName,true);
-		}
-
-		AssetDatabase.RemoveUnusedAssetBundleNames();
-	}
+        AssetDatabase.RemoveUnusedAssetBundleNames();
+    }
 }
