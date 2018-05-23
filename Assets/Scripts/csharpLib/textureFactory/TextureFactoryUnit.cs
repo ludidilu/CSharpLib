@@ -4,64 +4,64 @@ using System.Collections.Generic;
 using assetManager;
 using System;
 
-namespace textureFactory{
+namespace textureFactory
+{
+    public class TextureFactoryUnit<T> : ITextureFactoryUnit where T : UnityEngine.Object
+    {
+        private string name;
+        private T data;
+        private int type = -1;
 
-	public class TextureFactoryUnit<T> :ITextureFactoryUnit where T:UnityEngine.Object {
+        private bool isDispose = false;
 
-		private string name;
-		private T data;
-		private int type = -1;
+        private List<Action<T>> callBackList = new List<Action<T>>();
 
-		private bool isDispose = false;
+        public TextureFactoryUnit(string _name)
+        {
+            name = _name;
+        }
 
-		private List<Action<T>> callBackList = new List<Action<T>>();
+        public T GetTexture(Action<T> _callBack)
+        {
+            if (type == -1)
+            {
+                type = 0;
 
-		public TextureFactoryUnit(string _name){
-			
-			name = _name;
-		}
-
-		public T GetTexture(Action<T> _callBack){
-
-			if (type == -1) {
-				
-				type = 0;
-				
-				callBackList.Add (_callBack);
+                callBackList.Add(_callBack);
 
                 AssetManager.Instance.GetAsset<T>(name, GetAsset);
 
                 return default(T);
+            }
+            else if (type == 0)
+            {
+                callBackList.Add(_callBack);
 
-            } else if (type == 0) {
-				
-				callBackList.Add (_callBack);
+                return default(T);
+            }
+            else
+            {
+                if (_callBack != null)
+                {
+                    _callBack(data);
+                }
 
-				return default(T);
-				
-			} else {
+                return data;
+            }
+        }
 
-				if(_callBack != null){
+        private void GetAsset(T _data)
+        {
+            if (isDispose)
+            {
+                Resources.UnloadAsset(_data);
 
-					_callBack(data);
-				}
+                return;
+            }
 
-				return data;
-			}
-		}
+            data = _data;
 
-		private void GetAsset(T _data){
-
-			if(isDispose){
-
-				Resources.UnloadAsset(_data);
-
-				return;
-			}
-
-			data = _data;
-
-			type = 1;
+            type = 1;
 
             for (int i = 0; i < callBackList.Count; i++)
             {
@@ -73,21 +73,21 @@ namespace textureFactory{
                 }
             }
 
-			callBackList.Clear();
-		}
+            callBackList.Clear();
+        }
 
-		public void Dispose(){
+        public void Dispose()
+        {
+            if (type == 1)
+            {
+                Resources.UnloadAsset(data);
 
-			if (type == 1) {
-				
-				Resources.UnloadAsset(data);
-
-				data = null;
-
-			}else{
-
-				isDispose = true;
-			}
-		}
-	}
+                data = null;
+            }
+            else
+            {
+                isDispose = true;
+            }
+        }
+    }
 }

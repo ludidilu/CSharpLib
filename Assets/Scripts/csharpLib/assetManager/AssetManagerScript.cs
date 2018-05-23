@@ -38,6 +38,13 @@ public class AssetManagerScript : MonoBehaviour
             asset[i] = request.allAssets[i] as T;
         }
 
-        _callBack(asset);
+        try
+        {
+            _callBack(asset);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("callback load asset error:" + e.ToString());
+        }
     }
 }
