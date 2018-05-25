@@ -77,7 +77,7 @@ namespace superList
 
         private bool hasSetContainerSize = false;//由于在setData之前就调用OnScroll方法会导致报错  所以确保在OnScroll之前就已经setDta了
 
-        public void SetData<T>(List<T> _data)
+        public void SetData<T>(IList<T> _data)
         {
             scrollRect.StopMovement();
 
@@ -227,11 +227,11 @@ namespace superList
             ResetPos(0, false, true);
         }
 
-        public void SetDataAndKeepLocation<T>(List<T> _data)
+        public void SetDataAndKeepLocation<T>(IList<T> _data)
         {
             float percent = curPercent;
 
-            SetData<T>(_data);
+            SetData(_data);
 
             curPercent = percent;
 
