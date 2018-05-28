@@ -995,7 +995,7 @@ namespace superList
 
             (_cell.transform as RectTransform).anchoredPosition = pos;
 
-            _cell.index = _index;
+            _cell.SetIndex(_index);
 
             //_cell.gameObject.name = unitName + _index;
 

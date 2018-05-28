@@ -14,7 +14,7 @@ namespace superList
         public CanvasGroup canvasGroup;
 
         [HideInInspector]
-        public int index;
+        public int index { private set; get; }
 
         protected SuperList superList;
 
@@ -43,6 +43,11 @@ namespace superList
             selected = _value;
 
             //由于Rect2DMask有bug  所以添加这2行2B代码
+        }
+
+        public virtual void SetIndex(int _index)
+        {
+            index = _index;
         }
 
         private int tweenID;
