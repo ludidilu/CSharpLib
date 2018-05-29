@@ -179,6 +179,19 @@ public static class SuperStaticData
 
                     break;
 
+                case "Int64":
+
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        _info.SetValue(_csv, 0);
+                    }
+                    else
+                    {
+                        _info.SetValue(_csv, long.Parse(_data));
+                    }
+
+                    break;
+
                 case "String":
 
                     _info.SetValue(_csv, FixStringChangeLine(_data));
@@ -234,7 +247,15 @@ public static class SuperStaticData
 
                     int[] intResult;
 
-                    if (!string.IsNullOrEmpty(_data))
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        intResult = new int[0];
+                    }
+                    else if (_data == "^")
+                    {
+                        intResult = new int[1];
+                    }
+                    else
                     {
                         string[] strArr = _data.Split('$');
 
@@ -245,12 +266,36 @@ public static class SuperStaticData
                             intResult[i] = int.Parse(strArr[i]);
                         }
                     }
-                    else
-                    {
-                        intResult = new int[0];
-                    }
 
                     _info.SetValue(_csv, intResult);
+
+                    break;
+
+                case "Int64[]":
+
+                    long[] longResult;
+
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        longResult = new long[0];
+                    }
+                    else if (_data == "^")
+                    {
+                        longResult = new long[1];
+                    }
+                    else
+                    {
+                        string[] strArr = _data.Split('$');
+
+                        longResult = new long[strArr.Length];
+
+                        for (int i = 0; i < strArr.Length; i++)
+                        {
+                            longResult[i] = long.Parse(strArr[i]);
+                        }
+                    }
+
+                    _info.SetValue(_csv, longResult);
 
                     break;
 
@@ -258,7 +303,15 @@ public static class SuperStaticData
 
                     string[] stringResult;
 
-                    if (!string.IsNullOrEmpty(_data))
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        stringResult = new string[0];
+                    }
+                    else if (_data == "^")
+                    {
+                        stringResult = new string[1];
+                    }
+                    else
                     {
                         string[] tmpStr = _data.Split('$');
 
@@ -269,10 +322,6 @@ public static class SuperStaticData
                             stringResult[i] = FixStringChangeLine(tmpStr[i]);
                         }
                     }
-                    else
-                    {
-                        stringResult = new string[0];
-                    }
 
                     _info.SetValue(_csv, stringResult);
 
@@ -282,7 +331,15 @@ public static class SuperStaticData
 
                     bool[] boolResult;
 
-                    if (!string.IsNullOrEmpty(_data))
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        boolResult = new bool[0];
+                    }
+                    else if (_data == "^")
+                    {
+                        boolResult = new bool[1];
+                    }
+                    else
                     {
                         string[] strArr = _data.Split('$');
 
@@ -293,10 +350,6 @@ public static class SuperStaticData
                             boolResult[i] = strArr[i] == "1" ? true : false;
                         }
                     }
-                    else
-                    {
-                        boolResult = new bool[0];
-                    }
 
                     _info.SetValue(_csv, boolResult);
 
@@ -306,7 +359,15 @@ public static class SuperStaticData
 
                     float[] floatResult;
 
-                    if (!string.IsNullOrEmpty(_data))
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        floatResult = new float[0];
+                    }
+                    else if (_data == "^")
+                    {
+                        floatResult = new float[1];
+                    }
+                    else
                     {
                         string[] strArr = _data.Split('$');
 
@@ -317,10 +378,6 @@ public static class SuperStaticData
                             floatResult[i] = float.Parse(strArr[i]);
                         }
                     }
-                    else
-                    {
-                        floatResult = new float[0];
-                    }
 
                     _info.SetValue(_csv, floatResult);
 
@@ -330,7 +387,15 @@ public static class SuperStaticData
 
                     double[] doubleResult;
 
-                    if (!string.IsNullOrEmpty(_data))
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        doubleResult = new double[0];
+                    }
+                    else if (_data == "^")
+                    {
+                        doubleResult = new double[1];
+                    }
+                    else
                     {
                         string[] strArr = _data.Split('$');
 
@@ -341,10 +406,6 @@ public static class SuperStaticData
                             doubleResult[i] = double.Parse(strArr[i]);
                         }
                     }
-                    else
-                    {
-                        doubleResult = new double[0];
-                    }
 
                     _info.SetValue(_csv, doubleResult);
 
@@ -354,7 +415,15 @@ public static class SuperStaticData
 
                     short[] shortResult;
 
-                    if (!string.IsNullOrEmpty(_data))
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        shortResult = new short[0];
+                    }
+                    else if (_data == "^")
+                    {
+                        shortResult = new short[1];
+                    }
+                    else
                     {
                         string[] strArr = _data.Split('$');
 
@@ -364,10 +433,6 @@ public static class SuperStaticData
                         {
                             shortResult[i] = short.Parse(strArr[i]);
                         }
-                    }
-                    else
-                    {
-                        shortResult = new short[0];
                     }
 
                     _info.SetValue(_csv, shortResult);
