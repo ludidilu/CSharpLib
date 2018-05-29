@@ -305,7 +305,6 @@ public static class StaticData
 
                         for (int i = 0; i < tmpStr.Length; i++)
                         {
-
                             stringResult[i] = FixStringChangeLine(tmpStr[i]);
                         }
                     }
